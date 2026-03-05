@@ -61,20 +61,21 @@ const products = [
   },
 ];
 
-const btnStyle: React.CSSProperties = {
-  width: "32px",
-  height: "32px",
+const arrowBtn: React.CSSProperties = {
+  width: "28px",
+  height: "28px",
   borderRadius: "50%",
   background: "#fff",
   border: "1px solid #e5e7eb",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: "18px",
+  fontSize: "14px",
   color: "#374151",
   transition: "all 0.2s ease",
+  padding: 0,
 };
 
 export default function NewProduct() {
@@ -105,10 +106,9 @@ export default function NewProduct() {
           >
             Produk Terbaru
           </h2>
-
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
             <button
-              style={btnStyle}
+              style={arrowBtn}
               onClick={() => swiperRef.current?.slidePrev()}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.background =
@@ -128,7 +128,7 @@ export default function NewProduct() {
               ‹
             </button>
             <button
-              style={btnStyle}
+              style={arrowBtn}
               onClick={() => swiperRef.current?.slideNext()}
               onMouseEnter={(e) => {
                 (e.currentTarget as HTMLButtonElement).style.background =
@@ -170,14 +170,18 @@ export default function NewProduct() {
                   overflow: "hidden",
                   background: "#fff",
                   cursor: "pointer",
-                  transition: "box-shadow 0.2s ease",
+                  transition: "box-shadow 0.3s ease, transform 0.3s ease", // ← tambah transform
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLDivElement).style.boxShadow =
                     "0 8px 24px rgba(0,0,0,0.1)";
+                  (e.currentTarget as HTMLDivElement).style.transform =
+                    "translateY(-4px)"; // ← naik sedikit
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLDivElement).style.transform =
+                    "translateY(0)"; // ← balik
                 }}
               >
                 {/* INFO DI ATAS */}
@@ -234,8 +238,6 @@ export default function NewProduct() {
                       {product.badge}
                     </span>
                   )}
-
-                  {/* ICON SAVE TOGGLE */}
                   <span
                     onClick={(e) => {
                       e.stopPropagation();
@@ -275,7 +277,6 @@ export default function NewProduct() {
                       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                     </svg>
                   </span>
-
                   <img
                     src={product.image}
                     alt={product.name}

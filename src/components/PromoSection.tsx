@@ -39,7 +39,8 @@ export default function PromoSection() {
               borderRadius: "14px",
               overflow: "hidden",
               height: "100%",
-              background: "#000",
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.15)",
             }}
           >
             <Swiper
@@ -55,7 +56,7 @@ export default function PromoSection() {
                 <SwiperSlide
                   key={index}
                   style={{
-                    background: "#000",
+                    background: "transparent",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -97,7 +98,7 @@ export default function PromoSection() {
                   borderRadius: "10px",
                   overflow: "hidden",
                   cursor: "pointer",
-                  background: "#000",
+                  background: "transparent",
                   outline:
                     activeIndex === index
                       ? "3px solid #60a5fa"

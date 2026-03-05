@@ -47,24 +47,23 @@ const products = [
   },
 ];
 
-const arrowBtn: React.CSSProperties = {
+const btnStyle: React.CSSProperties = {
   width: "36px",
   height: "36px",
+  minWidth: "36px",
+  flexShrink: 0,
   borderRadius: "50%",
   background: "#fff",
   border: "none",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: "20px",
+  fontSize: "16px",
+  padding: "0",
   color: "#374151",
   transition: "all 0.2s ease",
-  position: "absolute",
-  top: "50%",
-  transform: "translateY(-50%)",
-  zIndex: 10,
 };
 
 export default function TopProduct() {
@@ -72,23 +71,17 @@ export default function TopProduct() {
   const [saved, setSaved] = useState<boolean[]>(products.map(() => false));
 
   return (
-    <section style={{ background: "#072B50", padding: "60px 0" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 20px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "220px 1fr",
-            gap: "40px",
-            alignItems: "center",
-          }}
-        >
+    <section style={{ background: "#072B50", padding: "60px 20px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        {/* LAYOUT UTAMA - FLEXBOX */}
+        <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
           {/* KIRI - TEKS */}
-          <div>
+          <div style={{ minWidth: "180px", maxWidth: "180px" }}>
             <h2
               style={{
                 fontSize: "28px",
                 fontWeight: 800,
-                color: "#ffffff",
+                color: "#fff",
                 margin: "0 0 16px 0",
                 lineHeight: 1.2,
                 textTransform: "uppercase",
@@ -109,33 +102,32 @@ export default function TopProduct() {
             </p>
           </div>
 
-          {/* KANAN - SLIDER */}
-          <div style={{ position: "relative", overflow: "hidden" }}>
-            {/* ARROW PREV */}
-            <button
-              style={{ ...arrowBtn, left: "-18px" }}
-              onClick={() => swiperRef.current?.slidePrev()}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "#1e3a5f";
-                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "#fff";
-                (e.currentTarget as HTMLButtonElement).style.color = "#374151";
-              }}
-            >
-              ‹
-            </button>
+          {/* BUTTON PREV */}
+          <button
+            onClick={() => swiperRef.current?.slidePrev()}
+            style={btnStyle}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "#1e40af";
+              (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "#fff";
+              (e.currentTarget as HTMLButtonElement).style.color = "#374151";
+            }}
+          >
+            ❮
+          </button>
 
+          {/* SWIPER */}
+          <div style={{ flex: 1, minWidth: 0 }}>
             <Swiper
               onSwiper={(swiper) => (swiperRef.current = swiper)}
-              spaceBetween={16}
+              spaceBetween={14}
               slidesPerView={4}
               breakpoints={{
-                320: { slidesPerView: 1.2 },
-                640: { slidesPerView: 2.2 },
+                320: { slidesPerView: 2 },
+                640: { slidesPerView: 3 },
                 1024: { slidesPerView: 4 },
               }}
             >
@@ -147,22 +139,25 @@ export default function TopProduct() {
                       borderRadius: "12px",
                       overflow: "hidden",
                       cursor: "pointer",
-                      transition: "box-shadow 0.2s ease",
+                      transition: "box-shadow 0.3s ease, transform 0.3s ease",
                     }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLDivElement).style.boxShadow =
                         "0 8px 24px rgba(0,0,0,0.3)";
+                      (e.currentTarget as HTMLDivElement).style.transform =
+                        "translateY(-4px)";
                     }}
                     onMouseLeave={(e) => {
                       (e.currentTarget as HTMLDivElement).style.boxShadow =
                         "none";
+                      (e.currentTarget as HTMLDivElement).style.transform =
+                        "translateY(0)";
                     }}
                   >
-                    {/* IMAGE DI ATAS */}
+                    {/* IMAGE */}
                     <div
                       style={{ position: "relative", background: "#f9fafb" }}
                     >
-                      {/* SAVE ICON - bulat merah */}
                       <span
                         onClick={(e) => {
                           e.stopPropagation();
@@ -174,14 +169,14 @@ export default function TopProduct() {
                         }}
                         style={{
                           position: "absolute",
-                          top: "12px",
-                          left: "12px",
+                          top: "10px",
+                          left: "10px",
                           zIndex: 1,
                           cursor: "pointer",
                           background: saved[index] ? "#072B50" : "#e11d48",
                           borderRadius: "50%",
-                          width: "32px",
-                          height: "32px",
+                          width: "30px",
+                          height: "30px",
                           boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
                           display: "flex",
                           alignItems: "center",
@@ -191,8 +186,8 @@ export default function TopProduct() {
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
+                          width="14"
+                          height="14"
                           viewBox="0 0 24 24"
                           fill={saved[index] ? "#fff" : "none"}
                           stroke="#fff"
@@ -203,37 +198,36 @@ export default function TopProduct() {
                           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                         </svg>
                       </span>
-
                       <img
                         src={product.image}
                         alt={product.name}
                         style={{
                           width: "100%",
-                          height: "200px",
+                          height: "180px",
                           objectFit: "contain",
                           display: "block",
-                          padding: "16px",
+                          padding: "14px",
                         }}
                       />
                     </div>
 
-                    {/* INFO DI BAWAH */}
-                    <div style={{ padding: "14px" }}>
+                    {/* INFO */}
+                    <div style={{ padding: "12px" }}>
                       <p
                         style={{
-                          fontSize: "12px",
+                          fontSize: "11px",
                           color: "#9ca3af",
-                          margin: "0 0 6px 0",
+                          margin: "0 0 4px 0",
                         }}
                       >
                         {product.category}
                       </p>
                       <p
                         style={{
-                          fontSize: "15px",
+                          fontSize: "13px",
                           fontWeight: 700,
                           color: "#111827",
-                          margin: "0 0 6px 0",
+                          margin: "0 0 4px 0",
                           lineHeight: 1.3,
                         }}
                       >
@@ -241,29 +235,27 @@ export default function TopProduct() {
                       </p>
                       <p
                         style={{
-                          fontSize: "12px",
+                          fontSize: "11px",
                           color: "#9ca3af",
-                          margin: "0 0 14px 0",
+                          margin: "0 0 12px 0",
                           lineHeight: 1.5,
                         }}
                       >
                         {product.spec}
                       </p>
-
-                      {/* HARGA & RATING */}
                       <div
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "flex-end",
                           borderTop: "1px solid #f3f4f6",
-                          paddingTop: "12px",
+                          paddingTop: "10px",
                         }}
                       >
                         <div>
                           <p
                             style={{
-                              fontSize: "11px",
+                              fontSize: "10px",
                               color: "#9ca3af",
                               margin: "0 0 2px 0",
                             }}
@@ -272,7 +264,7 @@ export default function TopProduct() {
                           </p>
                           <p
                             style={{
-                              fontSize: "14px",
+                              fontSize: "13px",
                               fontWeight: 700,
                               color: "#ef4444",
                               margin: 0,
@@ -284,7 +276,7 @@ export default function TopProduct() {
                         <div style={{ textAlign: "right" }}>
                           <p
                             style={{
-                              fontSize: "11px",
+                              fontSize: "10px",
                               color: "#9ca3af",
                               margin: "0 0 2px 0",
                             }}
@@ -293,7 +285,7 @@ export default function TopProduct() {
                           </p>
                           <p
                             style={{
-                              fontSize: "14px",
+                              fontSize: "13px",
                               fontWeight: 600,
                               color: "#111827",
                               margin: 0,
@@ -308,25 +300,24 @@ export default function TopProduct() {
                 </SwiperSlide>
               ))}
             </Swiper>
-
-            {/* ARROW NEXT */}
-            <button
-              style={{ ...arrowBtn, right: "0px" }}
-              onClick={() => swiperRef.current?.slideNext()}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "#1e3a5f";
-                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "#fff";
-                (e.currentTarget as HTMLButtonElement).style.color = "#374151";
-              }}
-            >
-              ›
-            </button>
           </div>
+
+          {/* BUTTON NEXT */}
+          <button
+            onClick={() => swiperRef.current?.slideNext()}
+            style={btnStyle}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "#1e40af";
+              (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "#fff";
+              (e.currentTarget as HTMLButtonElement).style.color = "#374151";
+            }}
+          >
+            ❯
+          </button>
         </div>
       </div>
     </section>

@@ -39,7 +39,7 @@ export default function Register() {
           background: `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(${heroBg}) center/cover no-repeat`,
           display: "flex",
           alignItems: "center",
-          justifyContent: "flex-end",
+          justifyContent: "center",
           padding: "40px 80px",
         }}
       >

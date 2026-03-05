@@ -74,6 +74,8 @@ export default function CategorySection() {
     { name: "Mouse", image: mouseImg },
     { name: "Komputer", image: pcImg },
     { name: "Handphone", image: handphoneImg },
+    { name: "Handphone", image: handphoneImg },
+    { name: "Handphone", image: handphoneImg },
   ];
 
   return (
@@ -97,14 +99,14 @@ export default function CategorySection() {
         <Swiper
           modules={[Navigation]}
           navigation
-          spaceBetween={10}
-          slidesPerView={5}
+          spaceBetween={0}
+          slidesPerView={7}
           className="category-swiper"
-          style={{ overflow: "visible" }}
+          style={{ overflow: "hidden" }}
           breakpoints={{
-            320: { slidesPerView: 2.2, spaceBetween: 8 },
-            640: { slidesPerView: 3, spaceBetween: 10 },
-            1024: { slidesPerView: 5, spaceBetween: 10 },
+            320: { slidesPerView: 3, spaceBetween: 0 },
+            640: { slidesPerView: 5, spaceBetween: 0 },
+            1024: { slidesPerView: 7, spaceBetween: 0 },
           }}
         >
           {categories.map((item, index) => (

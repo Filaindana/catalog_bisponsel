@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import logoImg from "../assets/logo.png";
 import {
   Facebook,
@@ -11,10 +12,18 @@ import {
 } from "lucide-react";
 
 export default function Footer() {
+  const navigate = useNavigate();
+
+  const links = [
+    { label: "Beranda", path: "/" },
+    { label: "Produk", path: "/product" },
+    { label: "Promo", path: "/promo" },
+    { label: "Kontak", path: "/contact" },
+  ];
+
   return (
     <footer style={{ background: "#072B50", padding: "50px 0 0 0" }}>
       <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 20px" }}>
-        {/* TOP SECTION */}
         <div
           style={{
             display: "grid",
@@ -81,32 +90,31 @@ export default function Footer() {
                 gap: "10px",
               }}
             >
-              {["Beranda", "Produk", "Promo", "Tentang Kami", "Kontak"].map(
-                (item) => (
-                  <li key={item}>
-                    <a
-                      href="#"
-                      style={{
-                        fontSize: "13px",
-                        color: "#93c5fd",
-                        textDecoration: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                        transition: "color 0.2s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "#ffffff")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "#93c5fd")
-                      }
-                    >
-                      <span style={{ color: "#3b82f6" }}>›</span> {item}
-                    </a>
-                  </li>
-                ),
-              )}
+              {links.map((item) => (
+                <li key={item.label}>
+                  <span
+                    onClick={() => navigate(item.path)}
+                    style={{
+                      fontSize: "13px",
+                      color: "#93c5fd",
+                      textDecoration: "none",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      transition: "color 0.2s ease",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.color = "#ffffff")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.color = "#93c5fd")
+                    }
+                  >
+                    <span style={{ color: "#3b82f6" }}>›</span> {item.label}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -254,9 +262,8 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      {/* ← tutup maxWidth di sini */}
 
-      {/* BOTTOM BAR - di luar maxWidth agar full width */}
+      {/* BOTTOM BAR */}
       <div
         style={{
           background: "#302EA6",

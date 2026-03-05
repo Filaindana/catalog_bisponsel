@@ -36,8 +36,9 @@ export default function HeroHighlight() {
     >
       <div
         style={{
-          background: "#072B50",
-          borderRadius: "14px",
+          background:
+            "linear-gradient(90deg, #072B50 0%, #1e40af 50%, #7c3aed 100%)",
+          borderRadius: "7px",
           padding: "22px 30px",
           display: "flex",
           justifyContent: "space-between",

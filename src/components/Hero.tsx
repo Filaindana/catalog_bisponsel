@@ -1,6 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import heroImg from "../assets/hero1.jpg";
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section
       style={{
@@ -43,7 +46,16 @@ export default function Hero() {
             }}
           >
             Solusi Teknologi{" "}
-            <span style={{ color: "#DC2626" }}>Terpercaya </span>
+            <span
+              style={{
+                background: "linear-gradient(90deg, #3b82f6, #8b5cf6)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Terpercaya{" "}
+            </span>
             <br />
             untuk Bisnis Anda
           </h1>
@@ -53,6 +65,7 @@ export default function Hero() {
               fontSize: "18px",
               color: "#e5e7eb",
               marginBottom: "30px",
+              lineHeight: 1.7,
             }}
           >
             PT Indo Bismar menghadirkan produk IT dan perangkat teknologi
@@ -60,9 +73,39 @@ export default function Hero() {
             Indonesia.
           </p>
 
-          <button className="hero-btn">
+          <button
+            onClick={() => navigate("/product")}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "14px 28px",
+              borderRadius: "50px",
+              background: "#fff",
+              color: "#072B50",
+              fontSize: "15px",
+              fontWeight: 700,
+              border: "2px solid #fff",
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+              outline: "none",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "#072B50";
+              (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+              (e.currentTarget as HTMLButtonElement).style.border =
+                "2px solid #fff";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "#fff";
+              (e.currentTarget as HTMLButtonElement).style.color = "#072B50";
+              (e.currentTarget as HTMLButtonElement).style.border =
+                "2px solid #fff";
+            }}
+          >
             Lihat Detail
-            <span>→</span>
+            <span style={{ fontSize: "16px" }}>›</span>
           </button>
         </div>
       </div>

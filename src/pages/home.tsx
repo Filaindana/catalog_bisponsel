@@ -5,6 +5,7 @@ import HeroHighlight from "../components/HeroHighlight";
 import NewProduct from "../components/NewProduct";
 import TopProduct from "../components/TopProduct";
 import BrandTersedia from "../components/BrandTersedia";
+import PromoHariIni from "../components/PromoHariIni";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
       <Hero />
       <HeroHighlight />
       <CategorySection />
+      <PromoHariIni />
       <PromoSection />
       <NewProduct />
       <TopProduct />

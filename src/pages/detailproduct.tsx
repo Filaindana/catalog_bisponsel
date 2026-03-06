@@ -10,6 +10,7 @@ import mouseImg from "../assets/mouse.png";
 import keyboardImg from "../assets/keyboard.png";
 import soundImg from "../assets/sound.png";
 import monitorImg from "../assets/monitor.png";
+import ProductCard from "../components/ProductCard";
 
 const product = {
   name: "PC Gaming Pro Ryzen Edition",
@@ -594,153 +595,11 @@ export default function DetailProduct() {
               >
                 {relatedProducts.map((item, index) => (
                   <SwiperSlide key={item.id}>
-                    <div
-                      style={{
-                        background: "#fff",
-                        borderRadius: "12px",
-                        overflow: "hidden",
-                        border: "1px solid #e5e7eb",
-                        cursor: "pointer",
-                        transition: "box-shadow 0.2s ease",
-                      }}
-                      onMouseEnter={(e) =>
-                        ((e.currentTarget as HTMLDivElement).style.boxShadow =
-                          "0 8px 24px rgba(0,0,0,0.1)")
-                      }
-                      onMouseLeave={(e) =>
-                        ((e.currentTarget as HTMLDivElement).style.boxShadow =
-                          "none")
-                      }
-                    >
-                      <div
-                        style={{ position: "relative", background: "#f9fafb" }}
-                      >
-                        <span
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSaved((prev) => {
-                              const u = [...prev];
-                              u[index] = !u[index];
-                              return u;
-                            });
-                          }}
-                          style={{
-                            position: "absolute",
-                            top: "8px",
-                            left: "8px",
-                            zIndex: 1,
-                            cursor: "pointer",
-                            background: saved[index] ? "#e11d48" : "#fff",
-                            borderRadius: "50%",
-                            width: "26px",
-                            height: "26px",
-                            boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            transition: "all 0.2s ease",
-                          }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="13"
-                            height="13"
-                            viewBox="0 0 24 24"
-                            fill={saved[index] ? "#fff" : "none"}
-                            stroke={saved[index] ? "#fff" : "#374151"}
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                          </svg>
-                        </span>
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          style={{
-                            width: "100%",
-                            height: "130px",
-                            objectFit: "contain",
-                            display: "block",
-                            padding: "10px",
-                          }}
-                        />
-                      </div>
-                      <div style={{ padding: "10px" }}>
-                        <p
-                          style={{
-                            fontSize: "10px",
-                            color: "#6b7280",
-                            margin: "0 0 4px 0",
-                          }}
-                        >
-                          {item.category}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            color: "#111827",
-                            margin: "0 0 8px 0",
-                            lineHeight: 1.3,
-                          }}
-                        >
-                          {item.name}
-                        </p>
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            borderTop: "1px solid #f3f4f6",
-                            paddingTop: "8px",
-                          }}
-                        >
-                          <div>
-                            <p
-                              style={{
-                                fontSize: "9px",
-                                color: "#9ca3af",
-                                margin: "0 0 2px 0",
-                              }}
-                            >
-                              Harga
-                            </p>
-                            <p
-                              style={{
-                                fontSize: "11px",
-                                fontWeight: 700,
-                                color: "#ef4444",
-                                margin: 0,
-                              }}
-                            >
-                              {formatPrice(item.price)}
-                            </p>
-                          </div>
-                          <div style={{ textAlign: "right" }}>
-                            <p
-                              style={{
-                                fontSize: "9px",
-                                color: "#9ca3af",
-                                margin: "0 0 2px 0",
-                              }}
-                            >
-                              Review
-                            </p>
-                            <p
-                              style={{
-                                fontSize: "11px",
-                                fontWeight: 600,
-                                color: "#111827",
-                                margin: 0,
-                              }}
-                            >
-                              ⭐ {item.rating}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ProductCard
+                      product={{ id: item.id, category: item.category, name: item.name, price: formatPrice(item.price), rating: item.rating, image: item.image }}
+                      saved={saved[index]}
+                      onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+                    />
                   </SwiperSlide>
                 ))}
               </Swiper>

@@ -14,11 +14,11 @@ import handphoneImg from "/src/assets/handphone.png";
 const swiperStyles = `
   .category-swiper .swiper-button-prev,
   .category-swiper .swiper-button-next {
-    width: 38px;
-    height: 38px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border: 1px solid #e5e7eb;
     color: #374151;
     transition: all 0.25s ease;
@@ -35,7 +35,7 @@ const swiperStyles = `
 
   .category-swiper .swiper-button-prev::after,
   .category-swiper .swiper-button-next::after {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 700;
   }
 
@@ -55,8 +55,8 @@ const swiperStyles = `
 
   .category-swiper .swiper-slide > div:hover .category-circle {
     background: #eef2ff !important;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
     border-color: #c7d2fe !important;
   }
 
@@ -86,16 +86,16 @@ export default function CategorySection() {
       <h2
         style={{
           textAlign: "center",
-          marginBottom: "30px",
-          fontSize: "26px",
-          fontWeight: 600,
+          marginBottom: "36px",
+          fontSize: "28px",
+          fontWeight: 700,
         }}
       >
         Product Category
       </h2>
 
-      {/* FULL WIDTH tapi arrow dikasih padding dari tepi */}
-      <div style={{ padding: "0 50px", position: "relative" }}>
+      {/* FULL WIDTH dengan arrow di tepi */}
+      <div style={{ padding: "0 60px", position: "relative" }}>
         <Swiper
           modules={[Navigation]}
           navigation
@@ -116,17 +116,17 @@ export default function CategorySection() {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
-                  gap: "8px",
+                  gap: "12px",
                   cursor: "pointer",
-                  padding: "10px 0",
+                  padding: "14px 0",
                 }}
               >
                 {/* CIRCLE */}
                 <div
                   className="category-circle"
                   style={{
-                    width: "75px",
-                    height: "75px",
+                    width: "100px",
+                    height: "100px",
                     borderRadius: "50%",
                     background: "#f3f4f6",
                     display: "flex",
@@ -141,8 +141,8 @@ export default function CategorySection() {
                     src={item.image}
                     alt={item.name}
                     style={{
-                      width: "60%",
-                      height: "60%",
+                      width: "65%",
+                      height: "65%",
                       objectFit: "contain",
                     }}
                   />
@@ -150,8 +150,8 @@ export default function CategorySection() {
 
                 <span
                   style={{
-                    fontSize: "13px",
-                    fontWeight: 500,
+                    fontSize: "15px",
+                    fontWeight: 600,
                     textAlign: "center",
                     color: "#374151",
                   }}

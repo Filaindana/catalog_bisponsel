@@ -16,8 +16,8 @@ function WithNavbar() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/product" element={<Product />} />
         <Route path="/promo" element={<Promo />} />
+        <Route path="/product" element={<Product />} />
         <Route path="/product/:id" element={<DetailProduct />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>

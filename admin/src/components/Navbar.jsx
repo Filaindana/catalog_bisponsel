@@ -1,7 +1,7 @@
 import { Bell, Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
-const breadcrumbMap: Record<string, string> = {
+const breadcrumbMap = {
   "/dashboard": "Dashboard",
   "/produk": "Produk",
   "/promo": "Promo",
@@ -64,7 +64,7 @@ export default function Navbar() {
             background: "#f8fafc",
             fontSize: "13px",
             outline: "none",
-            boxSizing: "border-box" as const,
+            boxSizing: "border-box",
             color: "#374151",
           }}
         />

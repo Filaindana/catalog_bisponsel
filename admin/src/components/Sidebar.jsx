@@ -111,14 +111,10 @@ export default function Sidebar() {
                 fontSize: "14px",
               }}
               onMouseEnter={(e) => {
-                if (!isActive)
-                  (e.currentTarget as HTMLDivElement).style.background =
-                    "#f1f5f9";
+                if (!isActive) e.currentTarget.style.background = "#f1f5f9";
               }}
               onMouseLeave={(e) => {
-                if (!isActive)
-                  (e.currentTarget as HTMLDivElement).style.background =
-                    "transparent";
+                if (!isActive) e.currentTarget.style.background = "transparent";
               }}
             >
               {menu.icon}
@@ -148,12 +144,9 @@ export default function Sidebar() {
             fontSize: "14px",
             transition: "all 0.2s ease",
           }}
-          onMouseEnter={(e) =>
-            ((e.currentTarget as HTMLDivElement).style.background = "#fef2f2")
-          }
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#fef2f2")}
           onMouseLeave={(e) =>
-            ((e.currentTarget as HTMLDivElement).style.background =
-              "transparent")
+            (e.currentTarget.style.background = "transparent")
           }
         >
           <LogOut size={18} />

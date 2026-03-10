@@ -7,7 +7,7 @@ import Promo from "./pages/Promo";
 import Cabang from "./pages/Cabang";
 import Pengaturan from "./pages/Pengaturan";
 
-function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayout({ children }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f1f5f9" }}>
       <Sidebar />

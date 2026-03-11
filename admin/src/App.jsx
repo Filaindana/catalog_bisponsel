@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar.jsx";
 import Dashboard from "./pages/Dashboard";
 import Produk from "./pages/Produk";
 import Promo from "./pages/Promo";

@@ -243,15 +243,15 @@ export default function Footer() {
                     boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.transform =
+                    e.currentTarget.style.transform =
                       "translateY(-3px)";
-                    (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                    e.currentTarget.style.boxShadow =
                       "0 8px 20px rgba(0,0,0,0.35)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.transform =
+                    e.currentTarget.style.transform =
                       "translateY(0)";
-                    (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                    e.currentTarget.style.boxShadow =
                       "0 4px 12px rgba(0,0,0,0.25)";
                   }}
                 >

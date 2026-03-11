@@ -1,14 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/Footer.jsx";
 
-import Home from "./pages/home";
-import Product from "./pages/product";
-import Promo from "./pages/promo";
-import DetailProduct from "./pages/detailproduct";
-import Contact from "./pages/contact";
-import Login from "./pages/login";
-import Register from "./pages/register";
+import Home from "./pages/home.jsx";
+import Product from "./pages/product.jsx";
+import Promo from "./pages/promo.jsx";
+import DetailProduct from "./pages/detailproduct.jsx";
+import Contact from "./pages/contact.jsx";
+import Login from "./pages/login.jsx";
+import Register from "./pages/register.jsx";
 
 function WithNavbar() {
   return (

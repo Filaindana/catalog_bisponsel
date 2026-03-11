@@ -64,9 +64,7 @@ const branches = [
 ];
 
 export default function Contact() {
-  const [selectedBranch, setSelectedBranch] = useState<
-    (typeof branches)[0] | null
-  >(null);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
   return (
     <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
@@ -483,11 +481,11 @@ export default function Contact() {
                   transition: "background 0.2s ease",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background =
+                  e.currentTarget.style.background =
                     "#0e3d6e";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.background =
+                  e.currentTarget.style.background =
                     "#072B50";
                 }}
               >

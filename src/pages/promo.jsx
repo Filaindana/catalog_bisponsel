@@ -87,10 +87,11 @@ const promoBundling = [
   },
 ];
 
-const formatPrice = (price: number) =>
+const formatPrice = (price) =>
   "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
 
 export default function Promo() {
+
   const navigate = useNavigate();
 
   return (
@@ -193,7 +194,7 @@ export default function Promo() {
               gap: "20px",
             }}
           >
-            {promoSatuan.map((promo) => (
+            {promoSatuan.map((promo, index) => (
               <div
                 key={promo.id}
                 style={{
@@ -205,15 +206,15 @@ export default function Promo() {
                   cursor: "pointer",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                  e.currentTarget.style.boxShadow =
                     "0 12px 32px rgba(0,0,0,0.12)";
-                  (e.currentTarget as HTMLDivElement).style.transform =
+                  e.currentTarget.style.transform =
                     "translateY(-4px)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.boxShadow =
+                  e.currentTarget.style.boxShadow =
                     "0 2px 8px rgba(0,0,0,0.06)";
-                  (e.currentTarget as HTMLDivElement).style.transform =
+                  e.currentTarget.style.transform =
                     "translateY(0)";
                 }}
               >

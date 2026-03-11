@@ -90,11 +90,14 @@ const brandStyles = `
 `;
 
 export default function BrandSection() {
+
   return (
     <section className="brand-section">
       <style>{brandStyles}</style>
 
-      <p className="brand-title">Brand Tersedia</p>
+      <h2 className="section-title" style={{ textAlign: "center", marginBottom: "32px" }}>
+        Brand Tersedia
+      </h2>
 
       <div className="brand-grid">
         {brands.map((brand, index) => (

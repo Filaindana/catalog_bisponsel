@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import produkImg from "../assets/monitor.png";
-import ProductCard from "./ProductCard";
+import ProductCard from "./ProductCard.jsx";
 
 const products = [
   { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
@@ -21,6 +21,7 @@ const css = `
     cursor: default;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    padding: 8px 12px 16px;
   }
   .np-scroll-track::-webkit-scrollbar { display: none; }
 
@@ -126,22 +127,24 @@ const css = `
 `;
 
 export default function NewProduct() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [saved, setSaved] = useState<boolean[]>(products.map(() => false));
+
+  const scrollRef = useRef(null);
+  const cardsRef = useRef(null);
+  const [saved, setSaved] = useState(products.map(() => false));
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
-  const onMouseDown = (e: React.MouseEvent) => {
+  const onMouseDown = (e) => {
     // hanya drag jika klik di area gambar (.np-img-wrap)
-    const target = e.target as HTMLElement;
+    const target = e.target;
     if (!target.closest(".np-img-wrap")) return;
     isDragging.current = true;
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
   };
 
-  const onMouseMove = (e: React.MouseEvent) => {
+  const onMouseMove = (e) => {
     if (!isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
@@ -151,7 +154,7 @@ export default function NewProduct() {
 
   const stopDrag = () => { isDragging.current = false; };
 
-  const scrollBy = (dir: number) => {
+  const scrollBy = (dir) => {
     if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
   };
 
@@ -163,7 +166,7 @@ export default function NewProduct() {
         {/* HEADER */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
           <div>
-            <h2 style={{ fontSize: "26px", fontWeight: 700, color: "#111827", margin: 0, borderLeft: "5px solid #072B50", paddingLeft: "14px" }}>
+            <h2 className="section-title" style={{ margin: 0, borderLeft: "5px solid #072B50", paddingLeft: "14px" }}>
               Produk Terbaru
             </h2>
             <div className="np-hint" style={{ paddingLeft: "19px", display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#9ca3af", marginTop: "4px" }}>
@@ -178,20 +181,24 @@ export default function NewProduct() {
 
         {/* SCROLL TRACK — bukan Swiper, full control cursor */}
         <div
-          ref={scrollRef}
-          className="np-scroll-track"
+          ref={(el) => {
+            scrollRef.current = el;
+            cardsRef.current = el;
+          }}
+          className="np-scroll-track h-[40px]"
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
           onMouseUp={stopDrag}
           onMouseLeave={stopDrag}
         >
           {products.map((product, index) => (
-            <ProductCard
-              key={index}
-              product={{ ...product, id: index + 1 }}
-              saved={saved[index]}
-              onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
-            />
+            <div key={index}>
+              <ProductCard
+                product={{ ...product, id: index + 1 }}
+                saved={saved[index]}
+                onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+              />
+            </div>
           ))}
         </div>
 

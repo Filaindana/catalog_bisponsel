@@ -2,7 +2,7 @@ import logo from "../assets/logo.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 
-const navLinkStyle = ({ isActive }: { isActive: boolean }) => ({
+const navLinkStyle = ({ isActive }) => ({
   textDecoration: "none",
   padding: "8px 14px",
   borderRadius: "8px",

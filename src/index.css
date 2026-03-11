@@ -39,6 +39,13 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.section-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #072B50;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;

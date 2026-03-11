@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import produkImg from "../assets/monitor.png";
-import ProductCard from "./ProductCard";
+import ProductCard from "./ProductCard.jsx";
 
 const products = [
   { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", originalPrice: "Rp 20.499.000", discount: 15, rating: 4.8, stock: 72, image: produkImg },
@@ -21,7 +21,7 @@ const css = `
     cursor: default;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding-bottom: 4px;
+    padding: 8px 12px 16px;
   }
   .ph-scroll-track::-webkit-scrollbar { display: none; }
 
@@ -129,7 +129,7 @@ const css = `
   }
 `;
 
-function useCountdown(targetSeconds: number) {
+function useCountdown(targetSeconds) {
   const [seconds, setSeconds] = useState(targetSeconds);
   useEffect(() => {
     const t = setInterval(() => setSeconds(s => (s > 0 ? s - 1 : 0)), 1000);
@@ -142,21 +142,22 @@ function useCountdown(targetSeconds: number) {
 }
 
 export default function PromoHariIni() {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [saved, setSaved] = useState<boolean[]>(products.map(() => false));
+
+  const scrollRef = useRef(null);
+  const [saved, setSaved] = useState(products.map(() => false));
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
   const [hours, minutes, secs] = useCountdown(6 * 3600 + 16 * 60 + 40);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
+  const onMouseDown = (e) => {
+    const target = e.target;
     if (!target.closest(".ph-img-wrap")) return;
     isDragging.current = true;
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
   };
-  const onMouseMove = (e: React.MouseEvent) => {
+  const onMouseMove = (e) => {
     if (!isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
@@ -164,7 +165,7 @@ export default function PromoHariIni() {
     if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - walk;
   };
   const stopDrag = () => { isDragging.current = false; };
-  const scrollBy = (dir: number) => {
+  const scrollBy = (dir) => {
     if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
   };
 
@@ -175,7 +176,7 @@ export default function PromoHariIni() {
 
         {/* HEADER */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px" }}>
-          <h2 style={{ fontSize: "26px", fontWeight: 800, color: "#111827", margin: 0, borderLeft: "5px solid #072B50", paddingLeft: "14px" }}>
+          <h2 className="section-title" style={{ margin: 0, borderLeft: "5px solid #072B50", paddingLeft: "14px" }}>
             Promo Spesial Hari Ini
           </h2>
           <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
@@ -198,7 +199,9 @@ export default function PromoHariIni() {
 
         {/* SCROLL TRACK */}
         <div
-          ref={scrollRef}
+          ref={(el) => {
+            scrollRef.current = el;
+          }}
           className="ph-scroll-track"
           onMouseDown={onMouseDown}
           onMouseMove={onMouseMove}
@@ -206,13 +209,14 @@ export default function PromoHariIni() {
           onMouseLeave={stopDrag}
         >
           {products.map((product, index) => (
-            <ProductCard
-              key={index}
-              product={{ ...product, id: index + 1, badge: undefined }}
-              saved={saved[index]}
-              onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
-              variant="promo"
-            />
+            <div key={index}>
+              <ProductCard
+                product={{ ...product, id: index + 1, badge: undefined }}
+                saved={saved[index]}
+                onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+                variant="promo"
+              />
+            </div>
           ))}
         </div>
       </div>

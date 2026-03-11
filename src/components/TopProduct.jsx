@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import produkImg from "../assets/monitor.png";
-import ProductCard from "./ProductCard";
+import ProductCard from "./ProductCard.jsx";
 
 const products = [
   { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, image: produkImg },
@@ -69,27 +69,28 @@ const css = `
 `;
 
 export default function TopProduct() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [saved, setSaved] = useState<boolean[]>(products.map(() => false));
+
+  const trackRef = useRef(null);
+  const [saved, setSaved] = useState(products.map(() => false));
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollLeftRef = useRef(0);
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    const t = e.target as HTMLElement;
+  const onMouseDown = (e) => {
+    const t = e.target;
     if (!t.closest(".tp-imgbox")) return;
     isDragging.current = true;
     startX.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
     scrollLeftRef.current = trackRef.current?.scrollLeft ?? 0;
   };
-  const onMouseMove = (e: React.MouseEvent) => {
+  const onMouseMove = (e) => {
     if (!isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - (trackRef.current?.offsetLeft ?? 0);
     if (trackRef.current) trackRef.current.scrollLeft = scrollLeftRef.current - (x - startX.current) * 1.5;
   };
   const stopDrag = () => { isDragging.current = false; };
-  const move = (d: number) => { if (trackRef.current) trackRef.current.scrollLeft += d * 280; };
+  const move = (d) => { if (trackRef.current) trackRef.current.scrollLeft += d * 280; };
 
   return (
     <section style={{ background: "#072B50", padding: "60px 20px" }}>
@@ -99,7 +100,7 @@ export default function TopProduct() {
 
           {/* KIRI — tidak diubah */}
           <div style={{ minWidth: "180px", maxWidth: "180px" }}>
-            <h2 style={{ fontSize: "28px", fontWeight: 800, color: "#fff", margin: "0 0 16px 0", lineHeight: 1.2, textTransform: "uppercase", letterSpacing: "1px" }}>
+            <h2 className="section-title" style={{ color: "#fff", margin: "0 0 16px 0", lineHeight: 1.2, textTransform: "uppercase", letterSpacing: "1px" }}>
               Top Product
             </h2>
             <p style={{ fontSize: "14px", color: "#93c5fd", margin: 0, lineHeight: 1.7 }}>
@@ -111,7 +112,9 @@ export default function TopProduct() {
           <div className="tp-rel">
             <button className="tp-arrow prev" onClick={() => move(-1)}>❮</button>
 
-            <div className="tp-track" ref={trackRef}
+            <div className="tp-track" ref={(el) => {
+              trackRef.current = el;
+            }}
               onMouseDown={onMouseDown} onMouseMove={onMouseMove}
               onMouseUp={stopDrag} onMouseLeave={stopDrag}>
 

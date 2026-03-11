@@ -1,8 +1,9 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, Mousewheel, FreeMode } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
+import "swiper/css/free-mode";
 import keyboardImg from "/src/assets/keyboard.png";
 import kabellanImg from "/src/assets/kabel.png";
 import laptopImg from "/src/assets/laptop.png";
@@ -41,10 +42,10 @@ const swiperStyles = `
 
   .category-swiper .swiper-button-prev:hover,
   .category-swiper .swiper-button-next:hover {
-    background: #6366f1;
+    background: #072B50;
     color: #ffffff;
-    border-color: #6366f1;
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+    border-color: #072B50;
+    box-shadow: 0 6px 16px rgba(7, 43, 80, 0.35);
     transform: scale(1.08);
   }
 
@@ -54,10 +55,10 @@ const swiperStyles = `
   }
 
   .category-swiper .swiper-slide > div:hover .category-circle {
-    background: #eef2ff !important;
+    background: #f2f3f4 !important;
     transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
-    border-color: #c7d2fe !important;
+    box-shadow: 0 8px 20px rgba(7, 43, 80, 0.2);
+    border-color: #072B50 !important;
   }
 
   .category-circle {
@@ -65,7 +66,55 @@ const swiperStyles = `
   }
 `;
 
+function CategoryItem({ item }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "12px",
+        cursor: "pointer",
+        padding: "14px 0",
+      }}
+    >
+      <div
+        className="category-circle"
+        style={{
+          width: "100px",
+          height: "100px",
+          borderRadius: "50%",
+          background: "#f3f4f6",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "hidden",
+          border: "2px solid transparent",
+          boxShadow: "0 2px 4px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.08)",
+        }}
+      >
+        <img
+          src={item.image}
+          alt={item.name}
+          style={{ width: "65%", height: "65%", objectFit: "contain" }}
+        />
+      </div>
+      <span
+        style={{
+          fontSize: "15px",
+          fontWeight: 600,
+          textAlign: "center",
+          color: "#374151",
+        }}
+      >
+        {item.name}
+      </span>
+    </div>
+  );
+}
+
 export default function CategorySection() {
+
   const categories = [
     { name: "Keyboard", image: keyboardImg },
     { name: "Kabel LAN", image: kabellanImg },
@@ -82,27 +131,19 @@ export default function CategorySection() {
     <section style={{ padding: "60px 0", background: "#ffffff" }}>
       <style>{swiperStyles}</style>
 
-      {/* TITLE */}
-      <h2
-        style={{
-          textAlign: "center",
-          marginBottom: "36px",
-          fontSize: "28px",
-          fontWeight: 700,
-        }}
-      >
+      <h2 className="section-title" style={{ textAlign: "center", marginBottom: "36px" }}>
         Product Category
       </h2>
 
-      {/* FULL WIDTH dengan arrow di tepi */}
       <div style={{ padding: "0 60px", position: "relative" }}>
         <Swiper
-          modules={[Navigation]}
+          modules={[Navigation, Mousewheel, FreeMode]}
           navigation
+          mousewheel={{ forceToAxis: true }}
+          freeMode={true}
           spaceBetween={0}
           slidesPerView={7}
           className="category-swiper"
-          style={{ overflow: "hidden" }}
           breakpoints={{
             320: { slidesPerView: 3, spaceBetween: 0 },
             640: { slidesPerView: 5, spaceBetween: 0 },
@@ -111,54 +152,7 @@ export default function CategorySection() {
         >
           {categories.map((item, index) => (
             <SwiperSlide key={index}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: "12px",
-                  cursor: "pointer",
-                  padding: "14px 0",
-                }}
-              >
-                {/* CIRCLE */}
-                <div
-                  className="category-circle"
-                  style={{
-                    width: "100px",
-                    height: "100px",
-                    borderRadius: "50%",
-                    background: "#f3f4f6",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
-                    border: "2px solid transparent",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-                  }}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    style={{
-                      width: "65%",
-                      height: "65%",
-                      objectFit: "contain",
-                    }}
-                  />
-                </div>
-
-                <span
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: 600,
-                    textAlign: "center",
-                    color: "#374151",
-                  }}
-                >
-                  {item.name}
-                </span>
-              </div>
+              <CategoryItem item={item} />
             </SwiperSlide>
           ))}
         </Swiper>

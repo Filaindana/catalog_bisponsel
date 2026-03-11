@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
-import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/pagination";
@@ -19,7 +18,8 @@ const banners = [
 ];
 
 export default function PromoSection() {
-  const [swiperInstance, setSwiperInstance] = useState<SwiperType | null>(null);
+
+  const [swiperInstance, setSwiperInstance] = useState(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
@@ -121,11 +121,11 @@ export default function PromoSection() {
                     opacity: activeIndex === index ? 1 : 0.6,
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.transform =
+                    e.currentTarget.style.transform =
                       "scale(1.05)";
                   }}
                   onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.transform =
+                    e.currentTarget.style.transform =
                       "scale(1)";
                   }}
                 />

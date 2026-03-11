@@ -217,15 +217,15 @@ export default function Login() {
                 marginTop: "4px",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   "#0e3d6e";
-                (e.currentTarget as HTMLButtonElement).style.transform =
+                e.currentTarget.style.transform =
                   "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   "#072B50";
-                (e.currentTarget as HTMLButtonElement).style.transform =
+                e.currentTarget.style.transform =
                   "translateY(0)";
               }}
             >

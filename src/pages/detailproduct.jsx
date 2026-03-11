@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import type { Swiper as SwiperType } from "swiper";
 import { ArrowLeft, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import "swiper/css";
@@ -46,18 +45,18 @@ const relatedProducts = Array.from({ length: 6 }, (_, i) => ({
 
 export default function DetailProduct() {
   const navigate = useNavigate();
-  const swiperRef = useRef<SwiperType | null>(null);
+  const swiperRef = useRef(null);
   const [activeImage, setActiveImage] = useState(0);
-  const [activeTab, setActiveTab] = useState<"deskripsi" | "spesifikasi">(
+  const [activeTab, setActiveTab] = useState(
     "spesifikasi",
   );
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [saved, setSaved] = useState<boolean[]>(
+  const [saved, setSaved] = useState(
     relatedProducts.map(() => false),
   );
 
-  const formatPrice = (price: number) =>
+  const formatPrice = (price) =>
     "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
 
   return (
@@ -429,7 +428,7 @@ export default function DetailProduct() {
               marginBottom: "24px",
             }}
           >
-            {(["deskripsi", "spesifikasi"] as const).map((tab) => (
+            {(["deskripsi", "spesifikasi"]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -569,14 +568,14 @@ export default function DetailProduct() {
                 transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   "#072B50";
-                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                e.currentTarget.style.color = "#fff";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   "#fff";
-                (e.currentTarget as HTMLButtonElement).style.color = "#374151";
+                e.currentTarget.style.color = "#374151";
               }}
             >
               ‹
@@ -624,14 +623,14 @@ export default function DetailProduct() {
                 transition: "all 0.2s ease",
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   "#072B50";
-                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                e.currentTarget.style.color = "#fff";
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   "#fff";
-                (e.currentTarget as HTMLButtonElement).style.color = "#374151";
+                e.currentTarget.style.color = "#374151";
               }}
             >
               ›

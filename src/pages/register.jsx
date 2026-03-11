@@ -19,15 +19,15 @@ export default function Register() {
     color: "#fff",
     fontSize: "14px",
     outline: "none",
-    boxSizing: "border-box" as const,
+    boxSizing: "border-box",
     transition: "border 0.2s ease",
   };
 
   const labelStyle = {
     fontSize: "13px",
     fontWeight: 600,
-    color: "rgba(255,255,255,0.9)" as const,
-    display: "block" as const,
+    color: "rgba(255,255,255,0.9)",
+    display: "block",
     marginBottom: "8px",
   };
 
@@ -281,16 +281,16 @@ export default function Register() {
               }}
               onMouseEnter={(e) => {
                 if (agreeTerms) {
-                  (e.currentTarget as HTMLButtonElement).style.background =
+                  e.currentTarget.style.background =
                     "#0e3d6e";
-                  (e.currentTarget as HTMLButtonElement).style.transform =
+                  e.currentTarget.style.transform =
                     "translateY(-1px)";
                 }
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
+                e.currentTarget.style.background =
                   agreeTerms ? "#072B50" : "rgba(255,255,255,0.2)";
-                (e.currentTarget as HTMLButtonElement).style.transform =
+                e.currentTarget.style.transform =
                   "translateY(0)";
               }}
             >

@@ -1,6 +1,7 @@
 import { FiBox, FiUsers, FiTag, FiShield } from "react-icons/fi";
 
 export default function HeroHighlight() {
+
   const items = [
     {
       icon: <FiBox size={28} />,

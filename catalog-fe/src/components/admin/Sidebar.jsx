@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import logoImg from "../assets/logo.jpg";
+import logoImg from "../../assets/logo.png";
 import {
   LayoutDashboard,
   Package,

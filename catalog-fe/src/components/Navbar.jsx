@@ -32,12 +32,13 @@ export default function Navbar() {
     >
       {/* LOGO */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        <img
-          src={logo}
-          alt="Logo"
-          style={{ height: "40px", objectFit: "contain" }}
-        />
-        <b style={{ fontSize: "16px", color: "#072B50" }}>BismarCatalog</b>
+        <img src={logo} alt="Logo" style={{ height: "40px", objectFit: "contain" }} />
+        <div style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}>
+          <div>
+            <b style={{ fontSize: "18px", color: "#FE0808" }}>BIZ </b><b style={{ fontSize: "18px", color: "#072B50" }}>PONSEL</b>
+          </div>
+          <span style={{ fontSize: "11px", color: "#072B50", letterSpacing: "2px", fontWeight: 600, marginTop: "3px" }}>CATALOG</span>
+        </div>
       </div>
 
       {/* MENU */}

@@ -139,9 +139,6 @@ function BranchCard({ branch, index, onClick }) {
           <MapPin size={9} style={{ color: NAVY }} />
           <span style={{ fontSize: "10px", fontWeight: 700, color: NAVY, letterSpacing: "0.8px", textTransform: "uppercase" }}>{branch.city}</span>
         </div>
-        <div className="bcard-arrow" style={{ position: "absolute", top: "14px", right: "14px", width: "32px", height: "32px", borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .25s, transform .25s" }}>
-          <ArrowUpRight size={15} style={{ color: "#fff" }} />
-        </div>
       </div>
       <div style={{ padding: "20px 20px 22px", display: "flex", flexDirection: "column", flex: 1 }}>
         <p className="bcard-name" style={{ fontSize: "17px", fontWeight: 700, color: NAVY, margin: "0 0 14px 0", lineHeight: 1.3 }}>{branch.name.replace("Cabang ", "")}</p>
@@ -382,105 +379,100 @@ export default function Contact() {
         <div onClick={() => setSelectedBranch(null)}
           style={{ position: "fixed", inset: 0, background: "rgba(2,12,28,0.75)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: "16px" }}>
           <div onClick={(e) => e.stopPropagation()}
-            style={{ background: "#fff", borderRadius: "22px", width: "100%", maxWidth: "480px", overflow: "hidden", animation: "scaleIn .24s cubic-bezier(.34,1.3,.64,1) both", boxShadow: "0 32px 80px rgba(4,20,40,.45)" }}>
+            style={{ background: "#fff", borderRadius: "22px", width: "100%", maxWidth: "860px", overflow: "hidden", animation: "scaleIn .24s cubic-bezier(.34,1.3,.64,1) both", boxShadow: "0 32px 80px rgba(4,20,40,.45)" }}>
 
-            {/* HEADER */}
-            <div style={{ position: "relative", background: NAVY, padding: "22px 20px 18px", overflow: "hidden" }}>
+            {/* HEADER — full width */}
+            <div style={{ position: "relative", background: NAVY, padding: "20px 24px 16px", overflow: "hidden" }}>
               <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.06, pointerEvents: "none" }} xmlns="http://www.w3.org/2000/svg">
                 <defs><pattern id="mDot" x="0" y="0" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill="white"/></pattern></defs>
                 <rect width="100%" height="100%" fill="url(#mDot)"/>
               </svg>
               <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "13px" }}>
-                  <div style={{ width: "44px", height: "44px", borderRadius: "13px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <Building2 size={21} style={{ color: "rgba(255,255,255,0.82)" }} />
+                  <div style={{ width: "40px", height: "40px", borderRadius: "11px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.18)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <Building2 size={19} style={{ color: "rgba(255,255,255,0.82)" }} />
                   </div>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
-                      <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 0 3px rgba(74,222,128,0.2)" }} />
-                      <span style={{ fontSize: "9.5px", color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase" }}>Detail Cabang</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "3px" }}>
+                        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 0 3px rgba(74,222,128,0.2)" }} />
+                        <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.5)", fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase" }}>Detail Cabang</span>
+                      </div>
+                      <h3 style={{ fontSize: "17px", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.4px" }}>{selectedBranch.name}</h3>
                     </div>
-                    <h3 style={{ fontSize: "18px", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.4px" }}>{selectedBranch.name}</h3>
+                    <div style={{ display: "inline-flex", alignItems: "center", gap: "5px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "30px", padding: "4px 11px" }}>
+                      <MapPin size={9} style={{ color: "rgba(255,255,255,0.6)" }} />
+                      <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>{selectedBranch.city}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Tombol X — SVG inline agar selalu tampil */}
+                {/* Tombol X — kecil & profesional */}
                 <button
                   onClick={() => setSelectedBranch(null)}
                   title="Tutup"
-                  style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.4)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, padding: 0, lineHeight: 1, transition: "background .18s" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.8)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.5)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.15)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.4)"; }}
+                  style={{ width: "26px", height: "26px", borderRadius: "6px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, padding: 0, lineHeight: 1, transition: "background .15s, border-color .15s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.7)"; e.currentTarget.style.borderColor = "rgba(239,68,68,0.4)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)"; }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="2" y1="2" x2="14" y2="14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                    <line x1="14" y1="2" x2="2" y2="14" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                  <svg width="11" height="11" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="1" y1="1" x2="10" y2="10" stroke="rgba(255,255,255,0.8)" strokeWidth="1.8" strokeLinecap="round"/>
+                    <line x1="10" y1="1" x2="1" y2="10" stroke="rgba(255,255,255,0.8)" strokeWidth="1.8" strokeLinecap="round"/>
                   </svg>
                 </button>
               </div>
-
-              <div style={{ position: "relative", marginTop: "14px", display: "inline-flex", alignItems: "center", gap: "5px", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: "30px", padding: "4px 11px" }}>
-                <MapPin size={9} style={{ color: "rgba(255,255,255,0.6)" }} />
-                <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.7)", fontWeight: 600 }}>{selectedBranch.city}</span>
-              </div>
             </div>
 
-            {/* BODY */}
-            <div style={{ padding: "16px", background: "#f8fafd" }}>
+            {/* BODY — landscape 2 kolom */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", background: "#f8fafd" }}>
 
-              {/* INFO CARDS — clean & minimal */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
+              {/* KOLOM KIRI — info cards + social */}
+              <div style={{ padding: "20px", borderRight: "1px solid #eef1f6", display: "flex", flexDirection: "column", gap: "10px" }}>
+                {/* INFO CARDS */}
                 {[
-                  { icon: <MapPin size={14} />, label: "Alamat",          value: selectedBranch.address },
-                  { icon: <Phone  size={14} />, label: "Telepon",         value: selectedBranch.phone   },
-                  { icon: <Mail   size={14} />, label: "Email",           value: selectedBranch.email   },
-                  { icon: <Clock  size={14} />, label: "Jam Operasional", value: selectedBranch.hours   },
+                  { icon: <MapPin size={13} />, label: "Alamat",          value: selectedBranch.address },
+                  { icon: <Phone  size={13} />, label: "Telepon",         value: selectedBranch.phone   },
+                  { icon: <Mail   size={13} />, label: "Email",           value: selectedBranch.email   },
+                  { icon: <Clock  size={13} />, label: "Jam Operasional", value: selectedBranch.hours   },
                 ].map((item, i) => (
-                  <div key={i} style={{
-                    display: "flex", alignItems: "center", gap: "14px",
-                    padding: "13px 16px", background: "#fff",
-                    borderRadius: "12px", border: "1px solid #eef1f6",
-                    boxShadow: "0 1px 3px rgba(7,43,80,0.05)"
-                  }}>
-                    {/* Icon circle */}
-                    <div style={{
-                      width: "36px", height: "36px", borderRadius: "50%",
-                      background: "#f0f4f9", display: "flex", alignItems: "center",
-                      justifyContent: "center", color: NAVY, flexShrink: 0
-                    }}>
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: "12px", padding: "11px 14px", background: "#fff", borderRadius: "11px", border: "1px solid #eef1f6", boxShadow: "0 1px 3px rgba(7,43,80,0.04)" }}>
+                    <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#f0f4f9", display: "flex", alignItems: "center", justifyContent: "center", color: NAVY, flexShrink: 0 }}>
                       {item.icon}
                     </div>
-                    {/* Divider */}
-                    <div style={{ width: "1px", height: "32px", background: "#eef1f6", flexShrink: 0 }} />
-                    {/* Text */}
+                    <div style={{ width: "1px", height: "28px", background: "#eef1f6", flexShrink: 0 }} />
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ fontSize: "10px", color: "#aab4c4", fontWeight: 700,
-                        textTransform: "uppercase", letterSpacing: "0.8px", margin: "0 0 2px 0" }}>
-                        {item.label}
-                      </p>
-                      <p style={{ fontSize: "13px", color: "#1e293b", fontWeight: 600,
-                        margin: 0, lineHeight: 1.4, wordBreak: "break-word" }}>
-                        {item.value}
-                      </p>
+                      <p style={{ fontSize: "9px", color: "#aab4c4", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", margin: "0 0 2px 0" }}>{item.label}</p>
+                      <p style={{ fontSize: "12.5px", color: "#1e293b", fontWeight: 600, margin: 0, lineHeight: 1.4, wordBreak: "break-word" }}>{item.value}</p>
                     </div>
                   </div>
                 ))}
-              </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                <div style={{ background: "#fff", borderRadius: "13px", border: "1px solid #e2e8f0", padding: "11px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                {/* SOCIAL */}
+                <div style={{ background: "#fff", borderRadius: "11px", border: "1px solid #eef1f6", padding: "11px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "2px" }}>
                   <div>
                     <p style={{ fontSize: "11px", fontWeight: 700, color: NAVY, margin: "0 0 1px 0" }}>Ikuti Kami</p>
                     <p style={{ fontSize: "10px", color: "#94a3b8", margin: 0 }}>Klik untuk info akun</p>
                   </div>
                   <div style={{ display: "flex", gap: "7px" }}>
-                    {socialLinks.map((sl) => <SocialIcon key={sl.label} sl={sl} size={36} iconSize={18} />)}
+                    {socialLinks.map((sl) => <SocialIcon key={sl.label} sl={sl} size={34} iconSize={17} />)}
                   </div>
                 </div>
-                <div style={{ borderRadius: "13px", overflow: "hidden", border: "1px solid #e2e8f0", boxShadow: "0 2px 10px rgba(7,43,80,0.07)" }}>
-                  <iframe src={selectedBranch.maps} width="100%" height="165" style={{ border: 0, display: "block" }} allowFullScreen loading="lazy" />
-                </div>
               </div>
+
+              {/* KOLOM KANAN — maps penuh */}
+              <div style={{ position: "relative", minHeight: "380px" }}>
+                <iframe
+                  src={selectedBranch.maps}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, display: "block", position: "absolute", inset: 0, minHeight: "380px" }}
+                  allowFullScreen
+                  loading="lazy"
+                  title={`Peta ${selectedBranch.name}`}
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+
             </div>
           </div>
         </div>

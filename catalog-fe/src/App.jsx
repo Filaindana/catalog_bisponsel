@@ -50,11 +50,12 @@ function AdminLayout() {
         <AdminSidebar />
         <main style={{ flex: 1, overflow: "auto" }}>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/produk" element={<Produk />} />
-            <Route path="/promo" element={<PromoAdmin />} />
-            <Route path="/cabang" element={<Cabang />} />
-            <Route path="/pengaturan" element={<Pengaturan />} />
+            {/* ⬇️ PERBAIKAN DI SINI (hapus "/" di depan path) */}
+            <Route index element={<Dashboard />} />
+            <Route path="produk" element={<Produk />} />
+            <Route path="promo" element={<PromoAdmin />} />
+            <Route path="cabang" element={<Cabang />} />
+            <Route path="pengaturan" element={<Pengaturan />} />
           </Routes>
         </main>
       </div>

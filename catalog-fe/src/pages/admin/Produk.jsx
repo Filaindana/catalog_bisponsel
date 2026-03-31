@@ -14,7 +14,6 @@ import {
   Check,
   ChevronDown,
   Tag,
-  FishOff,
 } from "lucide-react";
 
 const NAVY = "#072B50";

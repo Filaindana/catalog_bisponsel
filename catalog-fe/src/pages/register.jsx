@@ -3,6 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import heroBg from "../assets/hero1.jpg";
+// import { register } from "../utils/services/authService";
+
+// const handleRegister = async () => {
+//   try {
+//     await register({
+//       name,
+//       email,
+//       password,
+//     });
+
+//     alert("Register berhasil!");
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
 
 export default function Register() {
   const navigate = useNavigate();

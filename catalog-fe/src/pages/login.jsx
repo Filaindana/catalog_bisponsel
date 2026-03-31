@@ -3,11 +3,71 @@ import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import heroBg from "../assets/hero1.jpg";
+import { login } from "../utils/services/authService";
+
+// // // ==================================================================
+
+
+// const handleLogin = async () => {
+//   try {
+//     const res = await login({
+//       email,
+//       password,
+//     });
+
+//     // 💾 simpan ke localStorage
+//     localStorage.setItem("user", JSON.stringify(res.data));
+
+//     // 🔀 redirect berdasarkan role
+//     if (res.data.role === "admin") {
+//       window.location.href = "/admin";
+//     } else {
+//       window.location.href = "/";
+//     }
+
+//   } catch (err) {
+//     alert("Login gagal");
+//     console.error(err);
+//   }
+// };
+
+
+// ==================================================================
 
 export default function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Email dan password harus diisi");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await login({ email, password });
+
+      // Simpan data user/token
+      localStorage.setItem("user", JSON.stringify(res.data));
+
+      // Redirect sesuai role
+      if (res.data.role === "admin") {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
+    } catch (err) {
+      alert("Login gagal: " + (err.response?.data?.message || "Terjadi kesalahan"));
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
@@ -75,6 +135,8 @@ export default function Login() {
               <input
                 type="email"
                 placeholder="contoh@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 style={{
                   width: "100%",
                   padding: "12px 16px",
@@ -115,6 +177,8 @@ export default function Login() {
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Masukkan password"
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)}
                   style={{
                     width: "100%",
                     padding: "12px 44px 12px 16px",
@@ -202,7 +266,8 @@ export default function Login() {
 
             {/* TOMBOL MASUK */}
             <button
-              onClick={() => navigate("/")}
+              onClick={handleLogin}
+              disabled={loading}
               style={{
                 width: "100%",
                 padding: "13px",

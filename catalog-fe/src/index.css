@@ -40,10 +40,10 @@ body {
 }
 
 .section-title {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 28px;
   font-weight: 700;
-  color: #072B50;
+  color: #072b50;
 }
 
 h1 {
@@ -259,4 +259,18 @@ button:focus-visible {
   width: auto;
   height: auto;
   object-fit: contain;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
 }

@@ -10,15 +10,11 @@ import {
 } from "lucide-react";
 
 const menus = [
-  {
-    label: "Dashboard",
-    icon: <LayoutDashboard size={18} />,
-    path: "/dashboard",
-  },
-  { label: "Produk", icon: <Package size={18} />, path: "/produk" },
-  { label: "Promo", icon: <Tag size={18} />, path: "/promo" },
-  { label: "Cabang", icon: <Building2 size={18} />, path: "/cabang" },
-  { label: "Pengaturan", icon: <Settings size={18} />, path: "/pengaturan" },
+  { label: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin" },
+  { label: "Produk",    icon: <Package size={18} />,         path: "/admin/produk" },
+  { label: "Promo",     icon: <Tag size={18} />,             path: "/admin/promo" },
+  { label: "Cabang",    icon: <Building2 size={18} />,       path: "/admin/cabang" },
+  { label: "Pengaturan",icon: <Settings size={18} />,        path: "/admin/pengaturan" },
 ];
 
 export default function Sidebar() {

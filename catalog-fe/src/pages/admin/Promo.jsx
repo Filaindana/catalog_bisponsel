@@ -17,10 +17,6 @@ import {
   Clock,
 } from "lucide-react";
 
-const NAVY = "#072B50";
-const NAVY_LIGHT = "rgba(7,43,80,0.07)";
-const NAVY_BORDER = "rgba(7,43,80,0.15)";
-
 const initialPromos = [
   {
     id: 1,
@@ -115,20 +111,6 @@ const statusConfig = {
   },
 };
 
-const inputStyle = {
-  width: "100%",
-  padding: "11px 14px",
-  borderRadius: "10px",
-  border: `1.5px solid ${NAVY_BORDER}`,
-  fontSize: "13px",
-  outline: "none",
-  boxSizing: "border-box",
-  color: "#1e2433",
-  background: "#f8f9fc",
-  transition: "border-color 0.2s, background 0.2s",
-  fontFamily: "inherit",
-};
-
 const produkOptions = [
   "PC Gaming",
   "Hp Samsung",
@@ -140,54 +122,38 @@ const produkOptions = [
   "ASUS ROG",
   "MacBook Pro",
 ];
+const presetColors = [
+  "#072B50",
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
+  "#0d9488",
+  "#f97316",
+  "#06b6d4",
+];
 
-const focusNavy = (e) => {
-  e.target.style.borderColor = NAVY;
-  e.target.style.background = "#fff";
-};
-const blurDefault = (e) => {
-  e.target.style.borderColor = NAVY_BORDER;
-  e.target.style.background = "#f8f9fc";
-};
+const inputCls =
+  "w-full px-3.5 py-[11px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] text-[13px] outline-none text-[#1e2433] bg-[#f8f9fc] transition-all font-[inherit] focus:border-[#072B50] focus:bg-white";
+const labelCls =
+  "block text-[11px] font-extrabold text-gray-500 mb-[7px] uppercase tracking-[0.8px]";
+const labelSmCls =
+  "block text-[11px] font-extrabold text-gray-400 mb-1.5 uppercase tracking-[0.8px]";
 
 const Field = ({ label, children, hint }) => (
   <div>
-    <label
-      style={{
-        fontSize: "11px",
-        fontWeight: 800,
-        color: "#6b7280",
-        display: "block",
-        marginBottom: "7px",
-        textTransform: "uppercase",
-        letterSpacing: "0.8px",
-      }}
-    >
-      {label}
-    </label>
+    <label className={labelCls}>{label}</label>
     {children}
-    {hint && (
-      <p style={{ fontSize: "11px", color: "#9ca3af", margin: "5px 0 0 0" }}>
-        {hint}
-      </p>
-    )}
+    {hint && <p className="text-[11px] text-gray-400 mt-[5px] mb-0">{hint}</p>}
   </div>
 );
 
 const Overlay = ({ onClose, children }) => (
   <div
     onClick={onClose}
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(10,15,30,0.65)",
-      backdropFilter: "blur(6px)",
-      zIndex: 1000,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "16px",
-    }}
+    className="fixed inset-0 bg-[rgba(10,15,30,0.65)] backdrop-blur-md z-[1000] flex items-center justify-center p-4"
   >
     <div onClick={(e) => e.stopPropagation()}>{children}</div>
   </div>
@@ -198,274 +164,95 @@ function ViewPromoModal({ promo, onClose }) {
   const cfg = statusConfig[promo.status] || statusConfig.Berakhir;
   return (
     <Overlay onClose={onClose}>
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: "24px",
-          width: "460px",
-          overflow: "hidden",
-          boxShadow: "0 40px 100px rgba(0,0,0,0.3)",
-        }}
-      >
-        <div
-          style={{
-            height: "140px",
-            background: NAVY,
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "-30px",
-              right: "-30px",
-              width: "140px",
-              height: "140px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.06)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-20px",
-              left: "20px",
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.04)",
-            }}
-          />
-          <div style={{ textAlign: "center", position: "relative", zIndex: 1 }}>
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "14px",
-                background: "rgba(255,255,255,0.15)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 10px",
-              }}
-            >
+      <div className="bg-white rounded-3xl w-[460px] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.3)]">
+        {/* Header */}
+        <div className="h-[140px] bg-[#072B50] relative flex items-center justify-center overflow-hidden">
+          <div className="absolute -top-8 -right-8 w-[140px] h-[140px] rounded-full bg-white/[0.06]" />
+          <div className="absolute -bottom-5 left-5 w-[80px] h-[80px] rounded-full bg-white/[0.04]" />
+          <div className="text-center relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-2.5">
               <Tag size={24} color="#fff" />
             </div>
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: 800,
-                color: "rgba(255,255,255,0.9)",
-                textTransform: "uppercase",
-                letterSpacing: "2px",
-                background: "rgba(0,0,0,0.15)",
-                padding: "4px 12px",
-                borderRadius: "20px",
-              }}
-            >
+            <span className="text-xs font-extrabold text-white/90 uppercase tracking-[2px] bg-black/15 px-3 py-1 rounded-full">
               PROMO
             </span>
           </div>
           <button
             onClick={onClose}
-            style={{
-              position: "absolute",
-              top: "14px",
-              right: "14px",
-              background: "rgba(255,255,255,0.15)",
-              border: "none",
-              borderRadius: "10px",
-              width: "34px",
-              height: "34px",
-              cursor: "pointer",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="absolute top-3.5 right-3.5 bg-white/15 border-none rounded-[10px] w-[34px] h-[34px] cursor-pointer text-white flex items-center justify-center"
           >
             <X size={16} />
           </button>
         </div>
-        <div style={{ padding: "24px 28px 28px" }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: "20px",
-            }}
-          >
+
+        <div className="px-7 pt-6 pb-7">
+          <div className="flex justify-between items-start mb-5">
             <div>
-              <h2
-                style={{
-                  fontSize: "20px",
-                  fontWeight: 800,
-                  color: "#1e2433",
-                  margin: "0 0 6px 0",
-                }}
-              >
+              <h2 className="text-[20px] font-extrabold text-[#1e2433] mb-1.5">
                 {promo.name}
               </h2>
-              <p style={{ fontSize: "13px", color: "#6b7280", margin: 0 }}>
-                {promo.desc}
-              </p>
+              <p className="text-[13px] text-gray-500 m-0">{promo.desc}</p>
             </div>
             <span
-              style={{
-                padding: "5px 14px",
-                borderRadius: "20px",
-                fontSize: "12px",
-                fontWeight: 700,
-                background: cfg.bg,
-                color: cfg.color,
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                flexShrink: 0,
-                marginLeft: "12px",
-              }}
+              className="flex items-center gap-1.5 px-3.5 py-[5px] rounded-full text-xs font-bold shrink-0 ml-3"
+              style={{ background: cfg.bg, color: cfg.color }}
             >
               <span
-                style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "50%",
-                  background: cfg.dot,
-                  display: "inline-block",
-                }}
+                className="w-1.5 h-1.5 rounded-full inline-block"
+                style={{ background: cfg.dot }}
               />
               {cfg.label}
             </span>
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: "12px",
-              marginBottom: "16px",
-            }}
-          >
+
+          <div className="grid grid-cols-2 gap-3 mb-4">
             {[
               {
                 label: "Tanggal Mulai",
                 value: formatDate(promo.startDate),
-                icon: <Calendar size={14} color={NAVY} />,
+                icon: <Calendar size={14} color="#072B50" />,
               },
               {
                 label: "Tanggal Selesai",
                 value: formatDate(promo.endDate),
-                icon: <Clock size={14} color={NAVY} />,
+                icon: <Clock size={14} color="#072B50" />,
               },
             ].map(({ label, value, icon }) => (
               <div
                 key={label}
-                style={{
-                  padding: "14px 16px",
-                  background: NAVY_LIGHT,
-                  borderRadius: "12px",
-                  border: `1.5px solid ${NAVY_BORDER}`,
-                }}
+                className="px-4 py-3.5 bg-[rgba(7,43,80,0.07)] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)]"
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    marginBottom: "6px",
-                  }}
-                >
+                <div className="flex items-center gap-1.5 mb-1.5">
                   {icon}
-                  <p
-                    style={{
-                      fontSize: "11px",
-                      color: "#9ca3af",
-                      fontWeight: 700,
-                      margin: 0,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
-                  >
+                  <p className="text-[11px] text-gray-400 font-bold m-0 uppercase tracking-[0.5px]">
                     {label}
                   </p>
                 </div>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    color: NAVY,
-                    margin: 0,
-                  }}
-                >
+                <p className="text-[14px] font-bold text-[#072B50] m-0">
                   {value}
                 </p>
               </div>
             ))}
           </div>
-          <div
-            style={{
-              padding: "14px 16px",
-              background: NAVY_LIGHT,
-              borderRadius: "12px",
-              border: `1.5px solid ${NAVY_BORDER}`,
-              marginBottom: "20px",
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-            }}
-          >
+
+          <div className="px-4 py-3.5 bg-[rgba(7,43,80,0.07)] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] mb-5 flex items-center gap-3">
             <div
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                background: promo.bannerColor,
-                flexShrink: 0,
-              }}
+              className="w-10 h-10 rounded-[10px] shrink-0"
+              style={{ background: promo.bannerColor }}
             />
             <div>
-              <p
-                style={{
-                  fontSize: "11px",
-                  color: "#9ca3af",
-                  fontWeight: 700,
-                  margin: "0 0 3px 0",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.5px",
-                }}
-              >
+              <p className="text-[11px] text-gray-400 font-bold mb-0.5 uppercase tracking-[0.5px]">
                 Warna Banner
               </p>
-              <p
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: NAVY,
-                  margin: 0,
-                }}
-              >
+              <p className="text-[13px] font-bold text-[#072B50] m-0">
                 {promo.bannerColor.toUpperCase()}
               </p>
             </div>
           </div>
+
           <button
             onClick={onClose}
-            style={{
-              width: "100%",
-              padding: "13px",
-              borderRadius: "12px",
-              border: `1.5px solid ${NAVY_BORDER}`,
-              background: "#fff",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 700,
-              color: "#374151",
-              fontFamily: "inherit",
-            }}
+            className="w-full py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
           >
             Tutup
           </button>
@@ -484,7 +271,7 @@ function AddPromoModal({ onClose, onSave }) {
     endDate: "",
     desc: "",
     isAktif: true,
-    bannerColor: NAVY,
+    bannerColor: "#072B50",
   });
   const [produkSearch, setProdukSearch] = useState("");
   const [selectedProduk, setSelectedProduk] = useState([
@@ -511,213 +298,81 @@ function AddPromoModal({ onClose, onSave }) {
     { id: 3, label: "Produk", icon: <Sparkles size={13} /> },
   ];
 
-  const presetColors = [
-    "#072B50",
-    "#3b82f6",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#ec4899",
-    "#0d9488",
-    "#f97316",
-    "#06b6d4",
-  ];
+  const durasi =
+    form.startDate && form.endDate
+      ? Math.max(
+          0,
+          Math.ceil(
+            (new Date(form.endDate) - new Date(form.startDate)) /
+              (1000 * 60 * 60 * 24) +
+              1,
+          ),
+        )
+      : null;
 
   return (
     <Overlay onClose={onClose}>
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: "24px",
-          width: "540px",
-          maxHeight: "90vh",
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: "0 40px 100px rgba(0,0,0,0.3)",
-          overflow: "hidden",
-        }}
-      >
+      <div className="bg-white rounded-3xl w-[540px] max-h-[90vh] flex flex-col shadow-[0_40px_100px_rgba(0,0,0,0.3)] overflow-hidden">
         {/* HEADER */}
-        <div
-          style={{
-            background: NAVY,
-            padding: "28px 32px 24px",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "-20px",
-              right: "-20px",
-              width: "120px",
-              height: "120px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.05)",
-              zIndex: 0,
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-30px",
-              right: "80px",
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.04)",
-              zIndex: 0,
-            }}
-          />
+        <div className="bg-[#072B50] px-8 pt-7 pb-6 relative overflow-hidden">
+          <div className="absolute -top-5 -right-5 w-[120px] h-[120px] rounded-full bg-white/5 z-0" />
+          <div className="absolute -bottom-8 right-20 w-[80px] h-[80px] rounded-full bg-white/[0.04] z-0" />
 
-          {/* Title row */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              marginBottom: "24px",
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-              <div
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  borderRadius: "14px",
-                  background: "rgba(255,255,255,0.15)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+          <div className="flex justify-between items-start mb-6 relative z-10">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
                 <Zap size={20} color="#fff" />
               </div>
               <div>
-                <h2
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: 800,
-                    color: "#fff",
-                    margin: "0 0 3px 0",
-                  }}
-                >
+                <h2 className="text-[18px] font-extrabold text-white mb-0.5">
                   Tambah Promo Baru
                 </h2>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.6)",
-                    margin: 0,
-                  }}
-                >
+                <p className="text-xs text-white/60 m-0">
                   Langkah {step} dari {steps.length}
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              style={{
-                background: "rgba(255,255,255,0.15)",
-                border: "none",
-                borderRadius: "10px",
-                width: "36px",
-                height: "36px",
-                cursor: "pointer",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              className="bg-white/15 border-none rounded-[10px] w-9 h-9 cursor-pointer text-white flex items-center justify-center"
             >
               <X size={18} />
             </button>
           </div>
 
           {/* Steps */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              position: "relative",
-              zIndex: 1,
-            }}
-          >
+          <div className="flex items-center relative z-10">
             {steps.map((s, i) => (
               <div
                 key={s.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flex: i < steps.length - 1 ? 1 : "none",
-                }}
+                className={`flex items-center ${i < steps.length - 1 ? "flex-1" : ""}`}
               >
                 <div
                   onClick={() => step > s.id && setStep(s.id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    cursor: step > s.id ? "pointer" : "default",
-                  }}
+                  className={`flex items-center gap-2 ${step > s.id ? "cursor-pointer" : "cursor-default"}`}
                 >
                   <div
-                    style={{
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "50%",
-                      background:
-                        step >= s.id ? "#fff" : "rgba(255,255,255,0.2)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      border:
-                        step === s.id
-                          ? "2px solid rgba(255,255,255,0.6)"
-                          : "2px solid transparent",
-                    }}
+                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 ${step >= s.id ? "bg-white border-white/60" : "bg-white/20 border-transparent"}`}
                   >
                     {step > s.id ? (
-                      <Check size={14} color={NAVY} strokeWidth={3} />
+                      <Check size={14} color="#072B50" strokeWidth={3} />
                     ) : (
                       <span
-                        style={{
-                          color: step === s.id ? NAVY : "rgba(255,255,255,0.5)",
-                          display: "flex",
-                        }}
+                        className={`flex ${step === s.id ? "text-[#072B50]" : "text-white/50"}`}
                       >
                         {s.icon}
                       </span>
                     )}
                   </div>
                   <span
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      color: step >= s.id ? "#fff" : "rgba(255,255,255,0.45)",
-                      whiteSpace: "nowrap",
-                    }}
+                    className={`text-xs font-bold whitespace-nowrap ${step >= s.id ? "text-white" : "text-white/45"}`}
                   >
                     {s.label}
                   </span>
                 </div>
                 {i < steps.length - 1 && (
                   <div
-                    style={{
-                      flex: 1,
-                      height: "2px",
-                      background:
-                        step > s.id
-                          ? "rgba(255,255,255,0.7)"
-                          : "rgba(255,255,255,0.2)",
-                      margin: "0 12px",
-                      borderRadius: "2px",
-                    }}
+                    className={`flex-1 h-0.5 mx-3 rounded-sm ${step > s.id ? "bg-white/70" : "bg-white/20"}`}
                   />
                 )}
               </div>
@@ -726,20 +381,16 @@ function AddPromoModal({ onClose, onSave }) {
         </div>
 
         {/* BODY */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
+        <div className="flex-1 overflow-y-auto px-8 py-7">
           {/* STEP 1 */}
           {step === 1 && (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "18px" }}
-            >
+            <div className="flex flex-col gap-[18px]">
               <Field label="Nama Promo">
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Contoh: Flash Sale Akhir Tahun 50%"
-                  style={inputStyle}
-                  onFocus={focusNavy}
-                  onBlur={blurDefault}
+                  className={inputCls}
                 />
               </Field>
               <Field label="Deskripsi Promo">
@@ -747,23 +398,10 @@ function AddPromoModal({ onClose, onSave }) {
                   value={form.desc}
                   onChange={(e) => setForm({ ...form, desc: e.target.value })}
                   placeholder="Jelaskan detail penawaran promo ini..."
-                  style={{
-                    ...inputStyle,
-                    height: "90px",
-                    resize: "none",
-                    lineHeight: 1.6,
-                  }}
-                  onFocus={focusNavy}
-                  onBlur={blurDefault}
+                  className={`${inputCls} h-[90px] resize-none leading-relaxed`}
                 />
               </Field>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "14px",
-                }}
-              >
+              <div className="grid grid-cols-2 gap-3.5">
                 <Field label="Tanggal Mulai">
                   <input
                     type="date"
@@ -771,9 +409,7 @@ function AddPromoModal({ onClose, onSave }) {
                     onChange={(e) =>
                       setForm({ ...form, startDate: e.target.value })
                     }
-                    style={inputStyle}
-                    onFocus={focusNavy}
-                    onBlur={blurDefault}
+                    className={inputCls}
                   />
                 </Field>
                 <Field label="Tanggal Selesai">
@@ -783,92 +419,35 @@ function AddPromoModal({ onClose, onSave }) {
                     onChange={(e) =>
                       setForm({ ...form, endDate: e.target.value })
                     }
-                    style={inputStyle}
-                    onFocus={focusNavy}
-                    onBlur={blurDefault}
+                    className={inputCls}
                   />
                 </Field>
               </div>
-              {form.startDate && form.endDate && (
-                <div
-                  style={{
-                    padding: "12px 16px",
-                    background: NAVY_LIGHT,
-                    borderRadius: "12px",
-                    border: `1.5px solid ${NAVY_BORDER}`,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                  }}
-                >
-                  <Calendar size={16} color={NAVY} />
-                  <span
-                    style={{ fontSize: "13px", fontWeight: 600, color: NAVY }}
-                  >
-                    Durasi:{" "}
-                    {Math.max(
-                      0,
-                      Math.ceil(
-                        (new Date(form.endDate) - new Date(form.startDate)) /
-                          (1000 * 60 * 60 * 24) +
-                          1,
-                      ),
-                    )}{" "}
-                    hari
+              {durasi !== null && (
+                <div className="px-4 py-3 bg-[rgba(7,43,80,0.07)] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-2.5">
+                  <Calendar size={16} color="#072B50" />
+                  <span className="text-[13px] font-semibold text-[#072B50]">
+                    Durasi: {durasi} hari
                   </span>
                 </div>
               )}
-              <div
-                style={{
-                  padding: "16px",
-                  background: "#f8f9fc",
-                  borderRadius: "14px",
-                  border: `1.5px solid ${NAVY_BORDER}`,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+              <div className="px-4 py-4 bg-[#f8f9fc] rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex justify-between items-center">
                 <div>
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: "#1e2433",
-                      margin: "0 0 3px 0",
-                    }}
-                  >
+                  <p className="text-[13px] font-bold text-[#1e2433] mb-0.5">
                     Aktifkan Langsung
                   </p>
-                  <p style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}>
+                  <p className="text-xs text-gray-400 m-0">
                     Promo langsung tampil setelah disimpan
                   </p>
                 </div>
                 <div
                   onClick={() => setForm({ ...form, isAktif: !form.isAktif })}
-                  style={{
-                    width: "48px",
-                    height: "26px",
-                    borderRadius: "13px",
-                    background: form.isAktif ? NAVY : "#e2e8f0",
-                    cursor: "pointer",
-                    position: "relative",
-                    transition: "background 0.25s",
-                    flexShrink: 0,
-                  }}
+                  className="relative w-12 h-[26px] rounded-full cursor-pointer shrink-0 transition-colors duration-250"
+                  style={{ background: form.isAktif ? "#072B50" : "#e2e8f0" }}
                 >
                   <div
-                    style={{
-                      position: "absolute",
-                      top: "3px",
-                      left: form.isAktif ? "25px" : "3px",
-                      width: "20px",
-                      height: "20px",
-                      borderRadius: "50%",
-                      background: "#fff",
-                      transition: "left 0.25s",
-                      boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                    }}
+                    className="absolute top-[3px] w-5 h-5 rounded-full bg-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] transition-all duration-250"
+                    style={{ left: form.isAktif ? "25px" : "3px" }}
                   />
                 </div>
               </div>
@@ -877,149 +456,56 @@ function AddPromoModal({ onClose, onSave }) {
 
           {/* STEP 2 */}
           {step === 2 && (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-            >
+            <div className="flex flex-col gap-5">
               <div>
-                <p
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    color: "#6b7280",
-                    margin: "0 0 10px 0",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.8px",
-                  }}
-                >
-                  Preview Banner
-                </p>
+                <p className={labelCls}>Preview Banner</p>
                 <div
+                  className="h-[100px] rounded-2xl relative flex items-center justify-center overflow-hidden border-[1.5px] border-[rgba(7,43,80,0.15)]"
                   style={{
-                    height: "100px",
-                    borderRadius: "14px",
                     background: `linear-gradient(135deg, ${form.bannerColor}ee, ${form.bannerColor}88)`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    position: "relative",
-                    overflow: "hidden",
-                    border: `1.5px solid ${NAVY_BORDER}`,
                   }}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "-20px",
-                      right: "-20px",
-                      width: "100px",
-                      height: "100px",
-                      borderRadius: "50%",
-                      background: "rgba(255,255,255,0.1)",
-                    }}
-                  />
-                  <p
-                    style={{
-                      fontSize: "16px",
-                      fontWeight: 800,
-                      color: "#fff",
-                      textShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                      margin: 0,
-                    }}
-                  >
+                  <div className="absolute -top-5 -right-5 w-[100px] h-[100px] rounded-full bg-white/10" />
+                  <p className="text-[16px] font-extrabold text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.2)] m-0">
                     {form.name || "Nama Promo"}
                   </p>
                 </div>
               </div>
+
               <div>
-                <p
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    color: "#6b7280",
-                    margin: "0 0 12px 0",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.8px",
-                  }}
-                >
-                  Pilih Warna Banner
-                </p>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "10px",
-                    marginBottom: "14px",
-                  }}
-                >
+                <p className={labelCls}>Pilih Warna Banner</p>
+                <div className="flex flex-wrap gap-2.5 mb-3.5">
                   {presetColors.map((c) => (
                     <div
                       key={c}
                       onClick={() => setForm({ ...form, bannerColor: c })}
+                      className="w-9 h-9 rounded-[10px] cursor-pointer transition-transform hover:scale-[1.15]"
                       style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
                         background: c,
-                        cursor: "pointer",
                         border:
                           form.bannerColor === c
                             ? "3px solid #1e2433"
                             : "3px solid transparent",
-                        transition: "transform 0.15s",
                         boxShadow:
                           form.bannerColor === c ? `0 0 0 2px ${c}55` : "none",
                       }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.transform = "scale(1.15)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.transform = "scale(1)")
-                      }
                     />
                   ))}
-                  <div
-                    style={{
-                      width: "36px",
-                      height: "36px",
-                      borderRadius: "10px",
-                      overflow: "hidden",
-                      border: `1.5px solid ${NAVY_BORDER}`,
-                      cursor: "pointer",
-                      position: "relative",
-                    }}
-                  >
+                  <div className="w-9 h-9 rounded-[10px] overflow-hidden border-[1.5px] border-[rgba(7,43,80,0.15)] cursor-pointer relative">
                     <input
                       type="color"
                       value={form.bannerColor}
                       onChange={(e) =>
                         setForm({ ...form, bannerColor: e.target.value })
                       }
-                      style={{
-                        position: "absolute",
-                        inset: "-4px",
-                        width: "calc(100% + 8px)",
-                        height: "calc(100% + 8px)",
-                        cursor: "pointer",
-                        border: "none",
-                        padding: 0,
-                      }}
+                      className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)] cursor-pointer border-none p-0"
                     />
                   </div>
                 </div>
               </div>
+
               <div>
-                <p
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    color: "#6b7280",
-                    margin: "0 0 12px 0",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.8px",
-                  }}
-                >
-                  Upload Gambar Banner (Opsional)
-                </p>
+                <p className={labelCls}>Upload Gambar Banner (Opsional)</p>
                 <div
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -1030,44 +516,18 @@ function AddPromoModal({ onClose, onSave }) {
                     e.preventDefault();
                     setDragOver(false);
                   }}
-                  style={{
-                    border: `2px dashed ${dragOver ? NAVY : NAVY_BORDER}`,
-                    borderRadius: "14px",
-                    padding: "32px 20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "10px",
-                    cursor: "pointer",
-                    background: dragOver ? NAVY_LIGHT : "#fafaff",
-                    transition: "all 0.2s",
-                  }}
+                  className={`border-2 border-dashed rounded-2xl py-8 px-5 flex flex-col items-center gap-2.5 cursor-pointer transition-all ${dragOver ? "border-[#072B50] bg-[rgba(7,43,80,0.07)]" : "border-[rgba(7,43,80,0.15)] bg-[#fafaff]"}`}
                 >
                   <div
-                    style={{
-                      width: "48px",
-                      height: "48px",
-                      borderRadius: "14px",
-                      background: dragOver ? NAVY : NAVY_LIGHT,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center ${dragOver ? "bg-[#072B50]" : "bg-[rgba(7,43,80,0.07)]"}`}
                   >
-                    <Upload size={22} color={dragOver ? "#fff" : NAVY} />
+                    <Upload size={22} color={dragOver ? "#fff" : "#072B50"} />
                   </div>
-                  <p
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 700,
-                      color: "#1e2433",
-                      margin: 0,
-                    }}
-                  >
+                  <p className="text-[14px] font-bold text-[#1e2433] m-0">
                     Drag & drop atau{" "}
-                    <span style={{ color: NAVY }}>klik upload</span>
+                    <span className="text-[#072B50]">klik upload</span>
                   </p>
-                  <p style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}>
+                  <p className="text-xs text-gray-400 m-0">
                     PNG, JPG — Maks. 2MB • Rekomendasi 1200×400px
                   </p>
                 </div>
@@ -1077,79 +537,33 @@ function AddPromoModal({ onClose, onSave }) {
 
           {/* STEP 3 */}
           {step === 3 && (
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "20px" }}
-            >
+            <div className="flex flex-col gap-5">
               <div>
-                <p
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    color: "#6b7280",
-                    margin: "0 0 12px 0",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.8px",
-                  }}
-                >
-                  Cari & Tambah Produk
-                </p>
-                <div style={{ position: "relative" }}>
+                <p className={labelCls}>Cari & Tambah Produk</p>
+                <div className="relative">
                   <Search
                     size={14}
                     color="#9ca3af"
-                    style={{
-                      position: "absolute",
-                      left: "14px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                    }}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
                   />
                   <input
                     value={produkSearch}
                     onChange={(e) => setProdukSearch(e.target.value)}
                     placeholder="Ketik nama produk..."
-                    style={{ ...inputStyle, paddingLeft: "38px" }}
-                    onFocus={focusNavy}
-                    onBlur={blurDefault}
+                    className={`${inputCls} pl-[38px]`}
                   />
                   {produkSearch && filteredProduk.length > 0 && (
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        right: 0,
-                        background: "#fff",
-                        border: `1.5px solid ${NAVY_BORDER}`,
-                        borderRadius: "12px",
-                        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-                        zIndex: 10,
-                        marginTop: "6px",
-                        overflow: "hidden",
-                      }}
-                    >
+                    <div className="absolute top-full left-0 right-0 bg-white border-[1.5px] border-[rgba(7,43,80,0.15)] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] z-10 mt-1.5 overflow-hidden">
                       {filteredProduk.map((p, i) => (
                         <div
                           key={p}
                           onClick={() => addProduk(p)}
+                          className="px-4 py-[11px] text-[13px] text-gray-700 cursor-pointer font-semibold hover:bg-[rgba(7,43,80,0.07)] hover:text-[#072B50]"
                           style={{
-                            padding: "11px 16px",
-                            fontSize: "13px",
-                            color: "#374151",
-                            cursor: "pointer",
-                            fontWeight: 600,
                             borderBottom:
                               i < filteredProduk.length - 1
-                                ? `1px solid ${NAVY_LIGHT}`
+                                ? "1px solid rgba(7,43,80,0.07)"
                                 : "none",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = NAVY_LIGHT;
-                            e.currentTarget.style.color = NAVY;
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "#fff";
-                            e.currentTarget.style.color = "#374151";
                           }}
                         >
                           + {p}
@@ -1159,56 +573,22 @@ function AddPromoModal({ onClose, onSave }) {
                   )}
                 </div>
               </div>
+
               {selectedProduk.length > 0 && (
                 <div>
-                  <p
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: "#6b7280",
-                      margin: "0 0 12px 0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.8px",
-                    }}
-                  >
+                  <p className={labelCls}>
                     Produk Terpilih ({selectedProduk.length})
                   </p>
-                  <div
-                    style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
-                  >
+                  <div className="flex flex-wrap gap-2">
                     {selectedProduk.map((p) => (
                       <span
                         key={p}
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          padding: "7px 12px",
-                          background: NAVY_LIGHT,
-                          borderRadius: "10px",
-                          fontSize: "13px",
-                          fontWeight: 700,
-                          color: NAVY,
-                          border: `1.5px solid ${NAVY_BORDER}`,
-                        }}
+                        className="flex items-center gap-2 px-3 py-[7px] bg-[rgba(7,43,80,0.07)] rounded-[10px] text-[13px] font-bold text-[#072B50] border-[1.5px] border-[rgba(7,43,80,0.15)]"
                       >
                         {p}
                         <button
                           onClick={() => removeProduk(p)}
-                          style={{
-                            background: NAVY_BORDER,
-                            border: "none",
-                            borderRadius: "6px",
-                            width: "18px",
-                            height: "18px",
-                            cursor: "pointer",
-                            color: NAVY,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            padding: 0,
-                            flexShrink: 0,
-                          }}
+                          className="bg-[rgba(7,43,80,0.15)] border-none rounded-md w-[18px] h-[18px] cursor-pointer text-[#072B50] flex items-center justify-center p-0 shrink-0"
                         >
                           <X size={10} />
                         </button>
@@ -1217,25 +597,10 @@ function AddPromoModal({ onClose, onSave }) {
                   </div>
                 </div>
               )}
+
               {form.name && (
-                <div
-                  style={{
-                    background: NAVY_LIGHT,
-                    borderRadius: "16px",
-                    padding: "20px",
-                    border: `1.5px solid ${NAVY_BORDER}`,
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: NAVY,
-                      margin: "0 0 14px 0",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.8px",
-                    }}
-                  >
+                <div className="bg-[rgba(7,43,80,0.07)] rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)]">
+                  <p className="text-[11px] font-extrabold text-[#072B50] mb-3.5 uppercase tracking-[0.8px]">
                     ✓ Ringkasan Promo
                   </p>
                   {[
@@ -1256,26 +621,9 @@ function AddPromoModal({ onClose, onSave }) {
                       value: `${selectedProduk.length} produk`,
                     },
                   ].map(({ label, value }) => (
-                    <div
-                      key={label}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      <span style={{ fontSize: "12px", color: "#6b7280" }}>
-                        {label}
-                      </span>
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          color: NAVY,
-                          maxWidth: "60%",
-                          textAlign: "right",
-                        }}
-                      >
+                    <div key={label} className="flex justify-between mb-2">
+                      <span className="text-xs text-gray-500">{label}</span>
+                      <span className="text-xs font-bold text-[#072B50] max-w-[60%] text-right">
                         {value}
                       </span>
                     </div>
@@ -1287,30 +635,11 @@ function AddPromoModal({ onClose, onSave }) {
         </div>
 
         {/* FOOTER */}
-        <div
-          style={{
-            padding: "20px 32px",
-            borderTop: `1.5px solid ${NAVY_BORDER}`,
-            display: "flex",
-            gap: "12px",
-            flexShrink: 0,
-            background: "#fafbff",
-          }}
-        >
+        <div className="px-8 py-5 border-t-[1.5px] border-[rgba(7,43,80,0.15)] flex gap-3 shrink-0 bg-[#fafbff]">
           {step > 1 && (
             <button
               onClick={() => setStep(step - 1)}
-              style={{
-                padding: "13px 20px",
-                borderRadius: "12px",
-                border: `1.5px solid ${NAVY_BORDER}`,
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: 700,
-                color: "#374151",
-                fontFamily: "inherit",
-              }}
+              className="px-5 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
             >
               ← Kembali
             </button>
@@ -1318,17 +647,7 @@ function AddPromoModal({ onClose, onSave }) {
           {step === 1 && (
             <button
               onClick={onClose}
-              style={{
-                padding: "13px 20px",
-                borderRadius: "12px",
-                border: `1.5px solid ${NAVY_BORDER}`,
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: 700,
-                color: "#374151",
-                fontFamily: "inherit",
-              }}
+              className="px-5 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
             >
               Batal
             </button>
@@ -1336,19 +655,7 @@ function AddPromoModal({ onClose, onSave }) {
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
-              style={{
-                flex: 1,
-                padding: "13px",
-                borderRadius: "12px",
-                border: "none",
-                background: NAVY,
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: 700,
-                boxShadow: "0 4px 15px rgba(7,43,80,0.3)",
-                fontFamily: "inherit",
-              }}
+              className="flex-1 py-3.5 rounded-xl border-none bg-[#072B50] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(7,43,80,0.3)] font-[inherit]"
             >
               Lanjut → {steps[step].label}
             </button>
@@ -1365,19 +672,7 @@ function AddPromoModal({ onClose, onSave }) {
                 });
                 onClose();
               }}
-              style={{
-                flex: 1,
-                padding: "13px",
-                borderRadius: "12px",
-                border: "none",
-                background: "linear-gradient(135deg, #10b981, #059669)",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: 700,
-                boxShadow: "0 4px 15px rgba(16,185,129,0.35)",
-                fontFamily: "inherit",
-              }}
+              className="flex-1 py-3.5 rounded-xl border-none bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(16,185,129,0.35)] font-[inherit]"
             >
               ✓ Simpan Promo
             </button>
@@ -1402,7 +697,7 @@ export default function Promo() {
     startDate: "",
     endDate: "",
     status: "Aktif",
-    bannerColor: NAVY,
+    bannerColor: "#072B50",
   });
 
   const totalPages = Math.ceil(promos.length / ITEMS_PER_PAGE);
@@ -1443,168 +738,60 @@ export default function Promo() {
   return (
     <div>
       {/* HEADER */}
-      <div style={{ marginBottom: "28px" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: "24px",
-          }}
-        >
+      <div className="mb-7">
+        <div className="flex justify-between items-start mb-6">
           <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "6px",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: NAVY,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  boxShadow: "0 4px 12px rgba(7,43,80,0.3)",
-                }}
-              >
+            <div className="flex items-center gap-3 mb-1.5">
+              <div className="w-10 h-10 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_12px_rgba(7,43,80,0.3)]">
                 <Zap size={20} color="#fff" />
               </div>
-              <h1
-                style={{
-                  fontSize: "26px",
-                  fontWeight: 800,
-                  color: NAVY,
-                  margin: 0,
-                  letterSpacing: "-0.5px",
-                }}
-              >
+              <h1 className="text-[26px] font-extrabold text-[#072B50] m-0 tracking-[-0.5px]">
                 Manajemen Promo
               </h1>
             </div>
-            <p
-              style={{
-                fontSize: "14px",
-                color: "#6b7280",
-                margin: 0,
-                paddingLeft: "52px",
-              }}
-            >
+            <p className="text-[14px] text-gray-500 m-0 pl-[52px]">
               Kelola semua penawaran promo aktif dan mendatang.
             </p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "13px 24px",
-              borderRadius: "14px",
-              background: NAVY,
-              color: "#fff",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 700,
-              boxShadow: "0 4px 16px rgba(7,43,80,0.3)",
-              fontFamily: "inherit",
-            }}
+            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#072B50] text-white border-none cursor-pointer text-[14px] font-bold shadow-[0_4px_16px_rgba(7,43,80,0.3)] font-[inherit]"
           >
             <Plus size={16} /> Tambah Promo
           </button>
         </div>
 
         {/* STAT CARDS */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "16px",
-          }}
-        >
+        <div className="grid grid-cols-3 gap-4">
           {[
             {
               label: "Promo Aktif",
               value: aktifCount,
               icon: <Activity size={20} color="#fff" />,
-              bg: "#fff",
-              border: NAVY_BORDER,
-              color: NAVY,
-              iconBg: NAVY,
             },
             {
               label: "Segera Mulai",
               value: segeraCount,
               icon: <Clock size={20} color="#fff" />,
-              bg: "#fff",
-              border: NAVY_BORDER,
-              color: NAVY,
-              iconBg: NAVY,
             },
             {
               label: "Berakhir",
               value: berakhirCount,
               icon: <AlertTriangle size={20} color="#fff" />,
-              bg: "#fff",
-              border: NAVY_BORDER,
-              color: NAVY,
-              iconBg: NAVY,
             },
-          ].map(({ label, value, icon, bg, border, color, iconBg }) => (
+          ].map(({ label, value, icon }) => (
             <div
               key={label}
-              style={{
-                background: bg,
-                borderRadius: "16px",
-                padding: "20px",
-                border: `1.5px solid ${border}`,
-                display: "flex",
-                alignItems: "center",
-                gap: "16px",
-              }}
+              className="bg-white rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-4"
             >
-              <div
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "14px",
-                  background: iconBg,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                }}
-              >
+              <div className="w-12 h-12 rounded-2xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
                 {icon}
               </div>
               <div>
-                <p
-                  style={{
-                    fontSize: "28px",
-                    fontWeight: 800,
-                    color,
-                    margin: 0,
-                    lineHeight: 1,
-                  }}
-                >
+                <p className="text-[28px] font-extrabold text-[#072B50] m-0 leading-none">
                   {value}
                 </p>
-                <p
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    color,
-                    margin: "4px 0 0 0",
-                    opacity: 0.8,
-                  }}
-                >
+                <p className="text-[13px] font-semibold text-[#072B50]/80 mt-1 mb-0">
                   {label}
                 </p>
               </div>
@@ -1614,69 +801,27 @@ export default function Promo() {
       </div>
 
       {/* TABLE */}
-      <div
-        style={{
-          background: "#fff",
-          borderRadius: "20px",
-          border: `1.5px solid ${NAVY_BORDER}`,
-          overflow: "hidden",
-          boxShadow: "0 4px 24px rgba(7,43,80,0.08)",
-        }}
-      >
-        <div
-          style={{
-            background: NAVY,
-            padding: "16px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div className="bg-white rounded-[20px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
+        <div className="bg-[#072B50] px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Tag size={16} color="#fff" />
-            <span
-              style={{
-                fontSize: "13px",
-                fontWeight: 700,
-                color: "#fff",
-                textTransform: "uppercase",
-                letterSpacing: "0.8px",
-              }}
-            >
+            <span className="text-[13px] font-bold text-white uppercase tracking-[0.8px]">
               Daftar Promo
             </span>
           </div>
-          <span
-            style={{
-              fontSize: "12px",
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.7)",
-            }}
-          >
+          <span className="text-xs font-semibold text-white/70">
             {promos.length} total promo
           </span>
         </div>
 
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className="w-full border-collapse">
           <thead>
-            <tr
-              style={{
-                background: "#fafbff",
-                borderBottom: `1.5px solid ${NAVY_BORDER}`,
-              }}
-            >
+            <tr className="bg-[#fafbff] border-b-[1.5px] border-[rgba(7,43,80,0.15)]">
               {["BANNER", "NAMA PROMO", "PERIODE", "STATUS", "AKSI"].map(
                 (h) => (
                   <th
                     key={h}
-                    style={{
-                      padding: "14px 18px",
-                      textAlign: h === "AKSI" ? "right" : "left",
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: "#9ca3af",
-                      letterSpacing: "0.8px",
-                    }}
+                    className={`px-[18px] py-3.5 text-[11px] font-extrabold text-gray-400 tracking-[0.8px] ${h === "AKSI" ? "text-right" : "text-left"}`}
                   >
                     {h}
                   </th>
@@ -1690,165 +835,67 @@ export default function Promo() {
               return (
                 <tr
                   key={promo.id}
-                  style={{
-                    borderBottom:
-                      i < paginated.length - 1 ? `1.5px solid #f8f9fc` : "none",
-                    transition: "background 0.15s",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = NAVY_LIGHT)
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "transparent")
-                  }
+                  className={`transition-colors hover:bg-[rgba(7,43,80,0.07)] ${i < paginated.length - 1 ? "border-b border-[#f8f9fc]" : ""}`}
                 >
-                  <td style={{ padding: "16px 18px" }}>
+                  <td className="px-[18px] py-4">
                     <div
+                      className="w-[88px] h-[54px] rounded-xl relative flex items-center justify-center overflow-hidden"
                       style={{
-                        width: "88px",
-                        height: "54px",
-                        borderRadius: "12px",
                         background: `linear-gradient(135deg, ${promo.bannerColor}ee, ${promo.bannerColor}77)`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        position: "relative",
-                        overflow: "hidden",
                         boxShadow: `0 4px 12px ${promo.bannerColor}44`,
                       }}
                     >
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "-8px",
-                          right: "-8px",
-                          width: "32px",
-                          height: "32px",
-                          borderRadius: "50%",
-                          background: "rgba(255,255,255,0.15)",
-                        }}
-                      />
+                      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white/15" />
                       <Tag size={18} color="#fff" />
                     </div>
                   </td>
-                  <td style={{ padding: "16px 18px" }}>
-                    <p
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        color: NAVY,
-                        margin: "0 0 4px 0",
-                      }}
-                    >
+                  <td className="px-[18px] py-4">
+                    <p className="text-[14px] font-bold text-[#072B50] mb-1">
                       {promo.name}
                     </p>
-                    <p
-                      style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}
-                    >
-                      {promo.desc}
-                    </p>
+                    <p className="text-xs text-gray-400 m-0">{promo.desc}</p>
                   </td>
-                  <td style={{ padding: "16px 18px" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "6px",
-                      }}
-                    >
+                  <td className="px-[18px] py-4">
+                    <div className="flex items-center gap-1.5">
                       <Calendar size={13} color="#9ca3af" />
-                      <span
-                        style={{
-                          fontSize: "13px",
-                          color: "#374151",
-                          fontWeight: 500,
-                        }}
-                      >
+                      <span className="text-[13px] text-gray-700 font-medium">
                         {formatDate(promo.startDate)} –{" "}
                         {formatDate(promo.endDate)}
                       </span>
                     </div>
                   </td>
-                  <td style={{ padding: "16px 18px" }}>
+                  <td className="px-[18px] py-4">
                     <span
-                      style={{
-                        padding: "5px 12px",
-                        borderRadius: "20px",
-                        fontSize: "12px",
-                        fontWeight: 700,
-                        background: cfg.bg,
-                        color: cfg.color,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "6px",
-                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full text-xs font-bold"
+                      style={{ background: cfg.bg, color: cfg.color }}
                     >
                       <span
-                        style={{
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          background: cfg.dot,
-                          display: "inline-block",
-                        }}
+                        className="w-1.5 h-1.5 rounded-full inline-block"
+                        style={{ background: cfg.dot }}
                       />
                       {cfg.label}
                     </span>
                   </td>
-                  <td style={{ padding: "16px 18px", textAlign: "right" }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      {[
-                        {
-                          icon: <Eye size={14} />,
-                          bg: NAVY_LIGHT,
-                          color: NAVY,
-                          action: () => setViewPromo(promo),
-                        },
-                        {
-                          icon: <Pencil size={14} />,
-                          bg: "#fefce8",
-                          color: "#ca8a04",
-                          action: () => openEdit(promo),
-                        },
-                        {
-                          icon: <Trash2 size={14} />,
-                          bg: "#fef2f2",
-                          color: "#ef4444",
-                          action: () => setDeleteId(promo.id),
-                        },
-                      ].map(({ icon, bg, color, action }, idx) => (
-                        <button
-                          key={idx}
-                          onClick={action}
-                          style={{
-                            width: "34px",
-                            height: "34px",
-                            borderRadius: "10px",
-                            border: "none",
-                            background: bg,
-                            color,
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            transition: "transform 0.15s",
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.currentTarget.style.transform = "scale(1.1)")
-                          }
-                          onMouseLeave={(e) =>
-                            (e.currentTarget.style.transform = "scale(1)")
-                          }
-                        >
-                          {icon}
-                        </button>
-                      ))}
+                  <td className="px-[18px] py-4 text-right">
+                    <div className="flex gap-2 justify-end">
+                      <button
+                        onClick={() => setViewPromo(promo)}
+                        className="w-[34px] h-[34px] rounded-[10px] border-none bg-[rgba(7,43,80,0.07)] text-[#072B50] cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                      >
+                        <Eye size={14} />
+                      </button>
+                      <button
+                        onClick={() => openEdit(promo)}
+                        className="w-[34px] h-[34px] rounded-[10px] border-none bg-yellow-50 text-yellow-600 cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteId(promo.id)}
+                        className="w-[34px] h-[34px] rounded-[10px] border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -1858,35 +905,17 @@ export default function Promo() {
         </table>
 
         {/* PAGINATION */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "16px 20px",
-            borderTop: `1.5px solid ${NAVY_BORDER}`,
-            background: "#fafbff",
-          }}
-        >
-          <p style={{ fontSize: "13px", color: "#9ca3af", margin: 0 }}>
+        <div className="flex justify-between items-center px-5 py-4 border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]">
+          <p className="text-[13px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, promos.length)} dari{" "}
             {promos.length} promo
           </p>
-          <div style={{ display: "flex", gap: "6px" }}>
+          <div className="flex gap-1.5">
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              style={{
-                width: "34px",
-                height: "34px",
-                borderRadius: "10px",
-                border: `1.5px solid ${NAVY_BORDER}`,
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-                color: "#374151",
-              }}
+              className="w-[34px] h-[34px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] text-gray-700 disabled:opacity-40"
             >
               ‹
             </button>
@@ -1894,24 +923,7 @@ export default function Promo() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                style={{
-                  width: "34px",
-                  height: "34px",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  background: currentPage === page ? NAVY : "#fff",
-                  color: currentPage === page ? "#fff" : "#374151",
-                  border:
-                    currentPage === page
-                      ? "none"
-                      : `1.5px solid ${NAVY_BORDER}`,
-                  boxShadow:
-                    currentPage === page
-                      ? "0 4px 10px rgba(7,43,80,0.25)"
-                      : "none",
-                }}
+                className={`w-[34px] h-[34px] rounded-[10px] cursor-pointer text-[13px] font-bold border transition-all ${currentPage === page ? "bg-[#072B50] text-white border-transparent shadow-[0_4px_10px_rgba(7,43,80,0.25)]" : "bg-white text-gray-700 border-[rgba(7,43,80,0.15)]"}`}
               >
                 {page}
               </button>
@@ -1919,16 +931,7 @@ export default function Promo() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              style={{
-                width: "34px",
-                height: "34px",
-                borderRadius: "10px",
-                border: `1.5px solid ${NAVY_BORDER}`,
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: "14px",
-                color: "#374151",
-              }}
+              className="w-[34px] h-[34px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] text-gray-700 disabled:opacity-40"
             >
               ›
             </button>
@@ -1949,183 +952,70 @@ export default function Promo() {
       {/* MODAL EDIT */}
       {editPromo && (
         <Overlay onClose={() => setEditPromo(null)}>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "20px",
-              width: "480px",
-              overflow: "hidden",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.25)",
-            }}
-          >
-            <div
-              style={{
-                background: NAVY,
-                padding: "24px 28px",
-                display: "flex",
-                alignItems: "center",
-                gap: "14px",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.15)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+          <div className="bg-white rounded-[20px] w-[480px] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.25)]">
+            <div className="bg-[#072B50] px-7 py-6 flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
                 <Pencil size={18} color="#fff" />
               </div>
               <div>
-                <h2
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 800,
-                    color: "#fff",
-                    margin: 0,
-                  }}
-                >
+                <h2 className="text-[16px] font-extrabold text-white m-0">
                   Edit Promo
                 </h2>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.7)",
-                    margin: 0,
-                  }}
-                >
-                  {editPromo.name}
-                </p>
+                <p className="text-xs text-white/70 m-0">{editPromo.name}</p>
               </div>
               <button
                 onClick={() => setEditPromo(null)}
-                style={{
-                  marginLeft: "auto",
-                  background: "rgba(255,255,255,0.15)",
-                  border: "none",
-                  borderRadius: "8px",
-                  width: "32px",
-                  height: "32px",
-                  cursor: "pointer",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="ml-auto bg-white/15 border-none rounded-lg w-8 h-8 cursor-pointer text-white flex items-center justify-center"
               >
                 <X size={16} />
               </button>
             </div>
-            <div
-              style={{
-                padding: "28px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-              }}
-            >
+
+            <div className="p-7 flex flex-col gap-4">
               {[
                 { label: "Nama Promo", key: "name" },
                 { label: "Deskripsi", key: "desc" },
               ].map(({ label, key }) => (
                 <div key={key}>
-                  <label
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: "#9ca3af",
-                      display: "block",
-                      marginBottom: "6px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.8px",
-                    }}
-                  >
-                    {label}
-                  </label>
+                  <label className={labelSmCls}>{label}</label>
                   <input
                     value={editForm[key]}
                     onChange={(e) =>
                       setEditForm({ ...editForm, [key]: e.target.value })
                     }
-                    style={inputStyle}
-                    onFocus={focusNavy}
-                    onBlur={blurDefault}
+                    className={inputCls}
                   />
                 </div>
               ))}
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
-                }}
-              >
+
+              <div className="grid grid-cols-2 gap-3">
                 {[
                   { label: "Tanggal Mulai", key: "startDate", type: "date" },
                   { label: "Tanggal Selesai", key: "endDate", type: "date" },
                 ].map(({ label, key, type }) => (
                   <div key={key}>
-                    <label
-                      style={{
-                        fontSize: "11px",
-                        fontWeight: 800,
-                        color: "#9ca3af",
-                        display: "block",
-                        marginBottom: "6px",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.8px",
-                      }}
-                    >
-                      {label}
-                    </label>
+                    <label className={labelSmCls}>{label}</label>
                     <input
                       type={type}
                       value={editForm[key]}
                       onChange={(e) =>
                         setEditForm({ ...editForm, [key]: e.target.value })
                       }
-                      style={inputStyle}
-                      onFocus={focusNavy}
-                      onBlur={blurDefault}
+                      className={inputCls}
                     />
                   </div>
                 ))}
               </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "12px",
-                }}
-              >
+
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: "#9ca3af",
-                      display: "block",
-                      marginBottom: "6px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.8px",
-                    }}
-                  >
-                    Status
-                  </label>
+                  <label className={labelSmCls}>Status</label>
                   <select
                     value={editForm.status}
                     onChange={(e) =>
                       setEditForm({ ...editForm, status: e.target.value })
                     }
-                    style={{
-                      ...inputStyle,
-                      appearance: "none",
-                      cursor: "pointer",
-                    }}
+                    className={`${inputCls} appearance-none cursor-pointer`}
                   >
                     <option value="Aktif">Aktif</option>
                     <option value="Segera">Segera</option>
@@ -2133,30 +1023,8 @@ export default function Promo() {
                   </select>
                 </div>
                 <div>
-                  <label
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: "#9ca3af",
-                      display: "block",
-                      marginBottom: "6px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.8px",
-                    }}
-                  >
-                    Warna Banner
-                  </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                      padding: "8px 12px",
-                      background: "#f8f9fc",
-                      borderRadius: "10px",
-                      border: `1.5px solid ${NAVY_BORDER}`,
-                    }}
-                  >
+                  <label className={labelSmCls}>Warna Banner</label>
+                  <div className="flex items-center gap-2.5 px-3 py-2 bg-[#f8f9fc] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)]">
                     <input
                       type="color"
                       value={editForm.bannerColor}
@@ -2166,61 +1034,25 @@ export default function Promo() {
                           bannerColor: e.target.value,
                         })
                       }
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "8px",
-                        border: "none",
-                        cursor: "pointer",
-                        padding: 0,
-                        background: "none",
-                      }}
+                      className="w-9 h-9 rounded-lg border-none cursor-pointer p-0 bg-transparent"
                     />
-                    <span
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: 700,
-                        color: "#374151",
-                      }}
-                    >
+                    <span className="text-[13px] font-bold text-gray-700">
                       {editForm.bannerColor.toUpperCase()}
                     </span>
                   </div>
                 </div>
               </div>
-              <div style={{ display: "flex", gap: "12px", marginTop: "4px" }}>
+
+              <div className="flex gap-3 mt-1">
                 <button
                   onClick={() => setEditPromo(null)}
-                  style={{
-                    flex: 1,
-                    padding: "13px",
-                    borderRadius: "12px",
-                    border: `1.5px solid ${NAVY_BORDER}`,
-                    background: "#fff",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    color: "#374151",
-                    fontFamily: "inherit",
-                  }}
+                  className="flex-1 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  style={{
-                    flex: 2,
-                    padding: "13px",
-                    borderRadius: "12px",
-                    border: "none",
-                    background: NAVY,
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    boxShadow: "0 4px 15px rgba(7,43,80,0.3)",
-                    fontFamily: "inherit",
-                  }}
+                  className="flex-[2] py-3.5 rounded-xl border-none bg-[#072B50] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(7,43,80,0.3)] font-[inherit]"
                 >
                   Simpan Perubahan
                 </button>
@@ -2233,91 +1065,30 @@ export default function Promo() {
       {/* MODAL HAPUS */}
       {deleteId !== null && (
         <Overlay onClose={() => setDeleteId(null)}>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: "20px",
-              width: "380px",
-              overflow: "hidden",
-              boxShadow: "0 32px 80px rgba(0,0,0,0.25)",
-            }}
-          >
-            <div
-              style={{
-                background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                padding: "32px 28px",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: "64px",
-                  height: "64px",
-                  borderRadius: "20px",
-                  background: "rgba(255,255,255,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 16px",
-                }}
-              >
+          <div className="bg-white rounded-[20px] w-[380px] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.25)]">
+            <div className="bg-gradient-to-br from-red-500 to-red-600 py-8 px-7 text-center">
+              <div className="w-16 h-16 rounded-[20px] bg-white/20 flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle size={30} color="#fff" />
               </div>
-              <h3
-                style={{
-                  fontSize: "20px",
-                  fontWeight: 800,
-                  color: "#fff",
-                  margin: "0 0 8px 0",
-                }}
-              >
+              <h3 className="text-[20px] font-extrabold text-white mb-2">
                 Hapus Promo?
               </h3>
-              <p
-                style={{
-                  fontSize: "13px",
-                  color: "rgba(255,255,255,0.85)",
-                  margin: 0,
-                  lineHeight: 1.6,
-                }}
-              >
+              <p className="text-[13px] text-white/85 m-0 leading-relaxed">
                 Tindakan ini tidak dapat dibatalkan.
                 <br />
                 Promo akan dihapus permanen.
               </p>
             </div>
-            <div style={{ padding: "24px 28px", display: "flex", gap: "12px" }}>
+            <div className="px-7 py-6 flex gap-3">
               <button
                 onClick={() => setDeleteId(null)}
-                style={{
-                  flex: 1,
-                  padding: "13px",
-                  borderRadius: "12px",
-                  border: `1.5px solid ${NAVY_BORDER}`,
-                  background: "#fff",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: "#374151",
-                  fontFamily: "inherit",
-                }}
+                className="flex-1 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                style={{
-                  flex: 1,
-                  padding: "13px",
-                  borderRadius: "12px",
-                  border: "none",
-                  background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  fontFamily: "inherit",
-                }}
+                className="flex-1 py-3.5 rounded-xl border-none bg-gradient-to-br from-red-500 to-red-600 text-white cursor-pointer text-[14px] font-bold font-[inherit]"
               >
                 Ya, Hapus
               </button>

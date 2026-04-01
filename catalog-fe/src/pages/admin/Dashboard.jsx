@@ -12,11 +12,6 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 
-const NAVY = "#072B50";
-const NAVY_LIGHT = "rgba(7,43,80,0.07)";
-const NAVY_BORDER = "rgba(7,43,80,0.12)";
-const NAVY_MID = "rgba(7,43,80,0.45)";
-
 const chartData = [
   { day: "Sen", v: 40 },
   { day: "Sel", v: 55 },
@@ -26,6 +21,8 @@ const chartData = [
   { day: "Sab", v: 45 },
   { day: "Min", v: 30 },
 ];
+
+const tooltipLabels = ["< 1k", "1.6k", "1.9k", "2.7k", "2.2k", "1.3k", "0.9k"];
 
 const stats = [
   {
@@ -88,8 +85,9 @@ const activities = [
     branch: "Cabang Jakarta Selatan",
     time: "2 jam lalu",
     tag: "Produk Baru",
-    tagColor: NAVY,
-    tagBg: NAVY_LIGHT,
+    tagColor: "#072B50",
+    tagBg: "rgba(7,43,80,0.07)",
+    tagBorder: "rgba(7,43,80,0.22)",
   },
   {
     emoji: "🏷️",
@@ -99,6 +97,7 @@ const activities = [
     tag: "Aktif",
     tagColor: "#16a34a",
     tagBg: "#dcfce7",
+    tagBorder: "#16a34a22",
   },
   {
     emoji: "✏️",
@@ -108,28 +107,15 @@ const activities = [
     tag: "Diperbarui",
     tagColor: "#d97706",
     tagBg: "#fef3c7",
+    tagBorder: "#d9770622",
   },
 ];
-
-const card = {
-  background: "#fff",
-  borderRadius: "16px",
-  border: `1px solid ${NAVY_BORDER}`,
-  overflow: "hidden",
-};
 
 export default function Dashboard() {
   const [hovered, setHovered] = useState(3);
 
   return (
-    <div
-      style={{
-        background: "#f4f6fb",
-        minHeight: "100vh",
-        padding: "28px",
-        fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
-      }}
-    >
+    <div className="bg-[#f4f6fb] min-h-screen p-7 font-['DM_Sans','Segoe_UI',sans-serif]">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap');
         * { box-sizing: border-box; }
@@ -144,169 +130,64 @@ export default function Dashboard() {
         .a3 { animation: fadeUp 0.4s ease 0.17s both; }
         .a4 { animation: fadeUp 0.4s ease 0.24s both; }
         @keyframes pulseDot { 0%,100%{opacity:1} 50%{opacity:0.45} }
+        .pulse-dot { animation: pulseDot 2s infinite; }
       `}</style>
 
       {/* HEADER */}
-      <div
-        className="a1"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "22px",
-        }}
-      >
+      <div className="a1 flex justify-between items-center mb-[22px]">
         <div>
-          <h1
-            style={{
-              margin: "0 0 4px",
-              fontSize: "20px",
-              fontWeight: 800,
-              color: NAVY,
-              letterSpacing: "-0.4px",
-            }}
-          >
+          <h1 className="m-0 mb-1 text-[20px] font-extrabold text-[#072B50] tracking-[-0.4px]">
             Dashboard Admin
           </h1>
-          <p style={{ margin: 0, fontSize: "13px", color: NAVY_MID }}>
+          <p className="m-0 text-[13px] text-[rgba(7,43,80,0.45)]">
             Selamat datang kembali — ringkasan katalog toko Anda.
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-              background: "#f0fdf4",
-              border: "1px solid #86efac",
-              borderRadius: "10px",
-              padding: "8px 14px",
-            }}
-          >
-            <div
-              style={{
-                width: "7px",
-                height: "7px",
-                borderRadius: "50%",
-                background: "#22c55e",
-                animation: "pulseDot 2s infinite",
-              }}
-            />
-            <span
-              style={{ fontSize: "12px", fontWeight: 700, color: "#16a34a" }}
-            >
-              Toko Aktif
-            </span>
+        <div className="flex gap-2">
+          <div className="flex items-center gap-[7px] bg-[#f0fdf4] border border-[#86efac] rounded-[10px] px-3.5 py-2">
+            <div className="pulse-dot w-[7px] h-[7px] rounded-full bg-[#22c55e]" />
+            <span className="text-xs font-bold text-[#16a34a]">Toko Aktif</span>
           </div>
-          <div
-            style={{
-              background: "#fff",
-              border: `1px solid ${NAVY_BORDER}`,
-              borderRadius: "10px",
-              padding: "8px 14px",
-              fontSize: "12px",
-              color: NAVY_MID,
-              fontWeight: 600,
-            }}
-          >
+          <div className="bg-white border border-[rgba(7,43,80,0.12)] rounded-[10px] px-3.5 py-2 text-xs text-[rgba(7,43,80,0.45)] font-semibold">
             Senin, 30 Mar 2026
           </div>
         </div>
       </div>
 
       {/* STAT CARDS */}
-      <div
-        className="a2"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3,1fr)",
-          gap: "14px",
-          marginBottom: "14px",
-        }}
-      >
+      <div className="a2 grid grid-cols-3 gap-3.5 mb-3.5">
         {stats.map((s, i) => {
           const Icon = s.icon;
+          const changeCls =
+            s.positive === true
+              ? "text-[#16a34a] bg-[#dcfce7]"
+              : s.positive === false
+                ? "text-[#ef4444] bg-[#fee2e2]"
+                : "text-gray-500 bg-gray-100";
           return (
             <div
               key={i}
-              className="hov-card"
-              style={{ ...card, padding: "20px" }}
+              className="hov-card bg-white rounded-2xl border border-[rgba(7,43,80,0.12)] overflow-hidden p-5"
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: "16px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "44px",
-                    height: "44px",
-                    borderRadius: "12px",
-                    background: NAVY,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "0 4px 14px rgba(7,43,80,0.28)",
-                  }}
-                >
+              <div className="flex justify-between items-start mb-4">
+                <div className="w-11 h-11 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_14px_rgba(7,43,80,0.28)]">
                   <Icon size={20} color="#fff" />
                 </div>
-                <ArrowUpRight size={15} color={NAVY_MID} />
+                <ArrowUpRight size={15} color="rgba(7,43,80,0.45)" />
               </div>
-              <p
-                style={{
-                  margin: "0 0 4px",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  color: NAVY_MID,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.8px",
-                }}
-              >
+              <p className="m-0 mb-1 text-[11px] font-bold text-[rgba(7,43,80,0.45)] uppercase tracking-[0.8px]">
                 {s.label}
               </p>
-              <p
-                style={{
-                  margin: "0 0 12px",
-                  fontSize: "34px",
-                  fontWeight: 800,
-                  color: NAVY,
-                  lineHeight: 1,
-                  letterSpacing: "-1.5px",
-                }}
-              >
+              <p className="m-0 mb-3 text-[34px] font-extrabold text-[#072B50] leading-none tracking-[-1.5px]">
                 {s.value}
               </p>
-              <div
-                style={{ display: "flex", alignItems: "center", gap: "6px" }}
-              >
+              <div className="flex items-center gap-1.5">
                 <span
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    padding: "3px 10px",
-                    borderRadius: "20px",
-                    color:
-                      s.positive === true
-                        ? "#16a34a"
-                        : s.positive === false
-                          ? "#ef4444"
-                          : "#6b7280",
-                    background:
-                      s.positive === true
-                        ? "#dcfce7"
-                        : s.positive === false
-                          ? "#fee2e2"
-                          : "#f3f4f6",
-                  }}
+                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full ${changeCls}`}
                 >
                   {s.change}
                 </span>
-                <span style={{ fontSize: "12px", color: NAVY_MID }}>
+                <span className="text-xs text-[rgba(7,43,80,0.45)]">
                   {s.desc}
                 </span>
               </div>
@@ -317,181 +198,66 @@ export default function Dashboard() {
 
       {/* ROW 2: Chart + Top Produk */}
       <div
-        className="a3"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 360px",
-          gap: "14px",
-          marginBottom: "14px",
-        }}
+        className="a3 grid gap-3.5 mb-3.5"
+        style={{ gridTemplateColumns: "1fr 360px" }}
       >
         {/* CHART */}
-        <div style={card}>
-          <div
-            style={{
-              background: NAVY,
-              padding: "14px 20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div className="bg-white rounded-2xl border border-[rgba(7,43,80,0.12)] overflow-hidden">
+          <div className="bg-[#072B50] px-5 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
               <Activity size={15} color="#fff" />
-              <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: "#fff",
-                  letterSpacing: "0.4px",
-                }}
-              >
+              <span className="text-[13px] font-bold text-white tracking-[0.4px]">
                 Analitik Tampilan Katalog
               </span>
             </div>
-            <select
-              style={{
-                fontSize: "12px",
-                padding: "5px 10px",
-                borderRadius: "7px",
-                border: "1px solid rgba(255,255,255,0.25)",
-                color: "#fff",
-                background: "rgba(255,255,255,0.12)",
-                cursor: "pointer",
-                outline: "none",
-                fontWeight: 600,
-                fontFamily: "inherit",
-              }}
-            >
-              <option style={{ color: NAVY }}>7 Hari Terakhir</option>
-              <option style={{ color: NAVY }}>30 Hari Terakhir</option>
+            <select className="text-xs px-2.5 py-[5px] rounded-[7px] border border-white/25 text-white bg-white/12 cursor-pointer outline-none font-semibold font-[inherit]">
+              <option style={{ color: "#072B50" }}>7 Hari Terakhir</option>
+              <option style={{ color: "#072B50" }}>30 Hari Terakhir</option>
             </select>
           </div>
 
-          <div style={{ padding: "20px 24px" }}>
-            <div style={{ display: "flex", gap: "28px", marginBottom: "20px" }}>
+          <div className="px-6 py-5">
+            <div className="flex gap-7 mb-5">
               <div>
-                <p
-                  style={{
-                    margin: "0 0 2px",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    color: NAVY_MID,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.7px",
-                  }}
-                >
+                <p className="m-0 mb-0.5 text-[11px] font-bold text-[rgba(7,43,80,0.45)] uppercase tracking-[0.7px]">
                   Total Tampilan
                 </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "26px",
-                    fontWeight: 800,
-                    color: NAVY,
-                    letterSpacing: "-1px",
-                  }}
-                >
+                <p className="m-0 text-[26px] font-extrabold text-[#072B50] tracking-[-1px]">
                   11.9k
                 </p>
               </div>
-              <div style={{ width: "1px", background: NAVY_BORDER }} />
+              <div className="w-px bg-[rgba(7,43,80,0.12)]" />
               <div>
-                <p
-                  style={{
-                    margin: "0 0 2px",
-                    fontSize: "11px",
-                    fontWeight: 700,
-                    color: NAVY_MID,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.7px",
-                  }}
-                >
+                <p className="m-0 mb-0.5 text-[11px] font-bold text-[rgba(7,43,80,0.45)] uppercase tracking-[0.7px]">
                   Rata-rata/Hari
                 </p>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "26px",
-                    fontWeight: 800,
-                    color: NAVY,
-                    letterSpacing: "-1px",
-                  }}
-                >
+                <p className="m-0 text-[26px] font-extrabold text-[#072B50] tracking-[-1px]">
                   1.7k
                 </p>
               </div>
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-end",
-                gap: "8px",
-                height: "130px",
-              }}
-            >
+            <div className="flex items-end gap-2 h-[130px]">
               {chartData.map((bar, i) => {
                 const active = hovered === i;
                 return (
                   <div
                     key={i}
-                    className="bar-item"
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      gap: "6px",
-                      height: "100%",
-                      position: "relative",
-                    }}
+                    className="bar-item flex-1 flex flex-col items-center gap-1.5 h-full relative"
                     onMouseEnter={() => setHovered(i)}
                     onMouseLeave={() => setHovered(3)}
                   >
                     {active && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "-26px",
-                          fontSize: "10px",
-                          fontWeight: 800,
-                          color: "#fff",
-                          background: NAVY,
-                          padding: "2px 7px",
-                          borderRadius: "6px",
-                          boxShadow: "0 3px 8px rgba(7,43,80,0.3)",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {
-                          [
-                            "< 1k",
-                            "1.6k",
-                            "1.9k",
-                            "2.7k",
-                            "2.2k",
-                            "1.3k",
-                            "0.9k",
-                          ][i]
-                        }
+                      <div className="absolute -top-[26px] text-[10px] font-extrabold text-white bg-[#072B50] px-[7px] py-0.5 rounded-md shadow-[0_3px_8px_rgba(7,43,80,0.3)] whitespace-nowrap">
+                        {tooltipLabels[i]}
                       </div>
                     )}
-                    <div
-                      style={{
-                        flex: 1,
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "flex-end",
-                      }}
-                    >
+                    <div className="flex-1 w-full flex items-end">
                       <div
+                        className="w-full rounded-t-md transition-all duration-200"
                         style={{
-                          width: "100%",
                           height: `${bar.v}%`,
-                          borderRadius: "6px 6px 0 0",
-                          background: active ? NAVY : NAVY_LIGHT,
-                          transition: "all 0.2s ease",
+                          background: active ? "#072B50" : "rgba(7,43,80,0.07)",
                           boxShadow: active
                             ? "0 4px 14px rgba(7,43,80,0.28)"
                             : "none",
@@ -499,11 +265,10 @@ export default function Dashboard() {
                       />
                     </div>
                     <span
+                      className="text-[11px] transition-all duration-200"
                       style={{
-                        fontSize: "11px",
                         fontWeight: active ? 800 : 500,
-                        color: active ? NAVY : NAVY_MID,
-                        transition: "all 0.2s",
+                        color: active ? "#072B50" : "rgba(7,43,80,0.45)",
                       }}
                     >
                       {bar.day}
@@ -516,129 +281,63 @@ export default function Dashboard() {
         </div>
 
         {/* TOP PRODUK */}
-        <div style={card}>
-          <div
-            style={{
-              background: NAVY,
-              padding: "14px 20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <div className="bg-white rounded-2xl border border-[rgba(7,43,80,0.12)] overflow-hidden">
+          <div className="bg-[#072B50] px-5 py-3.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
               <TrendingUp size={15} color="#fff" />
-              <span
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  color: "#fff",
-                  letterSpacing: "0.4px",
-                }}
-              >
+              <span className="text-[13px] font-bold text-white tracking-[0.4px]">
                 Produk Terpopuler
               </span>
             </div>
             <Eye size={14} color="rgba(255,255,255,0.55)" />
           </div>
 
-          <div style={{ padding: "14px" }}>
+          <div className="p-3.5">
             {topProducts.map((p, i) => (
               <div
                 key={i}
-                className="hov-row"
+                className="hov-row p-3 mb-1"
                 style={{
-                  padding: "12px",
-                  marginBottom: "4px",
-                  background: i === 0 ? NAVY_LIGHT : "transparent",
+                  background: i === 0 ? "rgba(7,43,80,0.07)" : "transparent",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    marginBottom: "8px",
-                  }}
-                >
+                <div className="flex items-center gap-2.5 mb-2">
                   <span
+                    className="text-[11px] font-extrabold min-w-[22px]"
                     style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      color: i === 0 ? NAVY : NAVY_MID,
-                      minWidth: "22px",
+                      color: i === 0 ? "#072B50" : "rgba(7,43,80,0.45)",
                     }}
                   >
                     {String(p.rank).padStart(2, "0")}
                   </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "13px",
-                        fontWeight: 700,
-                        color: NAVY,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
+                  <div className="flex-1 min-w-0">
+                    <p className="m-0 text-[13px] font-bold text-[#072B50] truncate">
                       {p.name}
                     </p>
-                    <p style={{ margin: 0, fontSize: "11px", color: NAVY_MID }}>
+                    <p className="m-0 text-[11px] text-[rgba(7,43,80,0.45)]">
                       {p.views} tayangan
                     </p>
                   </div>
                   <span
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      flexShrink: 0,
-                      color: p.positive ? "#16a34a" : "#ef4444",
-                      background: p.positive ? "#dcfce7" : "#fee2e2",
-                      padding: "3px 9px",
-                      borderRadius: "20px",
-                    }}
+                    className={`text-[11px] font-bold shrink-0 px-[9px] py-0.5 rounded-full ${
+                      p.positive
+                        ? "text-[#16a34a] bg-[#dcfce7]"
+                        : "text-[#ef4444] bg-[#fee2e2]"
+                    }`}
                   >
                     {p.change}
                   </span>
                 </div>
-                <div
-                  style={{
-                    height: "4px",
-                    background: NAVY_LIGHT,
-                    borderRadius: "4px",
-                    overflow: "hidden",
-                  }}
-                >
+                <div className="h-1 bg-[rgba(7,43,80,0.07)] rounded-full overflow-hidden">
                   <div
-                    style={{
-                      height: "100%",
-                      width: `${p.bar}%`,
-                      background: NAVY,
-                      borderRadius: "4px",
-                      transition: "width 0.6s ease",
-                    }}
+                    className="h-full bg-[#072B50] rounded-full transition-all duration-[600ms] ease-in-out"
+                    style={{ width: `${p.bar}%` }}
                   />
                 </div>
               </div>
             ))}
 
-            <div
-              className="hov-row"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "4px",
-                marginTop: "8px",
-                padding: "11px 12px",
-                border: `1px dashed ${NAVY_BORDER}`,
-                fontSize: "12px",
-                color: NAVY_MID,
-                fontWeight: 600,
-              }}
-            >
+            <div className="hov-row flex items-center justify-center gap-1 mt-2 px-3 py-[11px] border border-dashed border-[rgba(7,43,80,0.12)] text-xs text-[rgba(7,43,80,0.45)] font-semibold">
               Lihat Semua Produk <ChevronRight size={13} />
             </div>
           </div>
@@ -646,114 +345,56 @@ export default function Dashboard() {
       </div>
 
       {/* AKTIVITAS TERBARU */}
-      <div className="a4" style={card}>
-        <div
-          style={{
-            background: NAVY,
-            padding: "14px 20px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+      <div className="a4 bg-white rounded-2xl border border-[rgba(7,43,80,0.12)] overflow-hidden">
+        <div className="bg-[#072B50] px-5 py-3.5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <Clock size={15} color="#fff" />
-            <span
-              style={{
-                fontSize: "13px",
-                fontWeight: 700,
-                color: "#fff",
-                letterSpacing: "0.4px",
-              }}
-            >
+            <span className="text-[13px] font-bold text-white tracking-[0.4px]">
               Aktivitas Terbaru
             </span>
           </div>
-          <button
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              borderRadius: "7px",
-              padding: "4px 12px",
-              cursor: "pointer",
-              fontSize: "12px",
-              color: "#fff",
-              fontWeight: 600,
-              fontFamily: "inherit",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}
-          >
+          <button className="bg-white/[0.12] border border-white/20 rounded-[7px] px-3 py-1 cursor-pointer text-xs text-white font-semibold font-[inherit] flex items-center gap-1">
             Lihat semua <ChevronRight size={12} />
           </button>
         </div>
 
-        <div style={{ padding: "0 20px" }}>
+        <div className="px-5">
           {activities.map((act, i) => (
             <div
               key={i}
-              className="hov-row"
+              className="hov-row flex items-center gap-3.5 px-2.5 py-3.5"
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "14px",
-                padding: "14px 10px",
                 borderBottom:
                   i < activities.length - 1
-                    ? `1px solid ${NAVY_BORDER}`
+                    ? "1px solid rgba(7,43,80,0.12)"
                     : "none",
               }}
             >
-              <div
-                style={{
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "12px",
-                  background: NAVY_LIGHT,
-                  border: `1px solid ${NAVY_BORDER}`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "20px",
-                  flexShrink: 0,
-                }}
-              >
+              <div className="w-[42px] h-[42px] rounded-xl bg-[rgba(7,43,80,0.07)] border border-[rgba(7,43,80,0.12)] flex items-center justify-center text-[20px] shrink-0">
                 {act.emoji}
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p
-                  style={{
-                    margin: "0 0 3px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: NAVY,
-                  }}
-                >
+              <div className="flex-1 min-w-0">
+                <p className="m-0 mb-[3px] text-[13px] font-bold text-[#072B50]">
                   {act.title}
                 </p>
-                <p style={{ margin: 0, fontSize: "12px", color: NAVY_MID }}>
+                <p className="m-0 text-xs text-[rgba(7,43,80,0.45)]">
                   {act.branch} · {act.time}
                 </p>
               </div>
               <span
+                className="text-[11px] font-bold shrink-0 px-3 py-1 rounded-full border"
                 style={{
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  flexShrink: 0,
                   color: act.tagColor,
                   background: act.tagBg,
-                  padding: "4px 12px",
-                  borderRadius: "20px",
-                  border: `1px solid ${act.tagColor}22`,
+                  borderColor: act.tagBorder,
                 }}
               >
                 {act.tag}
               </span>
               <MoreHorizontal
                 size={16}
-                color={NAVY_MID}
-                style={{ flexShrink: 0, cursor: "pointer" }}
+                color="rgba(7,43,80,0.45)"
+                className="shrink-0 cursor-pointer"
               />
             </div>
           ))}

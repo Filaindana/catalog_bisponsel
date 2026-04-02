@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 
 const menus = [
-<<<<<<< HEAD
   {
     label: "Dashboard",
     icon: <LayoutDashboard size={18} />,
@@ -24,13 +23,12 @@ const menus = [
     icon: <Settings size={18} />,
     path: "/admin/pengaturan",
   },
-=======
+
   { label: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin" },
   { label: "Produk",    icon: <Package size={18} />,         path: "/admin/produk" },
   { label: "Promo",     icon: <Tag size={18} />,             path: "/admin/promo" },
   { label: "Cabang",    icon: <Building2 size={18} />,       path: "/admin/cabang" },
   { label: "Pengaturan",icon: <Settings size={18} />,        path: "/admin/pengaturan" },
->>>>>>> 7d6510e1ceca3b811be6c3b04a67fdf109aa792d
 ];
 export default function Sidebar() {
   const navigate = useNavigate();

@@ -2,11 +2,11 @@ import { Bell, Search } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const breadcrumbMap = {
-  "/dashboard": "Dashboard",
-  "/produk": "Produk",
-  "/promo": "Promo",
-  "/cabang": "Cabang",
-  "/pengaturan": "Pengaturan",
+  "/admin":            "Dashboard",
+  "/admin/produk":     "Produk",
+  "/admin/promo":      "Promo",
+  "/admin/cabang":     "Cabang",
+  "/admin/pengaturan": "Pengaturan",
 };
 
 export default function Navbar() {

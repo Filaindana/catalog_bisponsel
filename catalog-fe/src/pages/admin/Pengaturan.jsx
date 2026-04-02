@@ -11,7 +11,40 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-const NAVY = "#072B50";
+const inputCls =
+  "input-field w-full px-3.5 py-[11px] rounded-[10px] border-[1.5px] border-[#e8edf5] text-[14px] outline-none text-[#1e293b] bg-[#f8faff] font-[inherit] transition-all";
+
+const labelCls =
+  "block text-xs font-bold text-slate-500 mb-[7px] tracking-[0.06em] uppercase";
+
+const tabs = [
+  { id: "profile", label: "Profil Admin", icon: <User size={15} /> },
+  { id: "kontak", label: "Kontak Website", icon: <Phone size={15} /> },
+];
+
+// ✅ Dipindah ke luar komponen agar tidak dibuat ulang setiap render
+const SaveButton = ({ saved, onClick }) => (
+  <button
+    className="save-btn flex items-center gap-2 px-6 py-[11px] rounded-[11px] border-none cursor-pointer text-[14px] font-bold font-[inherit] shrink-0 text-white shadow-[0_4px_14px_rgba(7,43,80,0.25)] transition-all"
+    style={{
+      background: saved
+        ? "#22c55e"
+        : "linear-gradient(135deg, #072B50, #1a6ab1)",
+      transition: "background 0.3s",
+    }}
+    onClick={onClick}
+  >
+    {saved ? (
+      <>
+        <CheckCircle size={16} className="check-pop" /> Tersimpan!
+      </>
+    ) : (
+      <>
+        <Save size={15} /> Simpan
+      </>
+    )}
+  </button>
+);
 
 export default function Pengaturan() {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,47 +72,11 @@ export default function Pengaturan() {
     setTimeout(() => setSavedKontak(false), 2500);
   };
 
-  const inputBase = {
-    width: "100%",
-    padding: "11px 14px",
-    borderRadius: "10px",
-    border: "1.5px solid #e8edf5",
-    fontSize: "14px",
-    outline: "none",
-    boxSizing: "border-box",
-    color: "#1e293b",
-    background: "#f8faff",
-    fontFamily: "inherit",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  };
-
-  const labelStyle = {
-    fontSize: "12px",
-    fontWeight: 700,
-    color: "#64748b",
-    display: "block",
-    marginBottom: "7px",
-    letterSpacing: "0.06em",
-    textTransform: "uppercase",
-  };
-
-  const tabs = [
-    { id: "profile", label: "Profil Admin", icon: <User size={15} /> },
-    { id: "kontak", label: "Kontak Website", icon: <Phone size={15} /> },
-  ];
-
   return (
-    <div
-      style={{
-        fontFamily: "'Sora', 'Segoe UI', sans-serif",
-        minHeight: "100vh",
-        background: "#f4f7fe",
-        padding: "0",
-      }}
-    >
+    <div className="font-['Sora','Segoe_UI',sans-serif] min-h-screen bg-[#f4f7fe]">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap');
-        .input-field:focus { border-color: ${NAVY} !important; box-shadow: 0 0 0 3px rgba(7,43,80,0.10) !important; background: #fff !important; }
+        .input-field:focus { border-color: #072B50 !important; box-shadow: 0 0 0 3px rgba(7,43,80,0.10) !important; background: #fff !important; }
         .tab-btn { transition: all 0.2s; }
         .tab-btn:hover { background: rgba(7,43,80,0.07) !important; }
         .save-btn { transition: all 0.2s; }
@@ -97,122 +94,42 @@ export default function Pengaturan() {
 
       {/* PAGE HEADER */}
       <div
+        className="px-9 pt-9 pb-[72px] relative overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${NAVY} 0%, #0e4a8a 60%, #1a6ab1 100%)`,
-          padding: "36px 36px 72px",
-          position: "relative",
-          overflow: "hidden",
+          background:
+            "linear-gradient(135deg, #072B50 0%, #0e4a8a 60%, #1a6ab1 100%)",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            top: "-30px",
-            right: "60px",
-            width: "140px",
-            height: "140px",
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.07)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            right: "160px",
-            width: "60px",
-            height: "60px",
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.10)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            bottom: "-20px",
-            left: "200px",
-            width: "90px",
-            height: "90px",
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.06)",
-          }}
-        />
+        <div className="absolute -top-8 right-[60px] w-[140px] h-[140px] rounded-full bg-white/[0.07]" />
+        <div className="absolute top-5 right-[160px] w-[60px] h-[60px] rounded-full bg-white/10" />
+        <div className="absolute -bottom-5 left-[200px] w-[90px] h-[90px] rounded-full bg-white/[0.06]" />
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "14px",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
-          <div
-            style={{
-              width: "44px",
-              height: "44px",
-              borderRadius: "12px",
-              background: "rgba(255,255,255,0.18)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+        <div className="flex items-center gap-3.5 relative z-10">
+          <div className="w-11 h-11 rounded-xl bg-white/[0.18] flex items-center justify-center">
             <Shield size={22} color="#fff" />
           </div>
           <div>
-            <h1
-              style={{
-                fontSize: "22px",
-                fontWeight: 800,
-                color: "#fff",
-                margin: 0,
-                letterSpacing: "-0.3px",
-              }}
-            >
+            <h1 className="text-[22px] font-extrabold text-white m-0 tracking-[-0.3px]">
               Pengaturan
             </h1>
-            <p
-              style={{
-                fontSize: "13px",
-                color: "rgba(255,255,255,0.72)",
-                margin: "2px 0 0 0",
-              }}
-            >
+            <p className="text-[13px] text-white/[0.72] mt-0.5 mb-0">
               Kelola profil admin & informasi kontak website
             </p>
           </div>
         </div>
 
-        {/* TABS inside header */}
-        <div
-          style={{
-            display: "flex",
-            gap: "6px",
-            marginTop: "28px",
-            position: "relative",
-            zIndex: 1,
-          }}
-        >
+        {/* TABS */}
+        <div className="flex gap-1.5 mt-7 relative z-10">
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className="tab-btn"
+              className="tab-btn flex items-center gap-[7px] px-5 py-[9px] rounded-[10px] border-none cursor-pointer text-[13px] font-semibold font-[inherit]"
               onClick={() => setActiveTab(tab.id)}
               style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-                padding: "9px 20px",
-                borderRadius: "10px",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "13px",
-                fontWeight: 600,
-                fontFamily: "inherit",
                 background:
                   activeTab === tab.id ? "#fff" : "rgba(255,255,255,0.13)",
-                color: activeTab === tab.id ? NAVY : "rgba(255,255,255,0.85)",
+                color:
+                  activeTab === tab.id ? "#072B50" : "rgba(255,255,255,0.85)",
                 boxShadow:
                   activeTab === tab.id ? "0 4px 14px rgba(0,0,0,0.12)" : "none",
               }}
@@ -224,191 +141,68 @@ export default function Pengaturan() {
       </div>
 
       {/* CARD PULL-UP */}
-      <div
-        style={{
-          padding: "0 28px 40px",
-          marginTop: "-36px",
-          position: "relative",
-          zIndex: 2,
-        }}
-      >
+      <div className="px-7 pb-10 -mt-9 relative z-[2]">
         {/* ===== PROFILE TAB ===== */}
         {activeTab === "profile" && (
-          <div
-            className="card-anim"
-            style={{
-              background: "#fff",
-              borderRadius: "18px",
-              boxShadow: "0 8px 40px rgba(7,43,80,0.10)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Avatar Section */}
-            <div
-              style={{
-                padding: "32px 32px 28px",
-                borderBottom: "1.5px solid #f1f5f9",
-                display: "flex",
-                alignItems: "center",
-                gap: "28px",
-              }}
-            >
+          <div className="card-anim bg-white rounded-[18px] shadow-[0_8px_40px_rgba(7,43,80,0.10)] overflow-hidden">
+            <div className="px-8 pt-8 pb-7 border-b border-[#f1f5f9] flex items-center gap-7">
               <div
-                className="avatar-wrap"
+                className="avatar-wrap w-[88px] h-[88px] rounded-[18px] flex items-center justify-center text-[44px] shrink-0 shadow-[0_6px_24px_rgba(251,191,36,0.3)]"
                 style={{
-                  width: "88px",
-                  height: "88px",
-                  borderRadius: "18px",
                   background: "linear-gradient(135deg, #fde68a, #fbbf24)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "44px",
-                  flexShrink: 0,
-                  boxShadow: "0 6px 24px rgba(251,191,36,0.3)",
                 }}
               >
                 👨‍💼
               </div>
-              <div style={{ flex: 1 }}>
-                <p
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: 700,
-                    color: "#111827",
-                    margin: "0 0 3px 0",
-                  }}
-                >
+              <div className="flex-1">
+                <p className="text-[15px] font-bold text-gray-900 mb-0.5">
                   Foto CEO
                 </p>
-                <p
-                  style={{
-                    fontSize: "12.5px",
-                    color: "#94a3b8",
-                    margin: "0 0 14px 0",
-                  }}
-                >
+                <p className="text-[12.5px] text-slate-400 mb-3.5">
                   Format JPG, PNG atau GIF · Maks. 2MB
                 </p>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button
-                    className="upload-btn"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "7px",
-                      padding: "8px 18px",
-                      borderRadius: "9px",
-                      background: NAVY,
-                      color: "#fff",
-                      border: "none",
-                      cursor: "pointer",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      fontFamily: "inherit",
-                      boxShadow: "0 4px 10px rgba(7,43,80,0.2)",
-                    }}
-                  >
+                <div className="flex gap-2.5">
+                  <button className="upload-btn flex items-center gap-[7px] px-[18px] py-2 rounded-[9px] bg-[#072B50] text-white border-none cursor-pointer text-[13px] font-semibold font-[inherit] shadow-[0_4px_10px_rgba(7,43,80,0.2)]">
                     <Upload size={13} /> Upload Foto
                   </button>
-                  <button
-                    className="delete-btn"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "7px",
-                      padding: "8px 18px",
-                      borderRadius: "9px",
-                      background: "#fff",
-                      color: "#ef4444",
-                      border: "1.5px solid #fecaca",
-                      cursor: "pointer",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      fontFamily: "inherit",
-                    }}
-                  >
+                  <button className="delete-btn flex items-center gap-[7px] px-[18px] py-2 rounded-[9px] bg-white text-red-500 border-[1.5px] border-red-200 cursor-pointer text-[13px] font-semibold font-[inherit]">
                     <Trash2 size={13} /> Hapus
                   </button>
                 </div>
               </div>
-
-              {/* Save button top-right */}
-              <button
-                className="save-btn"
-                onClick={handleSaveProfile}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "11px 24px",
-                  borderRadius: "11px",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  fontFamily: "inherit",
-                  flexShrink: 0,
-                  background: savedProfile
-                    ? "#22c55e"
-                    : `linear-gradient(135deg, ${NAVY}, #1a6ab1)`,
-                  color: "#fff",
-                  boxShadow: `0 4px 14px rgba(7,43,80,0.25)`,
-                  transition: "background 0.3s",
-                }}
-              >
-                {savedProfile ? (
-                  <>
-                    <CheckCircle size={16} className="check-pop" /> Tersimpan!
-                  </>
-                ) : (
-                  <>
-                    <Save size={15} /> Simpan
-                  </>
-                )}
-              </button>
+              <SaveButton saved={savedProfile} onClick={handleSaveProfile} />
             </div>
 
-            {/* Form Fields */}
-            <div style={{ padding: "28px 32px 32px" }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "20px",
-                  marginBottom: "20px",
-                }}
-              >
+            <div className="px-8 pt-7 pb-8">
+              <div className="grid grid-cols-2 gap-5 mb-5">
                 <div>
-                  <label style={labelStyle}>Nama Lengkap</label>
+                  <label className={labelCls}>Nama Lengkap</label>
                   <input
-                    className="input-field"
+                    className={inputCls}
                     value={profileForm.nama}
                     onChange={(e) =>
                       setProfileForm({ ...profileForm, nama: e.target.value })
                     }
-                    style={inputBase}
                     placeholder="Nama lengkap admin"
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Email Admin</label>
+                  <label className={labelCls}>Email Admin</label>
                   <input
-                    className="input-field"
+                    className={inputCls}
                     value={profileForm.email}
                     onChange={(e) =>
                       setProfileForm({ ...profileForm, email: e.target.value })
                     }
-                    style={inputBase}
                     placeholder="email@bisnis.com"
                   />
                 </div>
               </div>
               <div>
-                <label style={labelStyle}>Password Baru</label>
-                <div style={{ position: "relative" }}>
+                <label className={labelCls}>Password Baru</label>
+                <div className="relative">
                   <input
-                    className="input-field"
+                    className={`${inputCls} pr-[46px]`}
                     type={showPassword ? "text" : "password"}
                     value={profileForm.password}
                     onChange={(e) =>
@@ -417,34 +211,16 @@ export default function Pengaturan() {
                         password: e.target.value,
                       })
                     }
-                    style={{ ...inputBase, paddingRight: "46px" }}
                     placeholder="Biarkan kosong jika tidak diubah"
                   />
                   <button
                     onClick={() => setShowPassword(!showPassword)}
-                    style={{
-                      position: "absolute",
-                      right: "13px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "#94a3b8",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
+                    className="absolute right-[13px] top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-slate-400 flex items-center"
                   >
                     {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                   </button>
                 </div>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#94a3b8",
-                    margin: "7px 0 0 0",
-                  }}
-                >
+                <p className="text-xs text-slate-400 mt-[7px] mb-0">
                   Minimal 8 karakter dengan kombinasi huruf & angka
                 </p>
               </div>
@@ -454,106 +230,29 @@ export default function Pengaturan() {
 
         {/* ===== KONTAK TAB ===== */}
         {activeTab === "kontak" && (
-          <div
-            className="card-anim"
-            style={{
-              background: "#fff",
-              borderRadius: "18px",
-              boxShadow: "0 8px 40px rgba(7,43,80,0.10)",
-              overflow: "hidden",
-            }}
-          >
-            {/* Header section */}
-            <div
-              style={{
-                padding: "28px 32px",
-                borderBottom: "1.5px solid #f1f5f9",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
+          <div className="card-anim bg-white rounded-[18px] shadow-[0_8px_40px_rgba(7,43,80,0.10)] overflow-hidden">
+            <div className="px-8 py-7 border-b border-[#f1f5f9] flex justify-between items-center">
               <div>
-                <h2
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 800,
-                    color: "#111827",
-                    margin: "0 0 4px 0",
-                  }}
-                >
+                <h2 className="text-[16px] font-extrabold text-gray-900 mb-1">
                   Kontak Website
                 </h2>
-                <p style={{ fontSize: "12.5px", color: "#94a3b8", margin: 0 }}>
+                <p className="text-[12.5px] text-slate-400 m-0">
                   Ditampilkan di footer · Klik produk diarahkan ke WhatsApp ini
                 </p>
               </div>
-              <button
-                className="save-btn"
-                onClick={handleSaveKontak}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "11px 24px",
-                  borderRadius: "11px",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  fontFamily: "inherit",
-                  background: savedKontak
-                    ? "#22c55e"
-                    : `linear-gradient(135deg, ${NAVY}, #1a6ab1)`,
-                  color: "#fff",
-                  boxShadow: `0 4px 14px rgba(7,43,80,0.25)`,
-                  transition: "background 0.3s",
-                }}
-              >
-                {savedKontak ? (
-                  <>
-                    <CheckCircle size={16} /> Tersimpan!
-                  </>
-                ) : (
-                  <>
-                    <Save size={15} /> Simpan
-                  </>
-                )}
-              </button>
+              <SaveButton saved={savedKontak} onClick={handleSaveKontak} />
             </div>
 
-            {/* Form */}
-            <div style={{ padding: "28px 32px 32px" }}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "20px",
-                  marginBottom: "20px",
-                }}
-              >
+            <div className="px-8 pt-7 pb-8">
+              <div className="grid grid-cols-2 gap-5 mb-5">
                 <div>
-                  <label style={labelStyle}>Nomor WhatsApp</label>
-                  <div style={{ display: "flex" }}>
-                    <span
-                      style={{
-                        padding: "11px 13px",
-                        background: "#f1f5f9",
-                        border: "1.5px solid #e8edf5",
-                        borderRight: "none",
-                        borderRadius: "10px 0 0 10px",
-                        fontSize: "14px",
-                        color: "#64748b",
-                        fontWeight: 600,
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
+                  <label className={labelCls}>Nomor WhatsApp</label>
+                  <div className="flex">
+                    <span className="px-3.5 py-[11px] bg-[#f1f5f9] border-[1.5px] border-[#e8edf5] border-r-0 rounded-l-[10px] text-[14px] text-slate-500 font-semibold flex items-center gap-1.5">
                       🇮🇩 +62
                     </span>
                     <input
-                      className="input-field"
+                      className={`${inputCls} rounded-l-none flex-1`}
                       value={kontakForm.whatsapp}
                       onChange={(e) =>
                         setKontakForm({
@@ -561,70 +260,38 @@ export default function Pengaturan() {
                           whatsapp: e.target.value,
                         })
                       }
-                      style={{
-                        ...inputBase,
-                        borderRadius: "0 10px 10px 0",
-                        flex: 1,
-                      }}
                       placeholder="8123456789"
                     />
                   </div>
                 </div>
                 <div>
-                  <label style={labelStyle}>Email Perusahaan</label>
+                  <label className={labelCls}>Email Perusahaan</label>
                   <input
-                    className="input-field"
+                    className={inputCls}
                     value={kontakForm.email}
                     onChange={(e) =>
                       setKontakForm({ ...kontakForm, email: e.target.value })
                     }
-                    style={inputBase}
                     placeholder="support@perusahaan.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label style={labelStyle}>Alamat Kantor Pusat</label>
+                <label className={labelCls}>Alamat Kantor Pusat</label>
                 <textarea
-                  className="input-field"
+                  className={`${inputCls} h-[90px] resize-none leading-relaxed`}
                   value={kontakForm.alamat}
                   onChange={(e) =>
                     setKontakForm({ ...kontakForm, alamat: e.target.value })
                   }
-                  style={{
-                    ...inputBase,
-                    height: "90px",
-                    resize: "none",
-                    lineHeight: "1.6",
-                  }}
                   placeholder="Masukkan alamat lengkap kantor..."
                 />
               </div>
 
-              {/* Info banner */}
-              <div
-                style={{
-                  marginTop: "20px",
-                  padding: "14px 18px",
-                  background: "rgba(7,43,80,0.06)",
-                  borderRadius: "12px",
-                  border: "1.5px solid rgba(7,43,80,0.12)",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "12px",
-                }}
-              >
-                <div style={{ fontSize: "18px", flexShrink: 0 }}>💡</div>
-                <p
-                  style={{
-                    fontSize: "12.5px",
-                    color: NAVY,
-                    margin: 0,
-                    lineHeight: "1.6",
-                    fontWeight: 500,
-                  }}
-                >
+              <div className="mt-5 px-[18px] py-3.5 bg-[rgba(7,43,80,0.06)] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.12)] flex items-start gap-3">
+                <div className="text-[18px] shrink-0">💡</div>
+                <p className="text-[12.5px] text-[#072B50] m-0 leading-relaxed font-medium">
                   Nomor WhatsApp ini akan digunakan sebagai tautan langsung
                   ketika pengunjung mengklik produk di halaman katalog. Pastikan
                   nomor aktif dan dapat dihubungi.

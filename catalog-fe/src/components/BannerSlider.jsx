@@ -17,15 +17,7 @@ export default function BannerSlider() {
     >
       {banners.map((_, i) => (
         <SwiperSlide key={i}>
-          <div
-            style={{
-              height: "100%",
-              background: "#cbd5e1",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <div className="h-full bg-slate-300 flex items-center justify-center">
             Banner {i + 1}
           </div>
         </SwiperSlide>

@@ -10,7 +10,6 @@ import {
 } from "lucide-react";
 
 const menus = [
-<<<<<<< HEAD
   {
     label: "Dashboard",
     icon: <LayoutDashboard size={18} />,
@@ -24,144 +23,61 @@ const menus = [
     icon: <Settings size={18} />,
     path: "/admin/pengaturan",
   },
-=======
-  { label: "Dashboard", icon: <LayoutDashboard size={18} />, path: "/admin" },
-  { label: "Produk",    icon: <Package size={18} />,         path: "/admin/produk" },
-  { label: "Promo",     icon: <Tag size={18} />,             path: "/admin/promo" },
-  { label: "Cabang",    icon: <Building2 size={18} />,       path: "/admin/cabang" },
-  { label: "Pengaturan",icon: <Settings size={18} />,        path: "/admin/pengaturan" },
->>>>>>> 7d6510e1ceca3b811be6c3b04a67fdf109aa792d
 ];
+
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
   return (
-    <div
-      style={{
-        width: "220px",
-        minWidth: "220px",
-        background: "#ffffff",
-        borderRight: "1px solid #e2e8f0",
-        display: "flex",
-        flexDirection: "column",
-        padding: "24px 0",
-      }}
-    >
+    <div className="w-[240px] min-w-[240px] h-screen bg-white/80 backdrop-blur-xl border-r border-gray-200 flex flex-col py-6">
       {/* LOGO */}
-      <div
-        style={{
-          padding: "0 20px 28px 20px",
-          borderBottom: "1px solid #e2e8f0",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
-              width: "42px",
-              height: "42px",
-              borderRadius: "10px",
-              background: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
+      <div className="px-5 pb-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl bg-white flex items-center justify-center shadow-sm">
             <img
               src={logoImg}
               alt="Logo"
-              style={{
-                width: "42px",
-                height: "42px",
-                borderRadius: "10px",
-                objectFit: "contain",
-              }}
+              className="w-10 h-10 rounded-xl object-contain"
             />
           </div>
+
           <div>
-            <div
-              style={{ fontSize: "15px", fontWeight: 700, color: "#111827" }}
-            >
-              Bizponsel
-            </div>
-            <div style={{ fontSize: "12px", color: "#6b7280" }}>
-              Admin Panel
-            </div>
+            <h1 className="text-sm font-bold text-gray-800">Bizponsel</h1>
+            <p className="text-xs text-gray-500">Admin Panel</p>
           </div>
         </div>
       </div>
 
       {/* MENU */}
-      <div
-        style={{
-          flex: 1,
-          padding: "20px 12px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "4px",
-        }}
-      >
+      <div className="flex-1 px-3 py-5 flex flex-col gap-1">
         {menus.map((menu) => {
           const isActive = location.pathname === menu.path;
+
           return (
             <div
               key={menu.path}
               onClick={() => navigate(menu.path)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                padding: "10px 14px",
-                borderRadius: "10px",
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                background: isActive ? "#072B50" : "transparent",
-                color: isActive ? "#fff" : "#374151",
-                fontWeight: isActive ? 600 : 400,
-                fontSize: "14px",
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) e.currentTarget.style.background = "#f1f5f9";
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) e.currentTarget.style.background = "transparent";
-              }}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer text-sm transition-all duration-200
+                ${
+                  isActive
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                }
+              `}
             >
               {menu.icon}
-              {menu.label}
+              <span className="font-medium">{menu.label}</span>
             </div>
           );
         })}
       </div>
 
       {/* LOG OUT */}
-      <div
-        style={{
-          padding: "0 12px",
-          borderTop: "1px solid #e2e8f0",
-          paddingTop: "16px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            padding: "10px 14px",
-            borderRadius: "10px",
-            cursor: "pointer",
-            color: "#ef4444",
-            fontSize: "14px",
-            transition: "all 0.2s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#fef2f2")}
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background = "transparent")
-          }
-        >
+      <div className="px-3 pt-4 border-t border-gray-200">
+        <div className="flex items-center gap-3 px-4 py-2.5 rounded-xl cursor-pointer text-sm text-red-500 hover:bg-red-50 transition">
           <LogOut size={18} />
-          Log Out
+          <span className="font-medium">Log Out</span>
         </div>
       </div>
     </div>

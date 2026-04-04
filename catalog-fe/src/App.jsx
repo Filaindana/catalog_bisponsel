@@ -42,7 +42,7 @@ function AdminLayout() {
       <AdminNavbar />
       <div style={{ display: "flex", flex: 1 }}>
         <AdminSidebar />
-        <main style={{ flex: 1, overflow: "auto" }}>
+        <main style={{ flex: 1, overflowY: "auto", background: "#f4f7fe", padding: "60px 64px" }}>
           {/* ⬇️ INI YANG PENTING */}
           <Outlet />
         </main>

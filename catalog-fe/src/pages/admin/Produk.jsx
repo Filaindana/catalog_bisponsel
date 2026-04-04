@@ -150,15 +150,15 @@ const warnaMap = {
 };
 
 const inputCls =
-  "w-full px-3.5 py-[11px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] text-[13px] outline-none text-[#1e2433] bg-[#f8f9fc] transition-all font-[inherit] focus:border-[#072B50] focus:bg-white";
+  "w-full px-4 py-[13px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] text-[14px] outline-none text-[#1e2433] bg-[#f8f9fc] transition-all font-[inherit] focus:border-[#072B50] focus:bg-white";
 
 const Field = ({ label, children, hint }) => (
   <div>
-    <label className="block text-[11px] font-extrabold text-gray-500 mb-[7px] uppercase tracking-[0.8px]">
+    <label className="block text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.8px]" style={{ marginBottom: "10px" }}>
       {label}
     </label>
     {children}
-    {hint && <p className="text-[11px] text-gray-400 mt-[5px] mb-0">{hint}</p>}
+    {hint && <p className="text-[11px] text-gray-400 mb-0" style={{ marginTop: "8px" }}>{hint}</p>}
   </div>
 );
 
@@ -286,7 +286,6 @@ function ViewProductModal({ product, onClose }) {
 
 // ===================== MODAL TAMBAH =====================
 function AddProductModal({ onClose, onSave }) {
-  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -303,426 +302,158 @@ function AddProductModal({ onClose, onSave }) {
     { name: "product-side.jpg", progress: 65, size: "0.9 MB" },
   ]);
 
-  const steps = [
-    { id: 1, label: "Info", icon: <Info size={13} /> },
-    { id: 2, label: "Media", icon: <ImageIcon size={13} /> },
-    { id: 3, label: "Harga", icon: <DollarSign size={13} /> },
-  ];
+  const SectionTitle = ({ icon, title }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+      <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "rgba(7,43,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {icon}
+      </div>
+      <span style={{ fontSize: "11px", fontWeight: 800, color: "#072B50", textTransform: "uppercase", letterSpacing: "0.08em" }}>{title}</span>
+      <div style={{ flex: 1, height: "1.5px", background: "rgba(7,43,80,0.07)", marginLeft: "4px" }} />
+    </div>
+  );
 
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-white rounded-3xl w-[580px] max-h-[90vh] flex flex-col shadow-[0_40px_100px_rgba(0,0,0,0.3)] overflow-hidden">
+      <div style={{ width: "620px", background: "#fff", borderRadius: "20px", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 40px 100px rgba(0,0,0,0.3)", overflow: "hidden" }}>
+
         {/* HEADER */}
-        <div className="bg-[#072B50] px-8 py-7 relative">
-          <div className="absolute -top-5 -right-5 w-[120px] h-[120px] rounded-full bg-white/5 z-0" />
-          <div className="absolute -bottom-8 right-[60px] w-[80px] h-[80px] rounded-full bg-white/[0.04] z-0" />
-
-          <div className="flex justify-between items-start mb-6 relative z-10">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center shrink-0">
-                <Package size={20} color="#fff" />
-              </div>
-              <div>
-                <h2 className="text-[18px] font-extrabold text-white mb-0.5">
-                  Tambah Produk Baru
-                </h2>
-                <p className="text-xs text-white/60 m-0">
-                  Langkah {step} dari {steps.length}
-                </p>
-              </div>
+        <div style={{ padding: "24px 32px", borderBottom: "1.5px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(7,43,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Package size={20} color="#072B50" />
             </div>
-            <button
-              onClick={onClose}
-              className="bg-white/15 border-none rounded-[10px] w-9 h-9 cursor-pointer text-white flex items-center justify-center"
-            >
-              <X size={18} />
-            </button>
+            <div>
+              <h2 style={{ fontSize: "17px", fontWeight: 800, color: "#0f172a", margin: "0 0 3px" }}>Tambah Produk Baru</h2>
+              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>Isi semua informasi produk di bawah ini</p>
+            </div>
           </div>
-
-          {/* Steps */}
-          <div className="flex items-center relative z-10">
-            {steps.map((s, i) => (
-              <div
-                key={s.id}
-                className={`flex items-center ${i < steps.length - 1 ? "flex-1" : ""}`}
-              >
-                <div
-                  onClick={() => step > s.id && setStep(s.id)}
-                  className={`flex items-center gap-2 ${step > s.id ? "cursor-pointer" : "cursor-default"}`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 ${step >= s.id ? "bg-white border-white/60" : "bg-white/20 border-transparent"}`}
-                  >
-                    {step > s.id ? (
-                      <Check size={14} color="#072B50" strokeWidth={3} />
-                    ) : (
-                      <span
-                        className={`flex ${step === s.id ? "text-[#072B50]" : "text-white/50"}`}
-                      >
-                        {s.icon}
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className={`text-xs font-bold whitespace-nowrap ${step >= s.id ? "text-white" : "text-white/45"}`}
-                  >
-                    {s.label}
-                  </span>
-                </div>
-                {i < steps.length - 1 && (
-                  <div
-                    className={`flex-1 h-0.5 mx-3 rounded-sm ${step > s.id ? "bg-white/70" : "bg-white/20"}`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+          <button onClick={onClose} style={{ width: "34px", height: "34px", borderRadius: "8px", border: "1.5px solid #e8edf5", background: "#f8faff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
+            <X size={16} />
+          </button>
         </div>
 
         {/* BODY */}
-        <div className="flex-1 overflow-y-auto px-8 py-7">
-          {/* STEP 1 */}
-          {step === 1 && (
-            <div className="flex flex-col gap-5">
-              <Field
-                label="Nama Produk"
-                hint="Gunakan nama yang jelas dan deskriptif"
-              >
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Contoh: iPhone 15 Pro Max 256GB Natural Titanium"
-                  className={inputCls}
-                />
+        <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
+
+          {/* Informasi Dasar */}
+          <SectionTitle icon={<Info size={13} color="#072B50" />} title="Informasi Dasar" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px", marginBottom: "28px" }}>
+            <Field label="Nama Produk" hint="Gunakan nama yang jelas dan deskriptif">
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Contoh: iPhone 15 Pro Max 256GB Natural Titanium" className={inputCls} />
+            </Field>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <Field label="Kategori">
+                <CustomSelect value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} options={kategoriOptions} placeholder="Pilih kategori..." />
               </Field>
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Kategori">
-                  <CustomSelect
-                    value={form.category}
-                    onChange={(e) =>
-                      setForm({ ...form, category: e.target.value })
-                    }
-                    options={kategoriOptions}
-                    placeholder="Pilih kategori..."
-                  />
-                </Field>
-                <Field label="Brand">
-                  <CustomSelect
-                    value={form.brand}
-                    onChange={(e) =>
-                      setForm({ ...form, brand: e.target.value })
-                    }
-                    options={brandOptions}
-                    placeholder="Pilih brand..."
-                  />
-                </Field>
-              </div>
-              <Field
-                label="Deskripsi Produk"
-                hint="Min. 50 karakter untuk deskripsi yang baik"
-              >
-                <textarea
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                  placeholder="Jelaskan fitur unggulan, keunggulan, dan detail penting produk ini..."
-                  className={`${inputCls} h-[110px] resize-none leading-relaxed`}
-                />
-                <div className="flex justify-end mt-1">
-                  <span
-                    className={`text-[11px] ${form.description.length >= 50 ? "text-emerald-500" : "text-gray-400"}`}
-                  >
-                    {form.description.length} karakter
-                  </span>
-                </div>
-              </Field>
-              <Field label="Spesifikasi Lengkap">
-                <textarea
-                  value={form.spesifikasi}
-                  onChange={(e) =>
-                    setForm({ ...form, spesifikasi: e.target.value })
-                  }
-                  placeholder={
-                    "- Chipset: A17 Pro Bionic\n- RAM: 8GB\n- Storage: 256GB NVMe"
-                  }
-                  className={`${inputCls} h-[110px] resize-none font-mono text-xs leading-[1.7]`}
-                />
+              <Field label="Brand">
+                <CustomSelect value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} options={brandOptions} placeholder="Pilih brand..." />
               </Field>
             </div>
-          )}
+          </div>
 
-          {/* STEP 2 */}
-          {step === 2 && (
-            <div className="flex flex-col gap-5">
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                }}
-                className={`border-2 border-dashed rounded-2xl py-12 px-6 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all ${dragOver ? "border-[#072B50] bg-[rgba(7,43,80,0.07)]" : "border-[rgba(7,43,80,0.15)] bg-[#fafaff]"}`}
-              >
-                <div
-                  className={`w-16 h-16 rounded-[18px] flex items-center justify-center ${dragOver ? "bg-[#072B50]" : "bg-[rgba(7,43,80,0.07)]"}`}
-                >
-                  <Upload size={26} color={dragOver ? "#fff" : "#072B50"} />
-                </div>
-                <div className="text-center">
-                  <p className="text-[15px] font-bold text-[#1e2433] mb-1.5">
-                    Drag & drop foto produk ke sini
-                  </p>
-                  <p className="text-[13px] text-gray-500 mb-4">atau</p>
-                  <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#072B50] rounded-[10px]">
-                    <Upload size={14} color="#fff" />
-                    <span className="text-[13px] font-bold text-white">
-                      Pilih File
-                    </span>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-400 m-0">
-                  PNG, JPG, WebP — Maks. 5MB per file • Min. 800×800px
-                </p>
+          {/* Deskripsi & Spesifikasi */}
+          <SectionTitle icon={<Tag size={13} color="#072B50" />} title="Deskripsi & Spesifikasi" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px", marginBottom: "28px" }}>
+            <Field label="Deskripsi Produk" hint="Min. 50 karakter untuk deskripsi yang baik">
+              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Jelaskan fitur unggulan, keunggulan, dan detail penting produk ini..." className={`${inputCls} h-[100px] resize-none leading-relaxed`} />
+            </Field>
+            <Field label="Spesifikasi Lengkap">
+              <textarea value={form.spesifikasi} onChange={(e) => setForm({ ...form, spesifikasi: e.target.value })} placeholder={"- Chipset: A17 Pro Bionic\n- RAM: 8GB\n- Storage: 256GB NVMe"} className={`${inputCls} h-[90px] resize-none font-mono text-xs leading-[1.7]`} />
+            </Field>
+          </div>
+
+          {/* Foto Produk */}
+          <SectionTitle icon={<ImageIcon size={13} color="#072B50" />} title="Foto Produk" />
+          <div style={{ marginBottom: "28px" }}>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={(e) => { e.preventDefault(); setDragOver(false); }}
+              style={{ border: `2px dashed ${dragOver ? "#072B50" : "rgba(7,43,80,0.2)"}`, borderRadius: "14px", padding: "28px 24px", background: dragOver ? "rgba(7,43,80,0.05)" : "#fafaff", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", cursor: "pointer", transition: "all 0.2s", marginBottom: "14px" }}
+            >
+              <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: dragOver ? "#072B50" : "rgba(7,43,80,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Upload size={22} color={dragOver ? "#fff" : "#072B50"} />
               </div>
-
-              {uploadedFiles.length > 0 && (
-                <div>
-                  <p className="text-[11px] font-extrabold text-gray-500 mb-3 uppercase tracking-[0.8px]">
-                    File Terupload ({uploadedFiles.length})
-                  </p>
-                  <div className="flex flex-col gap-2.5">
-                    {uploadedFiles.map((file, i) => (
-                      <div
-                        key={i}
-                        className="bg-[#f8f9fc] rounded-xl px-4 py-3.5 flex items-center gap-3.5 border-[1.5px] border-[rgba(7,43,80,0.15)]"
-                      >
-                        <div
-                          className={`w-11 h-11 rounded-[10px] flex items-center justify-center shrink-0 ${file.progress === 100 ? "bg-[#d1fae5]" : "bg-[rgba(7,43,80,0.07)]"}`}
-                        >
-                          {file.progress === 100 ? (
-                            <Check size={18} color="#059669" strokeWidth={3} />
-                          ) : (
-                            <ImageIcon size={18} color="#072B50" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex justify-between mb-1.5">
-                            <p className="text-[13px] font-bold text-[#1e2433] m-0 truncate max-w-[200px]">
-                              {file.name}
-                            </p>
-                            <span
-                              className={`text-xs font-bold ${file.progress === 100 ? "text-[#059669]" : "text-[#072B50]"}`}
-                            >
-                              {file.progress === 100
-                                ? "✓ Selesai"
-                                : `${file.progress}%`}
-                            </span>
-                          </div>
-                          <div className="h-[5px] bg-[#e8eaf0] rounded-sm">
-                            <div
-                              className="h-full rounded-sm"
-                              style={{
-                                width: `${file.progress}%`,
-                                background:
-                                  file.progress === 100 ? "#10b981" : "#072B50",
-                              }}
-                            />
-                          </div>
-                          <p className="text-[11px] text-gray-400 mt-1 mb-0">
-                            {file.size}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() =>
-                            setUploadedFiles(
-                              uploadedFiles.filter((_, idx) => idx !== i),
-                            )
-                          }
-                          className="bg-[#fee2e2] border-none rounded-lg w-[30px] h-[30px] cursor-pointer text-red-500 flex items-center justify-center shrink-0"
-                        >
-                          <X size={13} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+              <div style={{ textAlign: "center" }}>
+                <p style={{ fontSize: "14px", fontWeight: 700, color: "#1e2433", margin: "0 0 4px" }}>Drag & drop foto produk di sini</p>
+                <p style={{ fontSize: "12px", color: "#9ca3af", margin: "0 0 12px" }}>atau</p>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 18px", background: "#072B50", borderRadius: "9px" }}>
+                  <Upload size={13} color="#fff" />
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}>Pilih File</span>
                 </div>
-              )}
+              </div>
+              <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0 }}>PNG, JPG, WebP — Maks. 5MB per file · Min. 800×800px</p>
+            </div>
 
-              <div className="bg-[rgba(7,43,80,0.07)] rounded-xl p-4 border-[1.5px] border-[rgba(7,43,80,0.15)]">
-                <p className="text-xs font-extrabold text-[#072B50] mb-2 uppercase tracking-[0.5px]">
-                  💡 Tips Foto Produk
-                </p>
-                {[
-                  "Gunakan latar belakang putih atau netral",
-                  "Pastikan pencahayaan merata dan cerah",
-                  "Upload minimal 3 foto dari sudut berbeda",
-                ].map((tip, i, arr) => (
-                  <p
-                    key={i}
-                    className={`text-xs text-[#072B50] ${i < arr.length - 1 ? "mb-1" : "m-0"}`}
-                  >
-                    • {tip}
-                  </p>
+            {uploadedFiles.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {uploadedFiles.map((file, i) => (
+                  <div key={i} style={{ background: "#f8f9fc", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px", border: "1.5px solid rgba(7,43,80,0.12)" }}>
+                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: file.progress === 100 ? "#d1fae5" : "rgba(7,43,80,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      {file.progress === 100 ? <Check size={16} color="#059669" strokeWidth={3} /> : <ImageIcon size={16} color="#072B50" />}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+                        <p style={{ fontSize: "13px", fontWeight: 700, color: "#1e2433", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "200px" }}>{file.name}</p>
+                        <span style={{ fontSize: "12px", fontWeight: 700, color: file.progress === 100 ? "#059669" : "#072B50" }}>{file.progress === 100 ? "✓ Selesai" : `${file.progress}%`}</span>
+                      </div>
+                      <div style={{ height: "4px", background: "#e8eaf0", borderRadius: "2px" }}>
+                        <div style={{ height: "100%", borderRadius: "2px", width: `${file.progress}%`, background: file.progress === 100 ? "#10b981" : "#072B50" }} />
+                      </div>
+                    </div>
+                    <button onClick={() => setUploadedFiles(uploadedFiles.filter((_, idx) => idx !== i))} style={{ width: "28px", height: "28px", borderRadius: "7px", border: "none", background: "#fee2e2", cursor: "pointer", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <X size={12} />
+                    </button>
+                  </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* STEP 3 */}
-          {step === 3 && (
-            <div className="flex flex-col gap-5">
-              <div className="bg-[rgba(7,43,80,0.07)] rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)]">
-                <p className="text-[11px] font-extrabold text-[#072B50] mb-4 uppercase tracking-[0.8px]">
-                  💰 Informasi Harga
-                </p>
-                <div className="grid grid-cols-2 gap-3.5">
-                  <Field label="Harga Jual (Rp)">
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-gray-500">
-                        Rp
-                      </span>
-                      <input
-                        type="number"
-                        value={form.price}
-                        onChange={(e) =>
-                          setForm({ ...form, price: e.target.value })
-                        }
-                        placeholder="0"
-                        className={`${inputCls} pl-[38px]`}
-                      />
-                    </div>
-                    {form.price && (
-                      <p className="text-xs text-[#072B50] font-semibold mt-[5px] mb-0">
-                        {formatPrice(Number(form.price))}
-                      </p>
-                    )}
-                  </Field>
-                  <Field label="Jumlah Stok">
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={form.stock}
-                        onChange={(e) =>
-                          setForm({ ...form, stock: e.target.value })
-                        }
-                        placeholder="0"
-                        className={`${inputCls} pr-[50px]`}
-                      />
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">
-                        Unit
-                      </span>
-                    </div>
-                    {form.stock && (
-                      <p
-                        className={`text-xs font-semibold mt-[5px] mb-0 ${Number(form.stock) < 10 ? "text-red-500" : "text-emerald-500"}`}
-                      >
-                        {Number(form.stock) < 10
-                          ? "⚠ Stok hampir habis"
-                          : "✓ Stok aman"}
-                      </p>
-                    )}
-                  </Field>
+          {/* Harga & Varian */}
+          <SectionTitle icon={<DollarSign size={13} color="#072B50" />} title="Harga & Varian" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <Field label="Harga Jual (Rp)">
+                <div style={{ position: "relative" }}>
+                  <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "13px", fontWeight: 700, color: "#9ca3af" }}>Rp</span>
+                  <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0" className={`${inputCls} pl-[38px]`} />
                 </div>
-              </div>
-
-              <div className="bg-[#f8f9fc] rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)]">
-                <p className="text-[11px] font-extrabold text-gray-500 mb-4 uppercase tracking-[0.8px]">
-                  🎨 Varian Produk
-                </p>
-                <Field label="Pilihan Warna">
-                  <CustomSelect
-                    value={form.warna}
-                    onChange={(e) =>
-                      setForm({ ...form, warna: e.target.value })
-                    }
-                    options={warnaOptions}
-                    placeholder="Pilih warna..."
-                  />
-                </Field>
-                {form.warna && (
-                  <div className="flex items-center gap-2 mt-3 px-3.5 py-2.5 bg-white rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)]">
-                    <div
-                      className="w-5 h-5 rounded-full border-2 border-[#e8eaf0]"
-                      style={{ background: warnaMap[form.warna] || "#e5e7eb" }}
-                    />
-                    <span className="text-[13px] font-semibold text-gray-700">
-                      {form.warna}
-                    </span>
-                    <span className="text-xs text-gray-400">dipilih</span>
-                  </div>
-                )}
-              </div>
-
-              {(form.name || form.price || form.stock) && (
-                <div className="bg-[#f0fdf4] rounded-2xl p-5 border-[1.5px] border-[#bbf7d0]">
-                  <p className="text-[11px] font-extrabold text-[#059669] mb-3.5 uppercase tracking-[0.8px]">
-                    ✓ Ringkasan Produk
+                {form.price && <p style={{ fontSize: "12px", color: "#072B50", fontWeight: 600, marginTop: "5px", marginBottom: 0 }}>{formatPrice(Number(form.price))}</p>}
+              </Field>
+              <Field label="Jumlah Stok">
+                <div style={{ position: "relative" }}>
+                  <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} placeholder="0" className={`${inputCls} pr-[50px]`} />
+                  <span style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", fontWeight: 700, color: "#9ca3af" }}>Unit</span>
+                </div>
+                {form.stock && (
+                  <p style={{ fontSize: "12px", fontWeight: 600, marginTop: "5px", marginBottom: 0, color: Number(form.stock) < 10 ? "#ef4444" : "#10b981" }}>
+                    {Number(form.stock) < 10 ? "⚠ Stok hampir habis" : "✓ Stok aman"}
                   </p>
-                  {[
-                    { label: "Nama", value: form.name || "-" },
-                    { label: "Kategori", value: form.category || "-" },
-                    {
-                      label: "Harga",
-                      value: form.price ? formatPrice(Number(form.price)) : "-",
-                    },
-                    {
-                      label: "Stok",
-                      value: form.stock ? `${form.stock} Unit` : "-",
-                    },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="flex justify-between mb-2">
-                      <span className="text-xs text-gray-500">{label}</span>
-                      <span className="text-xs font-bold text-[#1e2433] max-w-[60%] text-right truncate">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
+                )}
+              </Field>
             </div>
-          )}
+            <Field label="Pilihan Warna">
+              <CustomSelect value={form.warna} onChange={(e) => setForm({ ...form, warna: e.target.value })} options={warnaOptions} placeholder="Pilih warna..." />
+            </Field>
+            {form.warna && (
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8f9fc", borderRadius: "10px", border: "1.5px solid rgba(7,43,80,0.12)", padding: "12px 16px" }}>
+                <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: warnaMap[form.warna] || "#e5e7eb", border: "2px solid #e8eaf0" }} />
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>{form.warna}</span>
+                <span style={{ fontSize: "12px", color: "#9ca3af" }}>dipilih</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* FOOTER */}
-        <div className="px-8 py-5 border-t-[1.5px] border-[rgba(7,43,80,0.15)] flex gap-3 shrink-0 bg-[#fafbff]">
-          {step > 1 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="px-5 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
-            >
-              ← Kembali
-            </button>
-          )}
-          {step === 1 && (
-            <button
-              onClick={onClose}
-              className="px-5 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
-            >
-              Batal
-            </button>
-          )}
-          {step < 3 ? (
-            <button
-              onClick={() => setStep(step + 1)}
-              className="flex-1 py-3.5 rounded-xl border-none bg-[#072B50] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(7,43,80,0.3)] font-[inherit]"
-            >
-              Lanjut → {steps[step].label}
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                onSave(form);
-                onClose();
-              }}
-              className="flex-1 py-3.5 rounded-xl border-none bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(16,185,129,0.35)] font-[inherit]"
-            >
-              ✓ Simpan Produk
-            </button>
-          )}
+        <div style={{ padding: "20px 32px", borderTop: "1.5px solid #f1f5f9", display: "flex", justifyContent: "flex-end", gap: "12px", background: "#fafbff", flexShrink: 0 }}>
+          <button onClick={onClose} style={{ padding: "12px 24px", borderRadius: "12px", border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#64748b", fontFamily: "inherit" }}>
+            Batal
+          </button>
+          <button onClick={() => { onSave(form); onClose(); }} style={{ padding: "12px 24px", borderRadius: "12px", border: "none", background: "#072B50", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(7,43,80,0.3)", fontFamily: "inherit" }}>
+            Simpan Produk
+          </button>
         </div>
       </div>
     </Overlay>
@@ -801,8 +532,8 @@ export default function Produk() {
   return (
     <div>
       {/* HEADER */}
-      <div className="mb-7">
-        <div className="flex justify-between items-start mb-6">
+      <div style={{ marginBottom: "48px" }}>
+        <div className="flex justify-between items-start" style={{ marginBottom: "32px" }}>
           <div>
             <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_12px_rgba(7,43,80,0.3)]">
@@ -818,14 +549,16 @@ export default function Produk() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#072B50] text-white border-none cursor-pointer text-[14px] font-bold shadow-[0_4px_16px_rgba(7,43,80,0.3)] font-[inherit]"
+            style={{ display:"flex", alignItems:"center", gap:"8px", background:"#072B50", color:"#fff", padding:"12px 24px", borderRadius:"12px", border:"none", fontSize:"14px", fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(7,43,80,0.3)", transition:"all 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background="#0e4a8a"; e.currentTarget.style.transform="translateY(-1px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background="#072B50"; e.currentTarget.style.transform="translateY(0)"; }}
           >
             <Plus size={16} /> Tambah Produk
           </button>
         </div>
 
         {/* STAT CARDS */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-6">
           {[
             {
               label: "Total Produk",
@@ -845,7 +578,7 @@ export default function Produk() {
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="bg-white rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-4"
+              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5" style={{ padding: "28px" }}
             >
               <div className="w-12 h-12 rounded-2xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
                 {icon}
@@ -865,7 +598,7 @@ export default function Produk() {
 
       {/* TABLE */}
       <div className="bg-white rounded-[20px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
-        <div className="bg-[#072B50] px-5 py-4 flex items-center justify-between">
+        <div className="bg-[#072B50] flex items-center justify-between" style={{ padding: "20px 28px" }}>
           <div className="flex items-center gap-2">
             <Package size={16} color="#fff" />
             <span className="text-[13px] font-bold text-white uppercase tracking-[0.8px]">
@@ -884,7 +617,8 @@ export default function Produk() {
                 (h) => (
                   <th
                     key={h}
-                    className={`px-[18px] py-3.5 text-[11px] font-extrabold text-gray-400 tracking-[0.8px] ${h === "AKSI" ? "text-right" : "text-left"}`}
+                    className={`text-[11px] font-extrabold text-gray-400 tracking-[0.8px] ${h === "AKSI" ? "text-right" : "text-left"}`}
+                    style={{ padding: "18px 24px" }}
                   >
                     {h}
                   </th>
@@ -898,12 +632,12 @@ export default function Produk() {
                 key={product.id}
                 className={`transition-colors hover:bg-[rgba(7,43,80,0.07)] ${i < paginated.length - 1 ? "border-b border-[#f8f9fc]" : ""}`}
               >
-                <td className="px-[18px] py-4">
+                <td style={{ padding: "20px 24px" }}>
                   <div className="w-12 h-12 rounded-xl bg-[rgba(7,43,80,0.07)] flex items-center justify-center text-2xl border-[1.5px] border-[rgba(7,43,80,0.15)]">
                     {product.image}
                   </div>
                 </td>
-                <td className="px-[18px] py-4">
+                <td style={{ padding: "20px 24px" }}>
                   <p className="text-[14px] font-bold text-[#072B50] mb-0.5">
                     {product.name}
                   </p>
@@ -911,29 +645,23 @@ export default function Produk() {
                     {product.category}
                   </span>
                 </td>
-                <td className="px-[18px] py-4 text-[14px] font-bold text-[#072B50]">
+                <td style={{ padding: "20px 24px" }} className="text-[14px] font-bold text-[#072B50]">
                   {formatPrice(product.price)}
                 </td>
-                <td className="px-[18px] py-4">
-                  <span
-                    className={`text-[14px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}
-                  >
+                <td style={{ padding: "20px 24px" }}>
+                  <span className={`text-[14px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}>
                     {product.stock}
                   </span>
                   {product.stock < 10 && (
-                    <span className="text-[10px] text-red-500 block font-semibold">
-                      Stok menipis
-                    </span>
+                    <span className="text-[10px] text-red-500 block font-semibold">Stok menipis</span>
                   )}
                 </td>
-                <td className="px-[18px] py-4">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"}`}
-                  >
+                <td style={{ padding: "20px 24px" }}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"}`}>
                     {product.promo ? "Ya" : "Tidak"}
                   </span>
                 </td>
-                <td className="px-[18px] py-4 text-right">
+                <td style={{ padding: "20px 24px", textAlign: "right" }}>
                   <div className="flex gap-2 justify-end">
                     <button
                       onClick={() => setViewProduct(product)}
@@ -961,7 +689,7 @@ export default function Produk() {
         </table>
 
         {/* PAGINATION */}
-        <div className="flex justify-between items-center px-5 py-4 border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]">
+        <div className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]" style={{ padding: "18px 28px" }}>
           <p className="text-[13px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, products.length)} dari{" "}
@@ -1012,24 +740,22 @@ export default function Produk() {
       {editProduct && (
         <Overlay onClose={() => setEditProduct(null)}>
           <div className="bg-white rounded-[20px] w-[460px] shadow-[0_32px_80px_rgba(0,0,0,0.25)] overflow-hidden">
-            <div className="bg-[#072B50] px-7 py-6 flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center">
+            <div style={{ background: "#072B50", padding: "24px 28px", display: "flex", alignItems: "center", gap: "14px" }}>
+              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <Pencil size={18} color="#fff" />
               </div>
-              <div>
-                <h2 className="text-[16px] font-extrabold text-white m-0">
-                  Edit Produk
-                </h2>
-                <p className="text-xs text-white/70 m-0">{editProduct.name}</p>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#fff", margin: 0 }}>Edit Produk</h2>
+                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)", margin: "3px 0 0" }}>{editProduct.name}</p>
               </div>
               <button
                 onClick={() => setEditProduct(null)}
-                className="ml-auto bg-white/15 border-none rounded-lg w-8 h-8 cursor-pointer text-white flex items-center justify-center"
+                style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "10px", width: "34px", height: "34px", cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}
               >
                 <X size={16} />
               </button>
             </div>
-            <div className="p-7 flex flex-col gap-4">
+            <div style={{ padding: "32px", display: "flex", flexDirection: "column", gap: "20px" }}>
               {[
                 { label: "Nama Produk", key: "name" },
                 { label: "Kategori", key: "category" },
@@ -1085,16 +811,16 @@ export default function Produk() {
                   </p>
                 </div>
               </label>
-              <div className="flex gap-3">
+              <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
                 <button
                   onClick={() => setEditProduct(null)}
-                  className="flex-1 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
+                  style={{ flex: 1, padding: "13px 20px", borderRadius: "12px", border: "1.5px solid rgba(7,43,80,0.15)", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#374151", fontFamily: "inherit" }}
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="flex-[2] py-3.5 rounded-xl border-none bg-[#072B50] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(7,43,80,0.3)] font-[inherit]"
+                  style={{ flex: 2, padding: "13px 20px", borderRadius: "12px", border: "none", background: "#072B50", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(7,43,80,0.3)", fontFamily: "inherit" }}
                 >
                   Simpan Perubahan
                 </button>
@@ -1121,16 +847,16 @@ export default function Produk() {
                 Produk akan dihapus permanen.
               </p>
             </div>
-            <div className="px-7 py-6 flex gap-3">
+            <div style={{ padding: "24px 28px", display: "flex", gap: "12px" }}>
               <button
                 onClick={() => setDeleteId(null)}
-                className="flex-1 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
+                style={{ flex: 1, padding: "13px 20px", borderRadius: "12px", border: "1.5px solid rgba(7,43,80,0.15)", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#374151", fontFamily: "inherit" }}
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 py-3.5 rounded-xl border-none bg-gradient-to-br from-red-500 to-red-600 text-white cursor-pointer text-[14px] font-bold font-[inherit]"
+                style={{ flex: 1, padding: "13px 20px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(239,68,68,0.35)", fontFamily: "inherit" }}
               >
                 Ya, Hapus
               </button>

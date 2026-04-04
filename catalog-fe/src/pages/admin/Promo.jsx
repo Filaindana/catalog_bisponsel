@@ -136,7 +136,7 @@ const presetColors = [
 ];
 
 const inputCls =
-  "w-full px-3.5 py-[11px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] text-[13px] outline-none text-[#1e2433] bg-[#f8f9fc] transition-all font-[inherit] focus:border-[#072B50] focus:bg-white";
+  "w-full px-4 py-[13px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] text-[14px] outline-none text-[#1e2433] bg-[#f8f9fc] transition-all font-[inherit] focus:border-[#072B50] focus:bg-white";
 const labelCls =
   "block text-[11px] font-extrabold text-gray-500 mb-[7px] uppercase tracking-[0.8px]";
 const labelSmCls =
@@ -264,7 +264,6 @@ function ViewPromoModal({ promo, onClose }) {
 
 // ===================== MODAL TAMBAH =====================
 function AddPromoModal({ onClose, onSave }) {
-  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: "",
     startDate: "",
@@ -292,12 +291,6 @@ function AddPromoModal({ onClose, onSave }) {
   const removeProduk = (p) =>
     setSelectedProduk(selectedProduk.filter((s) => s !== p));
 
-  const steps = [
-    { id: 1, label: "Info", icon: <Tag size={13} /> },
-    { id: 2, label: "Banner", icon: <Zap size={13} /> },
-    { id: 3, label: "Produk", icon: <Sparkles size={13} /> },
-  ];
-
   const durasi =
     form.startDate && form.endDate
       ? Math.max(
@@ -310,373 +303,143 @@ function AddPromoModal({ onClose, onSave }) {
         )
       : null;
 
+  const SectionTitle = ({ icon, title }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
+      <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "rgba(7,43,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        {icon}
+      </div>
+      <span style={{ fontSize: "11px", fontWeight: 800, color: "#072B50", textTransform: "uppercase", letterSpacing: "0.08em" }}>{title}</span>
+      <div style={{ flex: 1, height: "1.5px", background: "rgba(7,43,80,0.07)", marginLeft: "4px" }} />
+    </div>
+  );
+
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-white rounded-3xl w-[540px] max-h-[90vh] flex flex-col shadow-[0_40px_100px_rgba(0,0,0,0.3)] overflow-hidden">
+      <div style={{ width: "560px", background: "#fff", borderRadius: "20px", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 40px 100px rgba(0,0,0,0.3)", overflow: "hidden" }}>
+
         {/* HEADER */}
-        <div className="bg-[#072B50] px-8 pt-7 pb-6 relative overflow-hidden">
-          <div className="absolute -top-5 -right-5 w-[120px] h-[120px] rounded-full bg-white/5 z-0" />
-          <div className="absolute -bottom-8 right-20 w-[80px] h-[80px] rounded-full bg-white/[0.04] z-0" />
-
-          <div className="flex justify-between items-start mb-6 relative z-10">
-            <div className="flex items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center">
-                <Zap size={20} color="#fff" />
-              </div>
-              <div>
-                <h2 className="text-[18px] font-extrabold text-white mb-0.5">
-                  Tambah Promo Baru
-                </h2>
-                <p className="text-xs text-white/60 m-0">
-                  Langkah {step} dari {steps.length}
-                </p>
-              </div>
+        <div style={{ padding: "24px 32px", borderBottom: "1.5px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(7,43,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Zap size={20} color="#072B50" />
             </div>
-            <button
-              onClick={onClose}
-              className="bg-white/15 border-none rounded-[10px] w-9 h-9 cursor-pointer text-white flex items-center justify-center"
-            >
-              <X size={18} />
-            </button>
+            <div>
+              <h2 style={{ fontSize: "17px", fontWeight: 800, color: "#0f172a", margin: "0 0 3px" }}>Tambah Promo Baru</h2>
+              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>Isi semua informasi promo di bawah ini</p>
+            </div>
           </div>
-
-          {/* Steps */}
-          <div className="flex items-center relative z-10">
-            {steps.map((s, i) => (
-              <div
-                key={s.id}
-                className={`flex items-center ${i < steps.length - 1 ? "flex-1" : ""}`}
-              >
-                <div
-                  onClick={() => step > s.id && setStep(s.id)}
-                  className={`flex items-center gap-2 ${step > s.id ? "cursor-pointer" : "cursor-default"}`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 ${step >= s.id ? "bg-white border-white/60" : "bg-white/20 border-transparent"}`}
-                  >
-                    {step > s.id ? (
-                      <Check size={14} color="#072B50" strokeWidth={3} />
-                    ) : (
-                      <span
-                        className={`flex ${step === s.id ? "text-[#072B50]" : "text-white/50"}`}
-                      >
-                        {s.icon}
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className={`text-xs font-bold whitespace-nowrap ${step >= s.id ? "text-white" : "text-white/45"}`}
-                  >
-                    {s.label}
-                  </span>
-                </div>
-                {i < steps.length - 1 && (
-                  <div
-                    className={`flex-1 h-0.5 mx-3 rounded-sm ${step > s.id ? "bg-white/70" : "bg-white/20"}`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
+          <button onClick={onClose} style={{ width: "34px", height: "34px", borderRadius: "8px", border: "1.5px solid #e8edf5", background: "#f8faff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
+            <X size={16} />
+          </button>
         </div>
 
         {/* BODY */}
-        <div className="flex-1 overflow-y-auto px-8 py-7">
-          {/* STEP 1 */}
-          {step === 1 && (
-            <div className="flex flex-col gap-[18px]">
-              <Field label="Nama Promo">
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Contoh: Flash Sale Akhir Tahun 50%"
-                  className={inputCls}
-                />
+        <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
+
+          {/* Informasi Promo */}
+          <SectionTitle icon={<Tag size={13} color="#072B50" />} title="Informasi Promo" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px", marginBottom: "28px" }}>
+            <Field label="Nama Promo">
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Contoh: Flash Sale Akhir Tahun 50%" className={inputCls} />
+            </Field>
+            <Field label="Deskripsi Singkat">
+              <textarea value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} placeholder="Jelaskan detail penawaran promo ini..." className={`${inputCls} h-[88px] resize-none leading-relaxed`} />
+            </Field>
+          </div>
+
+          {/* Periode & Status */}
+          <SectionTitle icon={<Calendar size={13} color="#072B50" />} title="Periode & Status" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "18px", marginBottom: "28px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <Field label="Tanggal Mulai">
+                <input type="date" value={form.startDate} onChange={(e) => setForm({ ...form, startDate: e.target.value })} className={inputCls} />
               </Field>
-              <Field label="Deskripsi Promo">
-                <textarea
-                  value={form.desc}
-                  onChange={(e) => setForm({ ...form, desc: e.target.value })}
-                  placeholder="Jelaskan detail penawaran promo ini..."
-                  className={`${inputCls} h-[90px] resize-none leading-relaxed`}
-                />
+              <Field label="Tanggal Selesai">
+                <input type="date" value={form.endDate} onChange={(e) => setForm({ ...form, endDate: e.target.value })} className={inputCls} />
               </Field>
-              <div className="grid grid-cols-2 gap-3.5">
-                <Field label="Tanggal Mulai">
-                  <input
-                    type="date"
-                    value={form.startDate}
-                    onChange={(e) =>
-                      setForm({ ...form, startDate: e.target.value })
-                    }
-                    className={inputCls}
-                  />
-                </Field>
-                <Field label="Tanggal Selesai">
-                  <input
-                    type="date"
-                    value={form.endDate}
-                    onChange={(e) =>
-                      setForm({ ...form, endDate: e.target.value })
-                    }
-                    className={inputCls}
-                  />
-                </Field>
+            </div>
+            {durasi !== null && (
+              <div style={{ padding: "12px 16px", background: "rgba(7,43,80,0.07)", borderRadius: "10px", border: "1.5px solid rgba(7,43,80,0.12)", display: "flex", alignItems: "center", gap: "10px" }}>
+                <Calendar size={15} color="#072B50" />
+                <span style={{ fontSize: "13px", fontWeight: 600, color: "#072B50" }}>Durasi: {durasi} hari</span>
               </div>
-              {durasi !== null && (
-                <div className="px-4 py-3 bg-[rgba(7,43,80,0.07)] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-2.5">
-                  <Calendar size={16} color="#072B50" />
-                  <span className="text-[13px] font-semibold text-[#072B50]">
-                    Durasi: {durasi} hari
-                  </span>
-                </div>
-              )}
-              <div className="px-4 py-4 bg-[#f8f9fc] rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex justify-between items-center">
-                <div>
-                  <p className="text-[13px] font-bold text-[#1e2433] mb-0.5">
-                    Aktifkan Langsung
-                  </p>
-                  <p className="text-xs text-gray-400 m-0">
-                    Promo langsung tampil setelah disimpan
-                  </p>
-                </div>
-                <div
-                  onClick={() => setForm({ ...form, isAktif: !form.isAktif })}
-                  className="relative w-12 h-[26px] rounded-full cursor-pointer shrink-0 transition-colors duration-250"
-                  style={{ background: form.isAktif ? "#072B50" : "#e2e8f0" }}
-                >
-                  <div
-                    className="absolute top-[3px] w-5 h-5 rounded-full bg-white shadow-[0_2px_4px_rgba(0,0,0,0.2)] transition-all duration-250"
-                    style={{ left: form.isAktif ? "25px" : "3px" }}
-                  />
-                </div>
+            )}
+            <div style={{ padding: "16px 18px", background: "#f8f9fc", borderRadius: "12px", border: "1.5px solid rgba(7,43,80,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <p style={{ fontSize: "13px", fontWeight: 700, color: "#1e2433", margin: "0 0 2px" }}>Aktifkan Langsung</p>
+                <p style={{ fontSize: "12px", color: "#9ca3af", margin: 0 }}>Promo langsung tampil setelah disimpan</p>
+              </div>
+              <div onClick={() => setForm({ ...form, isAktif: !form.isAktif })} style={{ position: "relative", width: "46px", height: "25px", borderRadius: "999px", cursor: "pointer", background: form.isAktif ? "#072B50" : "#e2e8f0", flexShrink: 0, transition: "background 0.25s" }}>
+                <div style={{ position: "absolute", top: "3px", width: "19px", height: "19px", borderRadius: "50%", background: "#fff", boxShadow: "0 2px 4px rgba(0,0,0,0.2)", transition: "left 0.25s", left: form.isAktif ? "24px" : "3px" }} />
               </div>
             </div>
-          )}
+          </div>
 
-          {/* STEP 2 */}
-          {step === 2 && (
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className={labelCls}>Preview Banner</p>
-                <div
-                  className="h-[100px] rounded-2xl relative flex items-center justify-center overflow-hidden border-[1.5px] border-[rgba(7,43,80,0.15)]"
-                  style={{
-                    background: `linear-gradient(135deg, ${form.bannerColor}ee, ${form.bannerColor}88)`,
-                  }}
-                >
-                  <div className="absolute -top-5 -right-5 w-[100px] h-[100px] rounded-full bg-white/10" />
-                  <p className="text-[16px] font-extrabold text-white [text-shadow:0_2px_8px_rgba(0,0,0,0.2)] m-0">
-                    {form.name || "Nama Promo"}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                <p className={labelCls}>Pilih Warna Banner</p>
-                <div className="flex flex-wrap gap-2.5 mb-3.5">
-                  {presetColors.map((c) => (
-                    <div
-                      key={c}
-                      onClick={() => setForm({ ...form, bannerColor: c })}
-                      className="w-9 h-9 rounded-[10px] cursor-pointer transition-transform hover:scale-[1.15]"
-                      style={{
-                        background: c,
-                        border:
-                          form.bannerColor === c
-                            ? "3px solid #1e2433"
-                            : "3px solid transparent",
-                        boxShadow:
-                          form.bannerColor === c ? `0 0 0 2px ${c}55` : "none",
-                      }}
-                    />
-                  ))}
-                  <div className="w-9 h-9 rounded-[10px] overflow-hidden border-[1.5px] border-[rgba(7,43,80,0.15)] cursor-pointer relative">
-                    <input
-                      type="color"
-                      value={form.bannerColor}
-                      onChange={(e) =>
-                        setForm({ ...form, bannerColor: e.target.value })
-                      }
-                      className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)] cursor-pointer border-none p-0"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <p className={labelCls}>Upload Gambar Banner (Opsional)</p>
-                <div
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragOver(true);
-                  }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    setDragOver(false);
-                  }}
-                  className={`border-2 border-dashed rounded-2xl py-8 px-5 flex flex-col items-center gap-2.5 cursor-pointer transition-all ${dragOver ? "border-[#072B50] bg-[rgba(7,43,80,0.07)]" : "border-[rgba(7,43,80,0.15)] bg-[#fafaff]"}`}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-2xl flex items-center justify-center ${dragOver ? "bg-[#072B50]" : "bg-[rgba(7,43,80,0.07)]"}`}
-                  >
-                    <Upload size={22} color={dragOver ? "#fff" : "#072B50"} />
-                  </div>
-                  <p className="text-[14px] font-bold text-[#1e2433] m-0">
-                    Drag & drop atau{" "}
-                    <span className="text-[#072B50]">klik upload</span>
-                  </p>
-                  <p className="text-xs text-gray-400 m-0">
-                    PNG, JPG — Maks. 2MB • Rekomendasi 1200×400px
-                  </p>
-                </div>
+          {/* Banner */}
+          <SectionTitle icon={<Zap size={13} color="#072B50" />} title="Banner Promo" />
+          <div style={{ marginBottom: "28px" }}>
+            <div style={{ height: "90px", borderRadius: "14px", background: `linear-gradient(135deg, ${form.bannerColor}ee, ${form.bannerColor}88)`, position: "relative", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", border: "1.5px solid rgba(7,43,80,0.12)", marginBottom: "14px" }}>
+              <div style={{ position: "absolute", top: "-20px", right: "-20px", width: "100px", height: "100px", borderRadius: "50%", background: "rgba(255,255,255,0.1)" }} />
+              <p style={{ fontSize: "15px", fontWeight: 800, color: "#fff", margin: 0, textShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>{form.name || "Nama Promo"}</p>
+            </div>
+            <label style={{ fontSize: "11px", fontWeight: 800, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "10px" }}>Pilih Warna</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "14px" }}>
+              {presetColors.map((c) => (
+                <div key={c} onClick={() => setForm({ ...form, bannerColor: c })} style={{ width: "34px", height: "34px", borderRadius: "9px", background: c, cursor: "pointer", border: form.bannerColor === c ? "3px solid #1e2433" : "3px solid transparent", boxShadow: form.bannerColor === c ? `0 0 0 2px ${c}55` : "none", transition: "transform 0.15s" }} />
+              ))}
+              <div style={{ width: "34px", height: "34px", borderRadius: "9px", overflow: "hidden", border: "1.5px solid rgba(7,43,80,0.15)", cursor: "pointer", position: "relative" }}>
+                <input type="color" value={form.bannerColor} onChange={(e) => setForm({ ...form, bannerColor: e.target.value })} style={{ position: "absolute", inset: "-4px", width: "calc(100% + 8px)", height: "calc(100% + 8px)", cursor: "pointer", border: "none", padding: 0 }} />
               </div>
             </div>
-          )}
+            <div onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={(e) => { e.preventDefault(); setDragOver(false); }}
+              style={{ border: `2px dashed ${dragOver ? "#072B50" : "rgba(7,43,80,0.2)"}`, borderRadius: "12px", padding: "20px", background: dragOver ? "rgba(7,43,80,0.05)" : "#fafaff", display: "flex", flexDirection: "column", alignItems: "center", gap: "8px", cursor: "pointer", transition: "all 0.2s" }}>
+              <Upload size={20} color={dragOver ? "#072B50" : "#9ca3af"} />
+              <p style={{ fontSize: "13px", fontWeight: 700, color: "#1e2433", margin: 0 }}>Upload gambar banner <span style={{ color: "#072B50" }}>(opsional)</span></p>
+              <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0 }}>PNG, JPG — Maks. 2MB · Rekomendasi 1200×400px</p>
+            </div>
+          </div>
 
-          {/* STEP 3 */}
-          {step === 3 && (
-            <div className="flex flex-col gap-5">
-              <div>
-                <p className={labelCls}>Cari & Tambah Produk</p>
-                <div className="relative">
-                  <Search
-                    size={14}
-                    color="#9ca3af"
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
-                  />
-                  <input
-                    value={produkSearch}
-                    onChange={(e) => setProdukSearch(e.target.value)}
-                    placeholder="Ketik nama produk..."
-                    className={`${inputCls} pl-[38px]`}
-                  />
-                  {produkSearch && filteredProduk.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 bg-white border-[1.5px] border-[rgba(7,43,80,0.15)] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.12)] z-10 mt-1.5 overflow-hidden">
-                      {filteredProduk.map((p, i) => (
-                        <div
-                          key={p}
-                          onClick={() => addProduk(p)}
-                          className="px-4 py-[11px] text-[13px] text-gray-700 cursor-pointer font-semibold hover:bg-[rgba(7,43,80,0.07)] hover:text-[#072B50]"
-                          style={{
-                            borderBottom:
-                              i < filteredProduk.length - 1
-                                ? "1px solid rgba(7,43,80,0.07)"
-                                : "none",
-                          }}
-                        >
-                          + {p}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {selectedProduk.length > 0 && (
-                <div>
-                  <p className={labelCls}>
-                    Produk Terpilih ({selectedProduk.length})
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedProduk.map((p) => (
-                      <span
-                        key={p}
-                        className="flex items-center gap-2 px-3 py-[7px] bg-[rgba(7,43,80,0.07)] rounded-[10px] text-[13px] font-bold text-[#072B50] border-[1.5px] border-[rgba(7,43,80,0.15)]"
-                      >
-                        {p}
-                        <button
-                          onClick={() => removeProduk(p)}
-                          className="bg-[rgba(7,43,80,0.15)] border-none rounded-md w-[18px] h-[18px] cursor-pointer text-[#072B50] flex items-center justify-center p-0 shrink-0"
-                        >
-                          <X size={10} />
-                        </button>
-                      </span>
+          {/* Produk Terkait */}
+          <SectionTitle icon={<Sparkles size={13} color="#072B50" />} title="Produk Terkait" />
+          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+            <Field label="Cari & Tambah Produk">
+              <div style={{ position: "relative" }}>
+                <Search size={14} color="#9ca3af" style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)" }} />
+                <input value={produkSearch} onChange={(e) => setProdukSearch(e.target.value)} placeholder="Ketik nama produk..." className={`${inputCls} pl-[38px]`} />
+                {produkSearch && filteredProduk.length > 0 && (
+                  <div style={{ position: "absolute", top: "100%", left: 0, right: 0, background: "#fff", border: "1.5px solid rgba(7,43,80,0.15)", borderRadius: "12px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 10, marginTop: "6px", overflow: "hidden" }}>
+                    {filteredProduk.map((p, i) => (
+                      <div key={p} onClick={() => addProduk(p)} style={{ padding: "11px 16px", fontSize: "13px", color: "#374151", cursor: "pointer", fontWeight: 600, borderBottom: i < filteredProduk.length - 1 ? "1px solid rgba(7,43,80,0.07)" : "none" }}>
+                        + {p}
+                      </div>
                     ))}
                   </div>
-                </div>
-              )}
-
-              {form.name && (
-                <div className="bg-[rgba(7,43,80,0.07)] rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)]">
-                  <p className="text-[11px] font-extrabold text-[#072B50] mb-3.5 uppercase tracking-[0.8px]">
-                    ✓ Ringkasan Promo
-                  </p>
-                  {[
-                    { label: "Nama", value: form.name },
-                    {
-                      label: "Periode",
-                      value:
-                        form.startDate && form.endDate
-                          ? `${formatDate(form.startDate)} – ${formatDate(form.endDate)}`
-                          : "-",
-                    },
-                    {
-                      label: "Status",
-                      value: form.isAktif ? "Langsung Aktif" : "Segera",
-                    },
-                    {
-                      label: "Produk",
-                      value: `${selectedProduk.length} produk`,
-                    },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="flex justify-between mb-2">
-                      <span className="text-xs text-gray-500">{label}</span>
-                      <span className="text-xs font-bold text-[#072B50] max-w-[60%] text-right">
-                        {value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                )}
+              </div>
+            </Field>
+            {selectedProduk.length > 0 && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                {selectedProduk.map((p) => (
+                  <span key={p} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "7px 12px", background: "rgba(7,43,80,0.07)", borderRadius: "10px", fontSize: "13px", fontWeight: 700, color: "#072B50", border: "1.5px solid rgba(7,43,80,0.12)" }}>
+                    {p}
+                    <button onClick={() => removeProduk(p)} style={{ width: "18px", height: "18px", borderRadius: "5px", border: "none", background: "rgba(7,43,80,0.15)", cursor: "pointer", color: "#072B50", display: "flex", alignItems: "center", justifyContent: "center", padding: 0, flexShrink: 0 }}>
+                      <X size={10} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* FOOTER */}
-        <div className="px-8 py-5 border-t-[1.5px] border-[rgba(7,43,80,0.15)] flex gap-3 shrink-0 bg-[#fafbff]">
-          {step > 1 && (
-            <button
-              onClick={() => setStep(step - 1)}
-              className="px-5 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
-            >
-              ← Kembali
-            </button>
-          )}
-          {step === 1 && (
-            <button
-              onClick={onClose}
-              className="px-5 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
-            >
-              Batal
-            </button>
-          )}
-          {step < 3 ? (
-            <button
-              onClick={() => setStep(step + 1)}
-              className="flex-1 py-3.5 rounded-xl border-none bg-[#072B50] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(7,43,80,0.3)] font-[inherit]"
-            >
-              Lanjut → {steps[step].label}
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                onSave({
-                  name: form.name,
-                  desc: form.desc,
-                  startDate: form.startDate,
-                  endDate: form.endDate,
-                  status: form.isAktif ? "Aktif" : "Segera",
-                  bannerColor: form.bannerColor,
-                });
-                onClose();
-              }}
-              className="flex-1 py-3.5 rounded-xl border-none bg-gradient-to-br from-emerald-500 to-emerald-600 text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_15px_rgba(16,185,129,0.35)] font-[inherit]"
-            >
-              ✓ Simpan Promo
-            </button>
-          )}
+        <div style={{ padding: "20px 32px", borderTop: "1.5px solid #f1f5f9", display: "flex", justifyContent: "flex-end", gap: "12px", background: "#fafbff", flexShrink: 0 }}>
+          <button onClick={onClose} style={{ padding: "12px 24px", borderRadius: "12px", border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#64748b", fontFamily: "inherit" }}>
+            Batal
+          </button>
+          <button onClick={() => { onSave({ name: form.name, desc: form.desc, startDate: form.startDate, endDate: form.endDate, status: form.isAktif ? "Aktif" : "Segera", bannerColor: form.bannerColor }); onClose(); }} style={{ padding: "12px 24px", borderRadius: "12px", border: "none", background: "#072B50", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(7,43,80,0.3)", fontFamily: "inherit" }}>
+            Simpan Promo
+          </button>
         </div>
       </div>
     </Overlay>
@@ -738,8 +501,8 @@ export default function Promo() {
   return (
     <div>
       {/* HEADER */}
-      <div className="mb-7">
-        <div className="flex justify-between items-start mb-6">
+      <div style={{ marginBottom: "48px" }}>
+        <div className="flex justify-between items-start" style={{ marginBottom: "32px" }}>
           <div>
             <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_12px_rgba(7,43,80,0.3)]">
@@ -755,14 +518,16 @@ export default function Promo() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-[#072B50] text-white border-none cursor-pointer text-[14px] font-bold shadow-[0_4px_16px_rgba(7,43,80,0.3)] font-[inherit]"
+            style={{ display:"flex", alignItems:"center", gap:"8px", background:"#072B50", color:"#fff", padding:"12px 24px", borderRadius:"12px", border:"none", fontSize:"14px", fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(7,43,80,0.3)", transition:"all 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.background="#0e4a8a"; e.currentTarget.style.transform="translateY(-1px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background="#072B50"; e.currentTarget.style.transform="translateY(0)"; }}
           >
             <Plus size={16} /> Tambah Promo
           </button>
         </div>
 
         {/* STAT CARDS */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-6">
           {[
             {
               label: "Promo Aktif",
@@ -782,7 +547,7 @@ export default function Promo() {
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="bg-white rounded-2xl p-5 border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-4"
+              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5" style={{ padding: "28px" }}
             >
               <div className="w-12 h-12 rounded-2xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
                 {icon}
@@ -802,7 +567,7 @@ export default function Promo() {
 
       {/* TABLE */}
       <div className="bg-white rounded-[20px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
-        <div className="bg-[#072B50] px-5 py-4 flex items-center justify-between">
+        <div className="bg-[#072B50] flex items-center justify-between" style={{ padding: "20px 28px" }}>
           <div className="flex items-center gap-2">
             <Tag size={16} color="#fff" />
             <span className="text-[13px] font-bold text-white uppercase tracking-[0.8px]">
@@ -821,7 +586,8 @@ export default function Promo() {
                 (h) => (
                   <th
                     key={h}
-                    className={`px-[18px] py-3.5 text-[11px] font-extrabold text-gray-400 tracking-[0.8px] ${h === "AKSI" ? "text-right" : "text-left"}`}
+                    className={`text-[11px] font-extrabold text-gray-400 tracking-[0.8px] ${h === "AKSI" ? "text-right" : "text-left"}`}
+                    style={{ padding: "18px 24px" }}
                   >
                     {h}
                   </th>
@@ -837,7 +603,7 @@ export default function Promo() {
                   key={promo.id}
                   className={`transition-colors hover:bg-[rgba(7,43,80,0.07)] ${i < paginated.length - 1 ? "border-b border-[#f8f9fc]" : ""}`}
                 >
-                  <td className="px-[18px] py-4">
+                  <td style={{ padding: "20px 24px" }}>
                     <div
                       className="w-[88px] h-[54px] rounded-xl relative flex items-center justify-center overflow-hidden"
                       style={{
@@ -849,13 +615,13 @@ export default function Promo() {
                       <Tag size={18} color="#fff" />
                     </div>
                   </td>
-                  <td className="px-[18px] py-4">
+                  <td style={{ padding: "20px 24px" }}>
                     <p className="text-[14px] font-bold text-[#072B50] mb-1">
                       {promo.name}
                     </p>
                     <p className="text-xs text-gray-400 m-0">{promo.desc}</p>
                   </td>
-                  <td className="px-[18px] py-4">
+                  <td style={{ padding: "20px 24px" }}>
                     <div className="flex items-center gap-1.5">
                       <Calendar size={13} color="#9ca3af" />
                       <span className="text-[13px] text-gray-700 font-medium">
@@ -864,7 +630,7 @@ export default function Promo() {
                       </span>
                     </div>
                   </td>
-                  <td className="px-[18px] py-4">
+                  <td style={{ padding: "20px 24px" }}>
                     <span
                       className="inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full text-xs font-bold"
                       style={{ background: cfg.bg, color: cfg.color }}
@@ -876,7 +642,7 @@ export default function Promo() {
                       {cfg.label}
                     </span>
                   </td>
-                  <td className="px-[18px] py-4 text-right">
+                  <td style={{ padding: "20px 24px", textAlign: "right" }}>
                     <div className="flex gap-2 justify-end">
                       <button
                         onClick={() => setViewPromo(promo)}
@@ -905,7 +671,7 @@ export default function Promo() {
         </table>
 
         {/* PAGINATION */}
-        <div className="flex justify-between items-center px-5 py-4 border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]">
+        <div className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]" style={{ padding: "18px 28px" }}>
           <p className="text-[13px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, promos.length)} dari{" "}

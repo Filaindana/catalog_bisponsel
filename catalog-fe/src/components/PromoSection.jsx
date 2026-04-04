@@ -18,31 +18,16 @@ const banners = [
 ];
 
 export default function PromoSection() {
-
   const [swiperInstance, setSwiperInstance] = useState(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex]       = useState(0);
 
   return (
     <section style={{ background: "#072B50", padding: "40px 0" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "0 20px" }}>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "2fr 1fr",
-            gap: "12px",
-            height: "380px",
-          }}
-        >
-          {/* LEFT BIG BANNER SLIDER */}
-          <div
-            style={{
-              borderRadius: "14px",
-              overflow: "hidden",
-              height: "100%",
-              background: "transparent",
-              border: "1px solid rgba(255,255,255,0.15)",
-            }}
-          >
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, height: 380 }}>
+
+          {/* LEFT BIG BANNER */}
+          <div style={{ borderRadius: 14, overflow: "hidden", height: "100%", border: "1px solid rgba(255,255,255,0.15)" }}>
             <Swiper
               modules={[Autoplay, Pagination]}
               pagination={{ clickable: true }}
@@ -55,22 +40,12 @@ export default function PromoSection() {
               {banners.map((banner, index) => (
                 <SwiperSlide
                   key={index}
-                  style={{
-                    background: "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "transparent" }}
                 >
                   <img
                     src={banner.image}
                     alt={banner.alt}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "contain",
-                      display: "block",
-                    }}
+                    style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
                   />
                 </SwiperSlide>
               ))}
@@ -78,60 +53,24 @@ export default function PromoSection() {
           </div>
 
           {/* RIGHT 2x2 THUMBNAIL */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gridTemplateRows: "1fr 1fr",
-              gap: "10px",
-              height: "100%",
-            }}
-          >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr", gap: 10, height: "100%" }}>
             {banners.map((card, index) => (
               <div
                 key={index}
-                onClick={() => {
-                  swiperInstance?.slideTo(index);
-                  setActiveIndex(index);
-                }}
-                style={{
-                  borderRadius: "10px",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  background: "transparent",
-                  outline:
-                    activeIndex === index
-                      ? "3px solid #60a5fa"
-                      : "3px solid transparent",
-                  transition: "outline 0.2s ease",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                onClick={() => { swiperInstance?.slideTo(index); setActiveIndex(index); }}
+                style={{ borderRadius: 10, overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", outline: activeIndex === index ? "3px solid #60a5fa" : "3px solid transparent", transition: "outline 0.2s ease" }}
               >
                 <img
                   src={card.image}
                   alt={card.alt}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    display: "block",
-                    transition: "transform 0.3s ease, opacity 0.3s ease",
-                    opacity: activeIndex === index ? 1 : 0.6,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform =
-                      "scale(1.05)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform =
-                      "scale(1)";
-                  }}
+                  style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", opacity: activeIndex === index ? 1 : 0.6, transition: "transform 0.3s ease, opacity 0.3s ease" }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
                 />
               </div>
             ))}
           </div>
+
         </div>
       </div>
     </section>

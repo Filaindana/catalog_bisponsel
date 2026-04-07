@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserCatalog;
+use App\Models\PromoProduk;
 use Illuminate\Http\Request;
 
-class UserCatalogController extends Controller
+class PromoProdukController
 {
     /**
      * Display a listing of the resource.
@@ -34,7 +34,7 @@ class UserCatalogController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(UserCatalog $userCatalog)
+    public function show(PromoProduk $promoProduk)
     {
         //
     }
@@ -42,7 +42,7 @@ class UserCatalogController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(UserCatalog $userCatalog)
+    public function edit(PromoProduk $promoProduk)
     {
         //
     }
@@ -50,7 +50,7 @@ class UserCatalogController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UserCatalog $userCatalog)
+    public function update(Request $request, PromoProduk $promoProduk)
     {
         //
     }
@@ -58,7 +58,7 @@ class UserCatalogController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UserCatalog $userCatalog)
+    public function destroy(PromoProduk $promoProduk)
     {
         //
     }

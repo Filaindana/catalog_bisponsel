@@ -6,26 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('user_catalogs', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('nama');
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('role')->default('admin'); // bisa admin/user
-            $table->timestamps();
+            $table->enum('peran', ['admin', 'user'])->default('user');
+            $table->timestamp('dibuat_pada')->useCurrent();
+            $table->timestamp('diperbarui_pada')->useCurrentOnUpdate()->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('user_catalogs');
+        Schema::dropIfExists('users');
     }
 };

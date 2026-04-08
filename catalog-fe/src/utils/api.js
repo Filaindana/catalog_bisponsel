@@ -1,17 +1,29 @@
-import axios from "axios";
+const BASE_URL = "http://localhost:8000/api";
 
-const API = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+// ambil token
+const getToken = () => localStorage.getItem("token");
 
-// 🔐 nanti kalau pakai token tinggal aktifin
-API.interceptors.request.use((config) => {
-  // const token = localStorage.getItem("token");
-  // if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// wrapper fetch
+const api = async (endpoint, options = {}) => {
+  const token = getToken();
 
-export default API;
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(options.headers || {}),
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "API Error");
+  }
+
+  return data;
+};
+
+export default api;

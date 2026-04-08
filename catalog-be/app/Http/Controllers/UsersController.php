@@ -11,11 +11,11 @@ class UsersController
 {
     public function index(): JsonResponse
     {
-        $userss = Users::select('id', 'nama', 'email', 'peran', 'dibuat_pada')->get();
+        $users = Users::select('id', 'nama', 'email', 'peran', 'dibuat_pada')->get();
 
         return response()->json([
             'status' => true,
-            'data'   => $userss,
+            'data'   => $users,
         ]);
     }
 
@@ -33,9 +33,9 @@ class UsersController
     {
         $validated = $request->validate([
             'nama'     => 'required|string|max:255',
-            'email'    => 'required|email|unique:userss,email',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
-            'peran'    => 'required|in:admin,users',
+            'peran'    => 'required|in:admin,user',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -55,9 +55,9 @@ class UsersController
 
         $validated = $request->validate([
             'nama'     => 'sometimes|string|max:255',
-            'email'    => 'sometimes|email|unique:userss,email,' . $id,
+            'email'    => 'sometimes|email|unique:users,email,' . $id,
             'password' => 'sometimes|string|min:8',
-            'peran'    => 'sometimes|in:admin,users',
+            'peran'    => 'sometimes|in:admin,user',
         ]);
 
         if (isset($validated['password'])) {

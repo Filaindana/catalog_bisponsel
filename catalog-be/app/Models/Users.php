@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Sanctum\HasApiTokens;
 
 class Users extends Authenticatable
 {
+    use HasApiTokens;
+
     protected $table = 'users';
 
     const CREATED_AT = 'dibuat_pada';

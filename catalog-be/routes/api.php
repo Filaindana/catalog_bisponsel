@@ -3,11 +3,23 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\PromoController;
+// 🔐 AUTH
 use App\Http\Controllers\Api\AuthController;
+
+// 📦 CONTROLLERS (INDONESIA)
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\PromoController;
+use App\Http\Controllers\PromoProdukController;
+use App\Http\Controllers\CabangController;
+use App\Http\Controllers\AktivitasController;
+use App\Http\Controllers\KontakController;
+use App\Http\Controllers\FavoritController;
+use App\Http\Controllers\PenjualanProdukController;
+use App\Http\Controllers\GambarProdukController;
+use App\Http\Controllers\SpesifikasiProdukController;
+use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\UsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,28 +27,77 @@ use App\Http\Controllers\Api\AuthController;
 |--------------------------------------------------------------------------
 */
 
+// =======================
 // 🔐 AUTH
+// =======================
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/me', [AuthController::class, 'me']);
+    });
 });
 
-// 🛍️ PRODUCTS
-Route::apiResource('products', ProductController::class);
 
-// 📁 CATEGORIES
-Route::apiResource('categories', CategoryController::class);
+// =======================
+// 🌐 PUBLIC
+// =======================
 
-// 🏷️ BRANDS
-Route::apiResource('brands', BrandController::class);
+// Produk + relasi
+Route::apiResource('produk', ProdukController::class)->only(['index', 'show']);
+Route::apiResource('kategori', KategoriController::class)->only(['index', 'show']);
+Route::apiResource('promo', PromoController::class)->only(['index', 'show']);
 
-// 🎁 PROMOS
-Route::apiResource('promos', PromoController::class);
+// Relasi tambahan
+Route::get('/produk/{id}/gambar', [GambarProdukController::class, 'index']);
+Route::get('/produk/{id}/spesifikasi', [SpesifikasiProdukController::class, 'index']);
 
-// 👤 TEST USER LOGIN (optional)
-Route::get('/me', function (Request $request) {
-    return response()->json([
-        'message' => 'API is working 🚀'
-    ]);
+// Cabang & aktivitas
+Route::apiResource('cabang', CabangController::class)->only(['index', 'show']);
+Route::apiResource('aktivitas', AktivitasController::class)->only(['index', 'show']);
+
+// Kontak (public bisa kirim)
+Route::post('/kontak', [KontakController::class, 'store']);
+
+
+// =======================
+// 🔒 PROTECTED (LOGIN)
+// =======================
+Route::middleware('auth:sanctum')->group(function () {
+
+    // 👤 User
+    Route::get('/users', [UsersController::class, 'index']);
+
+    // 🛍️ Produk
+    Route::apiResource('produk', ProdukController::class)->except(['index', 'show']);
+
+    // 📁 Kategori
+    Route::apiResource('kategori', KategoriController::class)->except(['index', 'show']);
+
+    // 🎁 Promo
+    Route::apiResource('promo', PromoController::class)->except(['index', 'show']);
+
+    // 🔗 Promo Produk
+    Route::apiResource('promo-produk', PromoProdukController::class);
+
+    // 🏢 Cabang & Aktivitas
+    Route::apiResource('cabang', CabangController::class)->except(['index', 'show']);
+    Route::apiResource('aktivitas', AktivitasController::class)->except(['index', 'show']);
+
+    // ⭐ Favorit
+    Route::get('/favorit', [FavoritController::class, 'index']);
+    Route::post('/favorit/{produk_id}', [FavoritController::class, 'store']);
+    Route::delete('/favorit/{produk_id}', [FavoritController::class, 'destroy']);
+
+    // 📊 Penjualan
+    Route::apiResource('penjualan', PenjualanProdukController::class);
+
+    // ⚙️ Pengaturan
+    Route::get('/pengaturan', [PengaturanController::class, 'index']);
+    Route::put('/pengaturan', [PengaturanController::class, 'update']);
+
+    // 📩 Kontak (admin lihat pesan)
+    Route::get('/kontak', [KontakController::class, 'index']);
 });

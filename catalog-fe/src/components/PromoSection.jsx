@@ -19,15 +19,17 @@ const banners = [
 
 export default function PromoSection() {
   const [swiperInstance, setSwiperInstance] = useState(null);
-  const [activeIndex, setActiveIndex]       = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section style={{ background: "#072B50", padding: "40px 0" }}>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 20px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, height: 380 }}>
-
+    <section className="bg-[#072B50] py-6 md:py-10">
+      <div className="max-w-[1100px] mx-auto px-4 md:px-5">
+        
+        {/* GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-3 md:h-[380px]">
+          
           {/* LEFT BIG BANNER */}
-          <div style={{ borderRadius: 14, overflow: "hidden", height: "100%", border: "1px solid rgba(255,255,255,0.15)" }}>
+          <div className="rounded-xl overflow-hidden h-[220px] md:h-full border border-white/15">
             <Swiper
               modules={[Autoplay, Pagination]}
               pagination={{ clickable: true }}
@@ -35,37 +37,44 @@ export default function PromoSection() {
               loop={false}
               onSwiper={(swiper) => setSwiperInstance(swiper)}
               onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
-              style={{ width: "100%", height: "100%" }}
+              className="w-full h-full"
             >
               {banners.map((banner, index) => (
                 <SwiperSlide
                   key={index}
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "transparent" }}
+                  className="flex items-center justify-center bg-transparent"
                 >
                   <img
                     src={banner.image}
                     alt={banner.alt}
-                    style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+                    className="w-full h-full object-contain block"
                   />
                 </SwiperSlide>
               ))}
             </Swiper>
           </div>
 
-          {/* RIGHT 2x2 THUMBNAIL */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr", gap: 10, height: "100%" }}>
+          {/* RIGHT THUMBNAIL */}
+          <div className="grid grid-cols-2 grid-rows-2 gap-2 md:gap-2.5 h-[200px] md:h-full">
             {banners.map((card, index) => (
               <div
                 key={index}
-                onClick={() => { swiperInstance?.slideTo(index); setActiveIndex(index); }}
-                style={{ borderRadius: 10, overflow: "hidden", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", outline: activeIndex === index ? "3px solid #60a5fa" : "3px solid transparent", transition: "outline 0.2s ease" }}
+                onClick={() => {
+                  swiperInstance?.slideTo(index);
+                  setActiveIndex(index);
+                }}
+                className={`rounded-lg overflow-hidden cursor-pointer flex items-center justify-center transition-all duration-200 ${
+                  activeIndex === index
+                    ? "outline outline-[3px] outline-blue-400"
+                    : "outline outline-[3px] outline-transparent"
+                }`}
               >
                 <img
                   src={card.image}
                   alt={card.alt}
-                  style={{ width: "100%", height: "100%", objectFit: "contain", display: "block", opacity: activeIndex === index ? 1 : 0.6, transition: "transform 0.3s ease, opacity 0.3s ease" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
+                  className={`w-full h-full object-contain block transition-all duration-300 ${
+                    activeIndex === index ? "opacity-100" : "opacity-60"
+                  } hover:scale-105`}
                 />
               </div>
             ))}

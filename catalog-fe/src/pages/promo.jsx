@@ -1,103 +1,86 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
-if (typeof document !== "undefined" && !document.querySelector("[data-font-promo]")) {
+/* ── Minimal style: hanya animasi & keyframes ── */
+if (typeof document !== "undefined" && !document.querySelector("[data-promo-style]")) {
   const s = document.createElement("style");
-  s.setAttribute("data-font-promo", "true");
+  s.setAttribute("data-promo-style", "true");
   s.textContent = `
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', sans-serif; background: #f5f7fa; }
+    .promo-root * { font-family: 'Inter', sans-serif !important; box-sizing: border-box; }
 
-    @keyframes fadeUp   { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
     @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+    @keyframes fadeLeft { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:translateX(0)} }
     @keyframes ticker   { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-    @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.4} }
-    @keyframes shimmer  { from{background-position:-600px 0} to{background-position:600px 0} }
-    @keyframes float    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.35} }
 
-    .card-enter { animation: fadeUp .45s ease both; }
-    .card-enter:nth-child(1){animation-delay:.06s}
-    .card-enter:nth-child(2){animation-delay:.12s}
-    .card-enter:nth-child(3){animation-delay:.18s}
-    .card-enter:nth-child(4){animation-delay:.24s}
+    /* Scroll-reveal: default hidden */
+    .reveal       { opacity:0; transform:translateY(28px); transition:opacity .55s ease, transform .55s ease; }
+    .reveal.left  { transform:translateX(-24px); }
+    .reveal.right { transform:translateX(24px); }
+    .reveal.shown { opacity:1 !important; transform:none !important; }
 
-    .p-card {
-      background:#fff; border-radius:18px; border:1px solid #e8edf4; overflow:hidden;
-      cursor:default; transition: transform .28s cubic-bezier(.34,1.3,.64,1), box-shadow .28s ease;
-      box-shadow: 0 2px 12px rgba(7,43,80,.06); font-family:'Inter',sans-serif;
-    }
-    .p-card:hover { transform: translateY(-5px); box-shadow: 0 20px 48px rgba(7,43,80,.14); }
-    .p-card:hover .p-img { transform: scale(1.06); }
-    .p-img { transition: transform .6s cubic-bezier(.25,.46,.45,.94); }
+    /* stagger delays */
+    .reveal-d1 { transition-delay:.08s; }
+    .reveal-d2 { transition-delay:.16s; }
+    .reveal-d3 { transition-delay:.24s; }
+    .reveal-d4 { transition-delay:.32s; }
+    .reveal-d5 { transition-delay:.40s; }
+    .reveal-d6 { transition-delay:.48s; }
 
-    .tab-pill {
-      padding: 7px 18px; border-radius: 30px; font-size: 12px; font-weight: 600;
-      border: 1.5px solid #e0e8f2; background: #fff; color: #6b7a8f; cursor: pointer;
-      font-family: 'Inter', sans-serif; transition: all .18s;
-    }
-    .tab-pill:hover { border-color:#a8b8cc; color:#072B50; }
-    .tab-pill.active { background: #072B50; color: #fff; border-color: #072B50; }
+    .promo-card  { transition: transform .25s cubic-bezier(.34,1.3,.64,1), box-shadow .25s ease; }
+    .promo-card:hover { transform:translateY(-5px); }
+    .promo-img   { transition: transform .5s cubic-bezier(.25,.46,.45,.94); }
+    .promo-card:hover .promo-img { transform:scale(1.06); }
 
-    .wish-btn {
-      width:32px; height:32px; border-radius:50%; background:#fff; border:1.5px solid #e0e8f2;
-      cursor:pointer; display:flex; align-items:center; justify-content:center;
-      transition: border-color .18s, transform .2s; flex-shrink:0;
-    }
-    .wish-btn:hover { border-color:#ff4d6d; transform:scale(1.1); }
+    .tab-active  { background:#072B50 !important; color:#fff !important; border-color:#072B50 !important; }
+    .tab-btn     { transition: all .15s ease; }
+    .tab-btn:hover:not(.tab-active) { border-color:#a8b8cc !important; color:#072B50 !important; }
 
-    .ticker-wrap { overflow:hidden; background:#072B50; }
-    .ticker-inner { display:flex; width:max-content; animation:ticker 28s linear infinite; }
-    .ticker-inner:hover { animation-play-state:paused; }
+    .banner-card { transition: transform .3s cubic-bezier(.34,1.3,.64,1), box-shadow .3s ease; }
+    .banner-card:hover { transform:translateY(-5px); box-shadow:0 28px 60px rgba(7,43,80,.22) !important; }
 
-    .countdown-box {
-      display:flex; flex-direction:column; align-items:center;
-      background:#f0f4f9; border:1px solid #dde6f0; border-radius:8px; padding:6px 10px; min-width:40px;
-    }
-
-    .badge-tag {
-      display:inline-flex; align-items:center; gap:4px; padding:3px 9px;
-      border-radius:30px; font-size:10px; font-weight:700; letter-spacing:.8px;
-      text-transform:uppercase; font-family:'Inter',sans-serif;
-    }
-
-    /* Banner CTA button */
-    .banner-btn {
-      display:inline-flex; align-items:center; gap:8px;
-      padding:12px 24px; border-radius:10px; font-size:13px; font-weight:700;
-      font-family:'Inter',sans-serif; cursor:pointer; border:none;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .banner-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.25); }
-    .banner-btn-primary { background:#fff; color:#072B50; }
-    .banner-btn-outline { background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,0.5); }
-    .banner-btn-outline:hover { background:rgba(255,255,255,0.1); border-color:#fff; }
-
-    /* Responsive */
-    @media(max-width:900px) {
-      .hero-inner { flex-direction:column!important; }
-      .hero-img    { width:100%!important; height:220px!important; min-height:unset!important; }
-      .cards-grid  { grid-template-columns: repeat(2,1fr)!important; }
-      .banner-grid { grid-template-columns: 1fr!important; }
-      .page-wrap   { padding:16px!important; }
-      .page-header { padding:28px 16px 24px!important; }
-      .header-stats{ display:none!important; }
-      .hero-content{ padding:24px!important; }
-      .hero-title  { font-size:22px!important; }
-      .hero-price  { font-size:22px!important; }
-      .banner-content { padding:32px 24px!important; }
-      .banner-title{ font-size:24px!important; }
-    }
-    @media(max-width:560px) {
-      .cards-grid  { grid-template-columns:1fr!important; }
-      .hero-countdown { flex-wrap:wrap; gap:8px!important; }
-    }
+    .countdown-box { animation: fadeUp .35s ease both; }
+    .promo-ticker-inner { display:flex; width:max-content; animation:ticker 32s linear infinite; }
+    .promo-ticker-inner:hover { animation-play-state:paused; }
   `;
   document.head.appendChild(s);
 }
 
-const NAVY       = "#072B50";
-const NAVY_FAINT = "#f0f4f9";
-const NAVY_BORDER= "#dde6f0";
+/* ── Scroll-reveal hook ── */
+function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { el.classList.add("shown"); obs.unobserve(el); } },
+      { threshold: 0.12 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
+
+/* ── Countdown ── */
+function useCountdown(end) {
+  const [t, setT] = useState({ h:"00", m:"00", s:"00" });
+  useEffect(() => {
+    const tick = () => {
+      const d = Math.max(0, end - Date.now());
+      setT({
+        h: String(Math.floor(d / 3600000)).padStart(2,"0"),
+        m: String(Math.floor((d % 3600000) / 60000)).padStart(2,"0"),
+        s: String(Math.floor((d % 60000) / 1000)).padStart(2,"0"),
+      });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [end]);
+  return t;
+}
 
 const PROMOS = [
   {
@@ -105,358 +88,129 @@ const PROMOS = [
     title:"Samsung Galaxy A55", subtitle:"5G · 256GB · 50MP Triple Camera",
     desc:"Super AMOLED 6.6\", baterai 5000mAh, desain premium kelas flagship. Stok terbatas!",
     originalPrice:"Rp 5.999.000", salePrice:"Rp 4.199.000", saving:"Hemat Rp 1.800.000",
-    image:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&q=80",
-    accent:"#e03131", hero:true, endTime: Date.now() + 86400000*2 + 3600000*5
+    image:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=700&q=80",
+    accent:"#e03131", hero:true, endTime: Date.now() + 86400000*2 + 3600000*5,
   },
   {
     id:2, tag:"FLASH SALE", tagBg:"#fff4e6", tagColor:"#e67700", discount:"45%",
     title:"iPhone 15 Pro", subtitle:"256GB · Natural Titanium",
-    desc:"Chip A17 Pro, kamera 48MP zoom 5×. Penawaran hari ini saja.",
+    desc:"Chip A17 Pro, kamera 48MP zoom 5×. Penawaran eksklusif hari ini saja.",
     originalPrice:"Rp 21.999.000", salePrice:"Rp 15.999.000", saving:"Terlaris Minggu Ini",
-    image:"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80",
-    accent:"#e67700"
+    image:"https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&q=80",
+    accent:"#e67700",
   },
   {
     id:3, tag:"NEW ARRIVAL", tagBg:"#ebfbee", tagColor:"#2f9e44", discount:"Baru",
     title:"Xiaomi 14T Pro", subtitle:"12GB/512GB · Leica Camera",
-    desc:"Kamera Leica profesional, Snapdragon 8s Gen 3, pengisian 120W.",
+    desc:"Kamera Leica profesional, Snapdragon 8s Gen 3, pengisian 120W super cepat.",
     originalPrice:"Rp 9.499.000", salePrice:"Rp 8.299.000", saving:"Free Buds + Case",
-    image:"https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&q=80",
-    accent:"#2f9e44"
+    image:"https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&q=80",
+    accent:"#2f9e44",
   },
   {
     id:4, tag:"BUNDLE", tagBg:"#f3f0ff", tagColor:"#7048e8", discount:"2+1",
     title:"TWS Earbuds Pro", subtitle:"ANC · 40 Jam · IPX5",
-    desc:"Active Noise Cancellation, latensi 40ms. Beli 2 gratis 1.",
+    desc:"Active Noise Cancellation, latensi 40ms. Beli 2 gratis 1 langsung.",
     originalPrice:"Rp 1.299.000", salePrice:"Rp 899.000", saving:"Bundle Terbaik",
-    image:"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&q=80",
-    accent:"#7048e8"
+    image:"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&q=80",
+    accent:"#7048e8",
   },
   {
     id:5, tag:"CASHBACK", tagBg:"#fff0f6", tagColor:"#c2255c", discount:"20%",
     title:"Galaxy Watch 7", subtitle:"Always-On · GPS · 45mm",
     desc:"Kesehatan 24/7, ECG, deteksi crash. Cashback kartu BCA & Mandiri.",
     originalPrice:"Rp 6.799.000", salePrice:"Rp 5.299.000", saving:"Cashback s/d Rp 1,3jt",
-    image:"https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80",
-    accent:"#c2255c"
-  },
-];
-
-const BANNERS = [
-  {
-    id:"b1",
-    label:"THE PROFESSIONAL EDGE",
-    title:"Professional\nWorkstation Bundle",
-    desc:"Save up to 30% when you build your dream setup. High-performance CPUs and 4K displays included.",
-    btnText:"Configure Now",
-    bg:"linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)",
-    image:"https://images.unsplash.com/photo-1593640408182-31c228f37e8e?w=700&q=80",
-    textAlign:"left",
-    accent:"#6aaff5",
+    image:"https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=80",
+    accent:"#c2255c",
   },
   {
-    id:"b2",
-    label:"ARTISTIC EXCELLENCE",
-    title:"Creative Studio\nSeries",
-    desc:"Unleash your imagination with specialized audio and visual hardware designed for creators.",
-    btnText:"Explore Series",
-    bg:"linear-gradient(135deg, #2d1b69 0%, #3d1a78 40%, #5b21b6 100%)",
-    image:"https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=80",
-    textAlign:"right",
-    accent:"#c084fc",
+    id:6, tag:"HOT DEAL", tagBg:"#fff0f0", tagColor:"#e03131", discount:"25%",
+    title:"ASUS ROG Phone 8", subtitle:"Snapdragon 8 Gen 3 · 16GB · 165Hz",
+    desc:"Layar 165Hz AMOLED, pendingin aktif, baterai 5500mAh. Gaming phone terkencang.",
+    originalPrice:"Rp 14.999.000", salePrice:"Rp 11.199.000", saving:"Hemat Rp 3.800.000",
+    image:"https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=500&q=80",
+    accent:"#e03131",
+  },
+  {
+    id:7, tag:"FLASH SALE", tagBg:"#fff4e6", tagColor:"#e67700", discount:"35%",
+    title:"MacBook Air M3", subtitle:"13\" · 8GB · 256GB · Midnight",
+    desc:"Chip M3 terbaru, layar Liquid Retina, baterai tahan 18 jam. Tipis & ringan.",
+    originalPrice:"Rp 19.999.000", salePrice:"Rp 12.999.000", saving:"Terlaris Pekan Ini",
+    image:"https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80",
+    accent:"#e67700",
+  },
+  {
+    id:8, tag:"NEW ARRIVAL", tagBg:"#ebfbee", tagColor:"#2f9e44", discount:"Baru",
+    title:"Sony WH-1000XM6", subtitle:"ANC · 40Jam · Hi-Res Audio",
+    desc:"Noise cancelling terbaik di kelasnya. Suara jernih, nyaman seharian.",
+    originalPrice:"Rp 5.499.000", salePrice:"Rp 4.799.000", saving:"Bonus Pouch Eksklusif",
+    image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+    accent:"#2f9e44",
+  },
+  {
+    id:9, tag:"BUNDLE", tagBg:"#f3f0ff", tagColor:"#7048e8", discount:"Hemat 40%",
+    title:"Gaming Setup Bundle", subtitle:"Monitor + Keyboard + Mouse",
+    desc:"Paket lengkap gaming: monitor 144Hz + keyboard mekanikal + mouse RGB.",
+    originalPrice:"Rp 8.999.000", salePrice:"Rp 5.399.000", saving:"Bundle Paling Laris",
+    image:"https://images.unsplash.com/photo-1547082299-de196ea013d6?w=500&q=80",
+    accent:"#7048e8",
   },
 ];
 
 const TABS = ["Semua","Hot Deal","Flash Sale","Bundle","Cashback","New Arrival"];
 
-/* ── hooks & sub-components ── */
-function useCountdown(end) {
-  const [t, setT] = useState({ h:"00", m:"00", s:"00" });
-  useEffect(() => {
-    const tick = () => {
-      const d = Math.max(0, end - Date.now());
-      setT({
-        h: String(Math.floor(d/3600000)).padStart(2,"0"),
-        m: String(Math.floor((d%3600000)/60000)).padStart(2,"0"),
-        s: String(Math.floor((d%60000)/1000)).padStart(2,"0"),
-      });
-    };
-    tick(); const id = setInterval(tick,1000); return () => clearInterval(id);
-  }, [end]);
-  return t;
-}
+const BANNERS = [
+  {
+    id:"b1", label:"THE PROFESSIONAL EDGE",
+    title:"Professional\nWorkstation Bundle",
+    desc:"Hemat hingga 30% saat membangun setup impian Anda. CPU performa tinggi & layar 4K tersedia.",
+    btnText:"Konfigurasi Sekarang",
+    bg:"linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%)",
+    image:"https://images.unsplash.com/photo-1593640408182-31c228f37e8e?w=700&q=80",
+    textAlign:"left", accent:"#6aaff5",
+  },
+  {
+    id:"b2", label:"ARTISTIC EXCELLENCE",
+    title:"Creative Studio\nSeries",
+    desc:"Wujudkan imajinasi Anda dengan hardware audio-visual khusus untuk para kreator.",
+    btnText:"Jelajahi Seri",
+    bg:"linear-gradient(135deg, #2d1b69 0%, #3d1a78 40%, #5b21b6 100%)",
+    image:"https://images.unsplash.com/photo-1518770660439-4636190af475?w=700&q=80",
+    textAlign:"right", accent:"#c084fc",
+  },
+];
 
-function WishBtn({ id }) {
-  const [on, setOn] = useState(false);
-  return (
-    <button className="wish-btn" onClick={(e) => { e.stopPropagation(); setOn(v=>!v); }}>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill={on?"#ff4d6d":"none"} stroke={on?"#ff4d6d":"#9aa5b4"} strokeWidth="2">
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-      </svg>
-    </button>
-  );
-}
-
+/* ─── Digit countdown box ─── */
 function Digit({ val, label }) {
   return (
-    <div className="countdown-box">
-      <span style={{ fontSize:"18px", fontWeight:800, color:NAVY, lineHeight:1, fontFamily:"'Inter',sans-serif" }}>{val}</span>
-      <span style={{ fontSize:"8px", color:"#8a9bb0", fontWeight:600, letterSpacing:"1px", textTransform:"uppercase", marginTop:"2px", fontFamily:"'Inter',sans-serif" }}>{label}</span>
+    <div className="countdown-box flex flex-col items-center bg-[#f0f4f9] border border-[#dde6f0] rounded-lg px-3 py-2 min-w-[44px]">
+      <span className="text-xl font-black text-[#072B50] leading-none">{val}</span>
+      <span className="text-[8px] font-semibold text-[#8a9bb0] tracking-widest uppercase mt-1">{label}</span>
     </div>
   );
 }
 
-function InfoBadge({ small }) {
+/* ─── Info Badge ─── */
+function InfoBadge({ small = false }) {
   return (
-    <div style={{ display:"inline-flex", alignItems:"center", gap:"6px", background:NAVY_FAINT, border:`1px solid ${NAVY_BORDER}`, borderRadius:"9px", padding: small ? "6px 11px" : "10px 18px" }}>
-      <svg width={small?11:13} height={small?11:13} viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2.2">
+    <div className={`inline-flex items-center gap-1.5 bg-[#f0f4f9] border border-[#dde6f0] rounded-lg text-[#072B50] font-semibold whitespace-nowrap ${small ? "px-3 py-1.5 text-[11px]" : "px-4 py-2.5 text-xs"}`}>
+      <svg width={small?11:13} height={small?11:13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
-      <span style={{ fontSize: small?"11px":"12px", fontWeight:600, color:NAVY, whiteSpace:"nowrap", fontFamily:"'Inter',sans-serif" }}>
-        {small ? "Info" : "Hubungi toko untuk info"}
-      </span>
+      {small ? "Info" : "Hubungi toko untuk info"}
     </div>
   );
 }
 
-/* ── Hero Card ── */
-function HeroCard({ p }) {
-  const t = useCountdown(p.endTime);
-  return (
-    <div className="p-card card-enter hero-inner" style={{ display:"flex" }}>
-      {/* Image */}
-      <div className="hero-img" style={{ width:"40%", flexShrink:0, position:"relative", overflow:"hidden", background:NAVY_FAINT, minHeight:"360px" }}>
-        <img className="p-img" src={p.image} alt={p.title}
-          style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-          onError={(e)=>{ e.currentTarget.style.display="none"; }}
-        />
-        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to right, transparent 60%, rgba(255,255,255,0.08) 100%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", top:"16px", left:"16px", background:NAVY, color:"#fff", borderRadius:"8px", padding:"6px 12px", fontSize:"13px", fontWeight:800, fontFamily:"'Inter',sans-serif" }}>
-          -{p.discount} OFF
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="hero-content" style={{ flex:1, padding:"36px", display:"flex", flexDirection:"column", justifyContent:"space-between" }}>
-        <div>
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"20px" }}>
-            <span className="badge-tag" style={{ background:p.tagBg, color:p.tagColor }}>🔥 {p.tag}</span>
-            <WishBtn id={p.id} />
-          </div>
-          <p style={{ fontSize:"11px", fontWeight:700, color:"#8a9bb0", letterSpacing:"1.2px", textTransform:"uppercase", marginBottom:"8px", fontFamily:"'Inter',sans-serif" }}>{p.subtitle}</p>
-          <h2 className="hero-title" style={{ fontSize:"28px", fontWeight:900, color:NAVY, letterSpacing:"-0.5px", lineHeight:1.15, marginBottom:"12px", fontFamily:"'Inter',sans-serif" }}>{p.title}</h2>
-          <p style={{ fontSize:"13px", color:"#5a6880", lineHeight:1.75, marginBottom:"24px", fontFamily:"'Inter',sans-serif" }}>{p.desc}</p>
-
-          {/* Countdown */}
-          <div style={{ marginBottom:"24px" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:"6px", marginBottom:"10px" }}>
-              <div style={{ width:"5px", height:"5px", borderRadius:"50%", background:"#e03131", animation:"pulse 1.5s infinite" }} />
-              <span style={{ fontSize:"10px", fontWeight:700, color:"#e03131", letterSpacing:"1.2px", textTransform:"uppercase", fontFamily:"'Inter',sans-serif" }}>Berakhir Dalam</span>
-            </div>
-            <div className="hero-countdown" style={{ display:"flex", gap:"8px", alignItems:"center" }}>
-              <Digit val={t.h} label="Jam" />
-              <span style={{ fontSize:"18px", fontWeight:700, color:"#c8d6e8", marginBottom:"14px" }}>:</span>
-              <Digit val={t.m} label="Menit" />
-              <span style={{ fontSize:"18px", fontWeight:700, color:"#c8d6e8", marginBottom:"14px" }}>:</span>
-              <Digit val={t.s} label="Detik" />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div style={{ height:"1px", background:NAVY_BORDER, marginBottom:"20px" }} />
-          <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:"12px", flexWrap:"wrap" }}>
-            <div>
-              <div style={{ fontSize:"12px", color:"#aab4c0", textDecoration:"line-through", marginBottom:"4px", fontFamily:"'Inter',sans-serif" }}>{p.originalPrice}</div>
-              <div className="hero-price" style={{ fontSize:"28px", fontWeight:900, color:NAVY, letterSpacing:"-0.5px", lineHeight:1, fontFamily:"'Inter',sans-serif" }}>{p.salePrice}</div>
-              <div style={{ fontSize:"11px", color:p.accent, fontWeight:700, marginTop:"6px", display:"flex", alignItems:"center", gap:"4px", fontFamily:"'Inter',sans-serif" }}>
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                {p.saving}
-              </div>
-            </div>
-            <InfoBadge small={false} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── Small Card ── */
-function SmallCard({ p }) {
-  return (
-    <div className="p-card card-enter" style={{ display:"flex", flexDirection:"column" }}>
-      <div style={{ position:"relative", height:"165px", overflow:"hidden", background:NAVY_FAINT, flexShrink:0 }}>
-        <img className="p-img" src={p.image} alt={p.title}
-          style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }}
-          onError={(e)=>{ e.currentTarget.style.display="none"; }}
-        />
-        <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top, rgba(7,43,80,.5) 0%, transparent 55%)", pointerEvents:"none" }} />
-        <div style={{ position:"absolute", top:"12px", left:"12px", background:NAVY, color:"#fff", borderRadius:"6px", padding:"4px 9px", fontSize:"11px", fontWeight:800, fontFamily:"'Inter',sans-serif" }}>
-          -{p.discount}
-        </div>
-        <div style={{ position:"absolute", top:"10px", right:"10px" }}><WishBtn id={p.id} /></div>
-        <div style={{ position:"absolute", bottom:"10px", left:"12px" }}>
-          <span className="badge-tag" style={{ background:"rgba(255,255,255,0.92)", color:p.tagColor, backdropFilter:"blur(6px)" }}>{p.tag}</span>
-        </div>
-      </div>
-      <div style={{ padding:"16px 18px 20px", display:"flex", flexDirection:"column", flex:1, fontFamily:"'Inter',sans-serif" }}>
-        <p style={{ fontSize:"10px", fontWeight:700, color:"#8a9bb0", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"5px" }}>{p.subtitle}</p>
-        <h3 style={{ fontSize:"15px", fontWeight:800, color:NAVY, letterSpacing:"-0.3px", lineHeight:1.25, marginBottom:"8px" }}>{p.title}</h3>
-        <p style={{ fontSize:"11.5px", color:"#6b7a8f", lineHeight:1.65, marginBottom:"14px", flex:1 }}>{p.desc}</p>
-        <div style={{ height:"1px", background:NAVY_BORDER, marginBottom:"14px" }} />
-        <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", gap:"8px" }}>
-          <div>
-            <div style={{ fontSize:"11px", color:"#b0bcc8", textDecoration:"line-through", marginBottom:"2px" }}>{p.originalPrice}</div>
-            <div style={{ fontSize:"18px", fontWeight:900, color:NAVY, letterSpacing:"-0.3px", lineHeight:1 }}>{p.salePrice}</div>
-            <div style={{ fontSize:"10px", color:p.accent, fontWeight:700, marginTop:"4px" }}>{p.saving}</div>
-          </div>
-          <InfoBadge small={true} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── Banner Section (bawah small cards) ── */
-function BannerSection() {
-  return (
-    <div style={{ marginTop:"28px" }}>
-      {/* Label */}
-      <div style={{ display:"flex", alignItems:"center", gap:"10px", marginBottom:"16px" }}>
-        <div style={{ width:"3px", height:"18px", borderRadius:"3px", background:NAVY }} />
-        <span style={{ fontSize:"13px", fontWeight:700, color:NAVY, fontFamily:"'Inter',sans-serif" }}>Koleksi Unggulan</span>
-        <div style={{ flex:1, height:"1px", background:NAVY_BORDER }} />
-      </div>
-
-      <div className="banner-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"16px" }}>
-        {BANNERS.map((b) => (
-          <BannerCard key={b.id} b={b} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function BannerCard({ b }) {
-  const [hovered, setHovered] = useState(false);
-  const isRight = b.textAlign === "right";
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        borderRadius:"18px", overflow:"hidden", position:"relative", minHeight:"200px",
-        background:b.bg, cursor:"pointer",
-        boxShadow: hovered ? "0 24px 56px rgba(7,43,80,0.22)" : "0 4px 20px rgba(7,43,80,0.1)",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        transition:"transform .3s cubic-bezier(.34,1.3,.64,1), box-shadow .3s ease",
-      }}
-    >
-      {/* Background image */}
-      <img
-        src={b.image}
-        alt={b.title}
-        style={{
-          position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover",
-          opacity: hovered ? 0.35 : 0.25,
-          transition:"opacity .4s ease",
-        }}
-        onError={(e)=>{ e.currentTarget.style.display="none"; }}
-      />
-
-      {/* Overlay gradient */}
-      <div style={{
-        position:"absolute", inset:0,
-        background: isRight
-          ? "linear-gradient(to left, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)"
-          : "linear-gradient(to right, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.55) 100%)",
-        pointerEvents:"none",
-      }} />
-
-      {/* Decorative circle */}
-      <div style={{
-        position:"absolute",
-        right: isRight ? "unset" : "-40px",
-        left: isRight ? "-40px" : "unset",
-        top:"-40px",
-        width:"200px", height:"200px", borderRadius:"50%",
-        background:"rgba(255,255,255,0.04)",
-        pointerEvents:"none",
-      }} />
-
-      {/* Content */}
-      <div
-        className="banner-content"
-        style={{
-          position:"relative", zIndex:2,
-          padding:"32px 36px",
-          display:"flex", flexDirection:"column",
-          alignItems: isRight ? "flex-end" : "flex-start",
-          textAlign: b.textAlign,
-          minHeight:"200px", justifyContent:"space-between",
-        }}
-      >
-        <div>
-          {/* Label */}
-          <div style={{
-            display:"inline-flex", alignItems:"center", gap:"6px",
-            background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)",
-            borderRadius:"30px", padding:"4px 12px", marginBottom:"14px",
-          }}>
-            <div style={{ width:"5px", height:"5px", borderRadius:"50%", background:b.accent }} />
-            <span style={{ fontSize:"9px", fontWeight:700, color:"rgba(255,255,255,0.7)", letterSpacing:"2px", textTransform:"uppercase", fontFamily:"'Inter',sans-serif" }}>
-              {b.label}
-            </span>
-          </div>
-
-          {/* Title */}
-          <h3 className="banner-title" style={{
-            fontSize:"26px", fontWeight:900, color:"#fff",
-            letterSpacing:"-0.5px", lineHeight:1.2, marginBottom:"10px",
-            fontFamily:"'Inter',sans-serif",
-            whiteSpace:"pre-line",
-          }}>
-            {b.title}
-          </h3>
-
-          {/* Desc */}
-          <p style={{
-            fontSize:"12px", color:"rgba(255,255,255,0.65)", lineHeight:1.7,
-            maxWidth:"300px", marginBottom:"22px", fontFamily:"'Inter',sans-serif",
-            marginLeft: isRight ? "auto" : "0",
-          }}>
-            {b.desc}
-          </p>
-        </div>
-
-        {/* Buttons */}
-        <div style={{ display:"flex", gap:"10px", flexWrap:"wrap", justifyContent: isRight ? "flex-end" : "flex-start" }}>
-          <button className="banner-btn banner-btn-primary">
-            {b.btnText}
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-            </svg>
-          </button>
-          <button className="banner-btn banner-btn-outline">
-            Pelajari Lebih
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ── Ticker ── */
+/* ─── Ticker ─── */
 function Ticker() {
-  const items = ["🔥 Samsung A55 — Diskon 30%","⚡ iPhone 15 Pro Flash Sale","🎁 TWS Bundle 2+1 Gratis","🆕 Xiaomi 14T Pro Pre-Order","📱 Galaxy Watch 7 Cashback 20%","🚚 Gratis Ongkir Semua Promo"];
-  const doubled = [...items, ...items];
+  const items = ["🔥 Samsung A55 — Diskon 30%","⚡ iPhone 15 Pro Flash Sale","🎁 TWS Bundle 2+1 Gratis","🆕 Xiaomi 14T Pro Pre-Order","📱 Galaxy Watch 7 Cashback 20%","💻 MacBook Air M3 Flash Sale","🎮 ROG Phone 8 Hot Deal","🚚 Gratis Ongkir Semua Promo"];
   return (
-    <div className="ticker-wrap" style={{ padding:"9px 0" }}>
-      <div className="ticker-inner">
-        {doubled.map((item,i) => (
-          <span key={i} style={{ color:"rgba(255,255,255,0.75)", fontSize:"11.5px", fontWeight:500, whiteSpace:"nowrap", padding:"0 28px", fontFamily:"'Inter',sans-serif" }}>
-            {item}<span style={{ marginLeft:"28px", color:"rgba(255,255,255,0.18)" }}>◆</span>
+    <div className="overflow-hidden bg-[#072B50] py-2.5">
+      <div className="promo-ticker-inner">
+        {[...items,...items].map((x,i) => (
+          <span key={i} className="text-[11.5px] font-medium whitespace-nowrap px-7 text-white/75">
+            {x}<span className="ml-7 text-white/18">◆</span>
           </span>
         ))}
       </div>
@@ -464,96 +218,271 @@ function Ticker() {
   );
 }
 
-/* ── Main Page ── */
+/* ─── Hero Card ─── */
+function HeroCard({ p }) {
+  const t   = useCountdown(p.endTime);
+  const ref = useReveal();
+  return (
+    <div ref={ref} className="reveal mb-6">
+      <div className="promo-card flex flex-col md:flex-row bg-white rounded-2xl border border-[#e8edf4] overflow-hidden shadow-sm hover:shadow-xl">
+        {/* Gambar */}
+        <div className="relative w-full md:w-[42%] shrink-0 overflow-hidden bg-[#f0f4f9] min-h-[240px] md:min-h-[380px]">
+          <img
+            className="promo-img w-full h-full object-cover absolute inset-0"
+            src={p.image} alt={p.title}
+            onError={e => { e.currentTarget.style.display="none"; }}
+          />
+          <div className="absolute inset-0 pointer-events-none" style={{ background:"linear-gradient(to right,transparent 60%,rgba(255,255,255,0.06) 100%)" }} />
+          <div className="absolute top-5 left-5 bg-[#072B50] text-white text-[13px] font-black rounded-lg px-3.5 py-2">
+            -{p.discount} OFF
+          </div>
+        </div>
+
+        {/* Konten */}
+        <div className="flex-1 flex flex-col justify-between p-7 md:p-10">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6"
+              style={{ background:p.tagBg, color:p.tagColor }}>
+              🔥 {p.tag}
+            </div>
+            <p className="text-[11px] font-bold text-[#8a9bb0] tracking-widest uppercase mb-2.5">{p.subtitle}</p>
+            <h2 className="text-2xl md:text-[30px] font-black text-[#072B50] leading-tight tracking-tight mb-4">{p.title}</h2>
+            <p className="text-[13.5px] text-[#5a6880] leading-relaxed mb-7">{p.desc}</p>
+
+            {/* Countdown */}
+            <div className="mb-7">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-[5px] h-[5px] rounded-full bg-[#e03131]" style={{ animation:"pulse 1.5s infinite" }} />
+                <span className="text-[10px] font-bold text-[#e03131] tracking-widest uppercase">Berakhir Dalam</span>
+              </div>
+              <div className="flex items-center gap-2.5 flex-wrap">
+                <Digit val={t.h} label="Jam" />
+                <span className="text-lg font-bold text-[#c8d6e8] mb-4">:</span>
+                <Digit val={t.m} label="Menit" />
+                <span className="text-lg font-bold text-[#c8d6e8] mb-4">:</span>
+                <Digit val={t.s} label="Detik" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="h-px bg-[#dde6f0] mb-6" />
+            <div className="flex items-end justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-xs text-[#aab4c0] line-through mb-1.5">{p.originalPrice}</div>
+                <div className="text-2xl md:text-[30px] font-black text-[#072B50] tracking-tight leading-none">{p.salePrice}</div>
+                <div className="flex items-center gap-1.5 mt-2 text-[11px] font-bold" style={{ color:p.accent }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  {p.saving}
+                </div>
+              </div>
+              <InfoBadge />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Small Card ─── */
+function SmallCard({ p, delay = "" }) {
+  const ref = useReveal();
+  return (
+    <div ref={ref} className={`reveal ${delay}`}>
+      <div className="promo-card flex flex-col bg-white rounded-2xl border border-[#e8edf4] overflow-hidden shadow-sm hover:shadow-xl h-full">
+        {/* Gambar */}
+        <div className="relative h-[175px] overflow-hidden bg-[#f0f4f9] shrink-0">
+          <img
+            className="promo-img w-full h-full object-cover absolute inset-0"
+            src={p.image} alt={p.title}
+            onError={e => { e.currentTarget.style.display="none"; }}
+          />
+          <div className="absolute inset-0 pointer-events-none" style={{ background:"linear-gradient(to top,rgba(7,43,80,.5) 0%,transparent 55%)" }} />
+          <div className="absolute top-3.5 left-3.5 bg-[#072B50] text-white text-[11px] font-black rounded-md px-3 py-1.5">
+            -{p.discount}
+          </div>
+          <div className="absolute bottom-3 left-3.5">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase"
+              style={{ background:"rgba(255,255,255,0.92)", color:p.tagColor, backdropFilter:"blur(6px)" }}>
+              {p.tag}
+            </span>
+          </div>
+        </div>
+
+        {/* Konten */}
+        <div className="flex flex-col flex-1 p-5">
+          <p className="text-[10px] font-bold text-[#8a9bb0] tracking-wider uppercase mb-1.5">{p.subtitle}</p>
+          <h3 className="text-[15px] font-black text-[#072B50] tracking-tight leading-snug mb-2.5">{p.title}</h3>
+          <p className="text-[12px] text-[#6b7a8f] leading-relaxed mb-4 flex-1">{p.desc}</p>
+
+          <div className="h-px bg-[#dde6f0] mb-4" />
+
+          <div className="flex items-end justify-between gap-3">
+            <div>
+              <div className="text-[11px] text-[#b0bcc8] line-through mb-1">{p.originalPrice}</div>
+              <div className="text-[18px] font-black text-[#072B50] tracking-tight leading-none">{p.salePrice}</div>
+              <div className="text-[10px] font-bold mt-1.5" style={{ color:p.accent }}>{p.saving}</div>
+            </div>
+            <InfoBadge small />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Banner Card ─── */
+function BannerCard({ b, delay="" }) {
+  const ref = useReveal();
+  const isRight = b.textAlign === "right";
+  return (
+    <div ref={ref} className={`reveal ${delay}`}>
+      <div className="banner-card relative rounded-2xl overflow-hidden min-h-[220px] cursor-pointer shadow-lg">
+        <div className="absolute inset-0" style={{ background:b.bg }} />
+        <img src={b.image} alt={b.title}
+          className="absolute inset-0 w-full h-full object-cover opacity-25 transition-opacity duration-300 hover:opacity-35"
+          onError={e => { e.currentTarget.style.display="none"; }}
+        />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: isRight
+            ? "linear-gradient(to left,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%)"
+            : "linear-gradient(to right,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%)" }} />
+
+        <div className={`relative z-10 flex flex-col justify-between p-8 md:p-9 min-h-[220px] ${isRight?"items-end text-right":"items-start text-left"}`}>
+          <div>
+            <div className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 mb-4 border border-white/20 bg-white/10">
+              <div className="w-1.5 h-1.5 rounded-full" style={{ background:b.accent }} />
+              <span className="text-[9px] font-bold text-white/70 tracking-[2px] uppercase">{b.label}</span>
+            </div>
+            <h3 className="text-2xl md:text-[26px] font-black text-white tracking-tight leading-snug mb-2.5 whitespace-pre-line">{b.title}</h3>
+            <p className="text-xs text-white/60 leading-relaxed max-w-[290px] mb-6" style={{ marginLeft:isRight?"auto":0 }}>{b.desc}</p>
+          </div>
+          <div className={`flex gap-3 flex-wrap ${isRight?"justify-end":"justify-start"}`}>
+            <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white text-[#072B50] text-[13px] font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg">
+              {b.btnText}
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+              </svg>
+            </button>
+            <button className="px-5 py-2.5 rounded-lg text-[13px] font-semibold text-white/80 border border-white/30 bg-transparent hover:bg-white/10 hover:border-white transition-all">
+              Pelajari Lebih
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── MAIN PAGE ─── */
 export default function PromoPage() {
   const [tab, setTab] = useState("Semua");
 
   const filtered = PROMOS.filter(p => {
-    if (tab==="Semua")       return true;
-    if (tab==="Hot Deal")    return p.tag==="HOT DEAL";
-    if (tab==="Flash Sale")  return p.tag==="FLASH SALE";
-    if (tab==="Bundle")      return p.tag==="BUNDLE";
-    if (tab==="Cashback")    return p.tag==="CASHBACK";
-    if (tab==="New Arrival") return p.tag==="NEW ARRIVAL";
+    if (tab === "Semua")       return true;
+    if (tab === "Hot Deal")    return p.tag === "HOT DEAL";
+    if (tab === "Flash Sale")  return p.tag === "FLASH SALE";
+    if (tab === "Bundle")      return p.tag === "BUNDLE";
+    if (tab === "Cashback")    return p.tag === "CASHBACK";
+    if (tab === "New Arrival") return p.tag === "NEW ARRIVAL";
     return true;
   });
 
-  const hero   = filtered.find(p=>p.hero) || filtered[0];
-  const smalls = filtered.filter(p=>p.id!==hero?.id);
+  const hero   = filtered.find(p => p.hero) || filtered[0];
+  const smalls = filtered.filter(p => p.id !== hero?.id);
+  const delays = ["reveal-d1","reveal-d2","reveal-d3","reveal-d4","reveal-d5","reveal-d6"];
+
+  const headerRef = useReveal();
 
   return (
-    <div style={{ background:"#f5f7fa", minHeight:"100vh", fontFamily:"'Inter', sans-serif" }}>
+    <div className="promo-root min-h-screen bg-[#f5f7fa]">
+
+      {/* ── TICKER ── */}
       <Ticker />
 
-      {/* PAGE HEADER */}
-      <div className="page-header" style={{ background:NAVY, padding:"40px 40px 32px", animation:"fadeIn .5s ease both" }}>
-        <div style={{ maxWidth:"1400px", margin:"0 auto", display:"flex", alignItems:"flex-end", justifyContent:"space-between", flexWrap:"wrap", gap:"16px" }}>
+      {/* ── PAGE HEADER ── */}
+      <div ref={headerRef} className="reveal bg-[#072B50] px-5 md:px-12 py-10 md:py-12">
+        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
           <div>
-            <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"10px" }}>
-              <div style={{ width:"20px", height:"2px", borderRadius:"2px", background:"rgba(255,255,255,0.35)" }} />
-              <span style={{ fontSize:"10px", color:"rgba(255,255,255,0.45)", fontWeight:700, letterSpacing:"2.5px", textTransform:"uppercase", fontFamily:"'Inter',sans-serif" }}>Penawaran Terbatas</span>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-5 h-0.5 rounded-full bg-white/35" />
+              <span className="text-[10px] font-bold text-white/45 tracking-[2.5px] uppercase">Penawaran Terbatas</span>
             </div>
-            <h1 style={{ fontSize:"32px", fontWeight:900, color:"#fff", letterSpacing:"-0.6px", lineHeight:1.1, marginBottom:"8px", fontFamily:"'Inter',sans-serif" }}>
-              Promo Terbaik <span style={{ color:"#6aaff5" }}>Bulan Ini</span>
+            <h1 className="text-2xl md:text-[34px] font-black text-white tracking-tight leading-tight mb-2">
+              Promo Terbaik <span className="text-[#6aaff5]">Bulan Ini</span>
             </h1>
-            <p style={{ fontSize:"13px", color:"rgba(255,255,255,0.45)", fontFamily:"'Inter',sans-serif" }}>{PROMOS.length} penawaran eksklusif · Stok sangat terbatas</p>
-          </div>
-          <div className="header-stats" style={{ display:"flex", gap:"32px" }}>
-            {[["5+","Promo Aktif"],["45%","Diskon Maks"],["6","Brand"]].map(([val,lbl])=>(
-              <div key={lbl} style={{ textAlign:"center" }}>
-                <div style={{ fontSize:"24px", fontWeight:900, color:"#fff", letterSpacing:"-0.4px", fontFamily:"'Inter',sans-serif" }}>{val}</div>
-                <div style={{ fontSize:"10px", color:"rgba(255,255,255,0.4)", fontWeight:600, letterSpacing:"0.8px", textTransform:"uppercase", fontFamily:"'Inter',sans-serif" }}>{lbl}</div>
-              </div>
-            ))}
+            <p className="text-[13px] text-white/45">{PROMOS.length} penawaran eksklusif · Stok sangat terbatas</p>
           </div>
         </div>
       </div>
 
-      {/* CONTENT */}
-      <div className="page-wrap" style={{ maxWidth:"1400px", margin:"0 auto", padding:"28px 40px 52px" }}>
+      {/* ── CONTENT ── */}
+      <div className="max-w-[1400px] mx-auto px-5 md:px-12 py-8 pb-16">
 
         {/* Tabs */}
-        <div style={{ display:"flex", gap:"6px", marginBottom:"24px", flexWrap:"wrap", alignItems:"center", animation:"fadeIn .5s ease .1s both" }}>
-          {TABS.map(t=>(
-            <button key={t} className={`tab-pill${tab===t?" active":""}`} onClick={()=>setTab(t)}>{t}</button>
+        <div className="flex flex-wrap items-center gap-2 mb-8">
+          {TABS.map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`tab-btn px-4 py-2 rounded-full text-xs font-semibold border border-[#e0e8f2] bg-white text-[#6b7a8f] ${tab===t?"tab-active":""}`}
+            >
+              {t}
+            </button>
           ))}
-          <div style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:"6px" }}>
-            <div style={{ width:"6px", height:"6px", borderRadius:"50%", background:"#2f9e44", animation:"pulse 2s infinite" }} />
-            <span style={{ fontSize:"11px", color:"#6b7a8f", fontWeight:500, fontFamily:"'Inter',sans-serif" }}>{filtered.length} promo ditemukan</span>
+          <div className="ml-auto flex items-center gap-1.5">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ animation:"pulse 2s infinite" }} />
+            <span className="text-[11px] text-[#6b7a8f] font-medium">{filtered.length} promo ditemukan</span>
           </div>
         </div>
 
         {/* Hero card */}
-        {hero && <div style={{ marginBottom:"16px" }}><HeroCard p={hero} /></div>}
+        {hero && <HeroCard p={hero} />}
 
         {/* Small cards grid */}
         {smalls.length > 0 && (
-          <div className="cards-grid" style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"14px" }}>
-            {smalls.map(p => <SmallCard key={p.id} p={p} />)}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-10">
+            {smalls.map((p, i) => (
+              <SmallCard key={p.id} p={p} delay={delays[i % delays.length]} />
+            ))}
           </div>
         )}
 
-        {/* ── Banner Section ── */}
-        <BannerSection />
+        {/* ── BANNER SECTION ── */}
+        <div className="mb-10">
+          <div className="flex items-center gap-4 mb-7">
+            <div className="w-[5px] h-8 rounded-[3px] bg-[#072B50] shrink-0" />
+            <span className="text-[22px] font-extrabold text-[#072B50] tracking-tight">Promo Spesial Hari Ini</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {BANNERS.map((b,i) => (
+              <BannerCard key={b.id} b={b} delay={delays[i]} />
+            ))}
+          </div>
+        </div>
 
         {/* Empty state */}
         {filtered.length === 0 && (
-          <div style={{ textAlign:"center", padding:"80px 20px", color:"#9aa5b4" }}>
-            <div style={{ fontSize:"40px", marginBottom:"12px" }}>🔍</div>
-            <p style={{ fontSize:"15px", fontWeight:600, color:NAVY, marginBottom:"6px", fontFamily:"'Inter',sans-serif" }}>Tidak ada promo untuk kategori ini</p>
-            <p style={{ fontSize:"13px", fontFamily:"'Inter',sans-serif" }}>Coba pilih kategori lain atau kembali ke Semua</p>
+          <div className="text-center py-24">
+            <div className="text-6xl mb-4">🔍</div>
+            <p className="text-[15px] font-semibold text-[#072B50] mb-1">Tidak ada promo untuk kategori ini</p>
+            <p className="text-[13px] text-[#9aa5b4]">Coba pilih kategori lain atau kembali ke Semua</p>
           </div>
         )}
 
         {/* Info note */}
-        <div style={{ marginTop:"28px", background:"#fff", borderRadius:"13px", border:`1px solid ${NAVY_BORDER}`, padding:"16px 22px", display:"flex", alignItems:"center", gap:"12px" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth="2">
+        <div className="flex items-start gap-3.5 bg-white rounded-xl border border-[#dde6f0] px-6 py-4">
+          <svg className="shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#072B50" strokeWidth="2">
             <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
           </svg>
-          <p style={{ fontSize:"12.5px", color:"#5a6880", lineHeight:1.6, margin:0, fontFamily:"'Inter',sans-serif" }}>
-            <strong style={{ color:NAVY }}>Catatan:</strong> Semua harga dan promo bersifat informatif. Untuk informasi lebih lanjut, silakan kunjungi toko kami atau hubungi tim kami langsung.
+          <p className="text-[12.5px] text-[#5a6880] leading-relaxed m-0">
+            <strong className="text-[#072B50]">Catatan:</strong> Semua harga dan promo bersifat informatif. Untuk informasi lebih lanjut, silakan kunjungi toko kami atau hubungi tim kami langsung.
           </p>
         </div>
+
       </div>
     </div>
   );

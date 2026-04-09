@@ -51,52 +51,63 @@ export default function PromoHariIni() {
   };
 
   return (
-    <section style={{ padding: "50px 0", background: "#fff" }}>
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px" }}>
+    <section className="py-[50px] bg-white">
+      <div className="max-w-[1400px] mx-auto px-[40px]">
 
         {/* HEADER */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-          <h2 className="section-title" style={{ margin: 0, borderLeft: "5px solid #072B50", paddingLeft: 14 }}>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-7 gap-3">
+          <h2 className="section-title m-0 border-l-[5px] border-[#072B50] pl-[14px]">
             Promo Spesial Hari Ini
           </h2>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+
+          <div className="flex items-center gap-4 justify-between md:justify-end w-full md:w-auto">
+
             {/* COUNTDOWN */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 600, color: "#6b7280" }}>End in</span>
+            <div className="flex items-center gap-[6px]">
+              <span className="text-[14px] font-semibold text-gray-500">End in</span>
               <div className="ph-countdown-box">{hours}</div>
-              <span style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: "0 2px" }}>:</span>
+              <span className="text-[20px] font-extrabold text-gray-900 mx-[2px]">:</span>
               <div className="ph-countdown-box">{minutes}</div>
-              <span style={{ fontSize: 20, fontWeight: 800, color: "#111827", margin: "0 2px" }}>:</span>
+              <span className="text-[20px] font-extrabold text-gray-900 mx-[2px]">:</span>
               <div className="ph-countdown-box">{secs}</div>
             </div>
+
             {/* ARROWS */}
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className="flex gap-2">
               {[["‹", -1], ["›", 1]].map(([icon, dir]) => (
-                <button key={dir} onClick={() => scrollBy(dir)} style={{ width: 40, height: 40, borderRadius: "50%", background: "#fff", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: "#374151", transition: "all 0.2s ease", padding: 0 }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
-                >{icon}</button>
+                <button
+                  key={dir}
+                  onClick={() => scrollBy(dir)}
+                  className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 border border-gray-200 shadow-md transition-all duration-200 hover:bg-[#072B50] hover:text-white hover:border-[#072B50]"
+                >
+                  {icon}
+                </button>
               ))}
             </div>
+
           </div>
         </div>
 
-        {/* SCROLL TRACK — margin-bottom trick agar hover shadow tidak terpotong */}
-        <div style={{ marginBottom: -8, paddingBottom: 8, overflow: "hidden" }}>
+        {/* SCROLL TRACK */}
+        <div className="mb-[-8px] pb-[8px] overflow-hidden">
           <div
             ref={scrollRef}
-            style={{ display: "flex", gap: 20, overflowX: "auto", overflowY: "visible", scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
+            className="flex gap-5 overflow-x-auto overflow-y-visible no-scrollbar cursor-default px-[4px] pt-[8px] pb-[16px] scroll-smooth"
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
             {products.map((product, index) => (
-              <div key={index} style={{ flexShrink: 0 }}>
+              <div key={index} className="flex-[0_0_220px] min-w-[220px]">
                 <ProductCard
                   product={{ ...product, id: index + 1, badge: undefined }}
                   saved={saved[index]}
-                  onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+                  onToggleSave={() => setSaved(prev => {
+                    const u = [...prev];
+                    u[index] = !u[index];
+                    return u;
+                  })}
                   variant="promo"
                 />
               </div>

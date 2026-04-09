@@ -25,24 +25,24 @@ export default function Footer() {
   ];
 
   const socials = [
-    { label: "Facebook",  bg: "#1877f2", icon: <FacebookIcon /> },
-    { label: "Instagram", bg: "radial-gradient(circle at 30% 110%, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)", icon: <InstagramIcon /> },
-    { label: "TikTok",    bg: "#010101", icon: <TikTokIcon /> },
-    { label: "WhatsApp",  bg: "#25d366", icon: <WhatsAppIcon /> },
+    { label: "Facebook",  bg: "bg-[#1877f2]",   icon: <FacebookIcon /> },
+    { label: "Instagram", bg: "bg-gradient-to-br from-[#f09433] via-[#dc2743] to-[#bc1888]", icon: <InstagramIcon /> },
+    { label: "TikTok",    bg: "bg-[#010101]",   icon: <TikTokIcon /> },
+    { label: "WhatsApp",  bg: "bg-[#25d366]",   icon: <WhatsAppIcon /> },
   ];
 
   return (
-    <footer style={{ background: "#072B50", paddingTop: 50 }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 40px" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr 1.6fr 1.6fr", gap: 40, paddingBottom: 40 }}>
+    <footer className="bg-[#072B50] pt-[50px]">
+      <div className="max-w-[1200px] mx-auto px-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1.6fr_1.6fr] gap-10 pb-10">
 
           {/* KOLOM 1 - BRAND */}
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              <img src={logoImg} alt="Logo" style={{ height: 36, objectFit: "contain" }} />
-              <span style={{ fontSize: 18, fontWeight: 700, color: "#ffffff" }}>BizPonsel</span>
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src={logoImg} alt="Logo" className="h-9 object-contain" />
+              <span className="text-lg font-bold text-white">BizPonsel</span>
             </div>
-            <p style={{ fontSize: 13, color: "#d7d7d7", lineHeight: 1.8, margin: 0 }}>
+            <p className="text-[13px] text-[#d7d7d7] leading-[1.8] m-0">
               Toko elektronik terpercaya dengan pilihan produk terlengkap dan
               harga terbaik untuk kebutuhan teknologi Anda.
             </p>
@@ -50,17 +50,15 @@ export default function Footer() {
 
           {/* KOLOM 2 - QUICK LINKS */}
           <div>
-            <h4 style={{ fontSize: 15, fontWeight: 700, color: "#ffffff", margin: "0 0 20px 0", paddingBottom: 10 }}>Quick Links</h4>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+            <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Quick Links</h4>
+            <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
               {links.map((item) => (
                 <li key={item.label}>
                   <span
                     onClick={() => { navigate(item.path); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    style={{ fontSize: 13, color: "#d7d7d7", display: "flex", alignItems: "center", gap: 6, cursor: "pointer", transition: "color 0.2s ease" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
-                    onMouseLeave={e => e.currentTarget.style.color = "#d7d7d7"}
+                    className="text-[13px] text-[#d7d7d7] flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors duration-200"
                   >
-                    <span style={{ color: "#3b82f6" }}>›</span> {item.label}
+                    <span className="text-blue-400">›</span> {item.label}
                   </span>
                 </li>
               ))}
@@ -69,12 +67,12 @@ export default function Footer() {
 
           {/* KOLOM 3 - CONTACT US */}
           <div>
-            <h4 style={{ fontSize: 15, fontWeight: 700, color: "#ffffff", margin: "0 0 20px 0", paddingBottom: 10 }}>Contact Us</h4>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Contact Us</h4>
+            <div className="flex flex-col gap-3.5">
               {contacts.map((item, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <span style={{ color: "#d7d7d7", marginTop: 2, flexShrink: 0 }}>{item.icon}</span>
-                  <span style={{ fontSize: 13, color: "#d7d7d7", lineHeight: 1.6 }}>{item.text}</span>
+                <div key={i} className="flex gap-3 items-start">
+                  <span className="text-[#d7d7d7] mt-0.5 shrink-0">{item.icon}</span>
+                  <span className="text-[13px] text-[#d7d7d7] leading-[1.6]">{item.text}</span>
                 </div>
               ))}
             </div>
@@ -82,19 +80,18 @@ export default function Footer() {
 
           {/* KOLOM 4 - FOLLOW US */}
           <div>
-            <h4 style={{ fontSize: 15, fontWeight: 700, color: "#ffffff", margin: "0 0 20px 0", paddingBottom: 10 }}>Follow Us</h4>
-            <p style={{ fontSize: 13, color: "#d7d7d7", marginBottom: 16, lineHeight: 1.6 }}>
+            <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Follow Us</h4>
+            <p className="text-[13px] text-[#d7d7d7] mb-4 leading-[1.6]">
               Ikuti kami di media sosial untuk update produk dan promo terbaru.
             </p>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div className="flex gap-2.5">
               {socials.map((social) => (
                 <a
                   key={social.label}
                   href="#"
                   title={social.label}
-                  style={{ width: 40, height: 40, borderRadius: 10, background: social.bg, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", textDecoration: "none", transition: "transform 0.2s ease, box-shadow 0.2s ease", boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.35)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.25)"; }}
+                  className={`w-10 h-10 rounded-[10px] ${social.bg} flex items-center justify-center text-white no-underline hover:-translate-y-1 transition-all duration-200`}
+                  style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }}
                 >
                   {social.icon}
                 </a>
@@ -106,15 +103,17 @@ export default function Footer() {
       </div>
 
       {/* BOTTOM BAR */}
-      <div style={{ background: "#061e38", padding: "18px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #1e4d7b" }}>
-        <p style={{ fontSize: 12, color: "#ffffff", margin: 0 }}>© 2026 BismarCatalog. All rights reserved.</p>
-        <div style={{ display: "flex", gap: 16 }}>
+      <div className="bg-[#061e38] py-[18px] px-10 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-[#1e4d7b]">
+        <p className="text-xs text-white m-0">© 2026 BismarCatalog. All rights reserved.</p>
+        <div className="flex gap-4">
           {["Privacy Policy", "Terms of Service"].map((item) => (
-            <a key={item} href="#"
-              style={{ fontSize: 12, color: "#d7d7d7", textDecoration: "none", transition: "color 0.2s ease" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#ffffff"}
-              onMouseLeave={e => e.currentTarget.style.color = "#d7d7d7"}
-            >{item}</a>
+            <a
+              key={item}
+              href="#"
+              className="text-xs text-[#d7d7d7] no-underline hover:text-white transition-colors duration-200"
+            >
+              {item}
+            </a>
           ))}
         </div>
       </div>

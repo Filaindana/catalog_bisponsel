@@ -1,9 +1,12 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Mousewheel, FreeMode } from "swiper/modules";
+import { Mousewheel, FreeMode } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import "swiper/css";
-import "swiper/css/navigation";
 import "swiper/css/free-mode";
+
 import keyboardImg   from "/src/assets/keyboard.png";
 import kabellanImg   from "/src/assets/kabel.png";
 import laptopImg     from "/src/assets/laptop.png";
@@ -12,63 +15,110 @@ import mouseImg      from "/src/assets/mouse.png";
 import pcImg         from "/src/assets/monitor.png";
 import handphoneImg  from "/src/assets/handphone.png";
 
-function CategoryItem({ item }) {
+function CategoryItem({ item, onClick }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, cursor: "pointer", padding: "14px 0" }}>
+    <div
+      onClick={onClick}
+      className="flex flex-col items-center gap-2 cursor-pointer py-3 w-full"
+    >
       <div
-        className="category-circle"
-        style={{
-          width: 100, height: 100, borderRadius: "50%",
-          background: "#f3f4f6",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          overflow: "hidden",
-          border: "2px solid transparent",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.05), 0 4px 12px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.08)",
-        }}
+        className="w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[100px] md:h-[100px] 
+        rounded-full bg-gray-100 flex items-center justify-center overflow-hidden 
+        border-2 border-transparent hover:border-[#072B50] hover:scale-105 
+        transition-all duration-200 shadow-md"
       >
-        <img src={item.image} alt={item.name} style={{ width: "65%", height: "65%", objectFit: "contain" }} />
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-[60%] h-[60%] object-contain"
+        />
       </div>
-      <span style={{ fontSize: 15, fontWeight: 600, textAlign: "center", color: "#374151" }}>{item.name}</span>
+
+      <span className="text-[12px] sm:text-[13px] md:text-[14px] font-semibold text-center text-gray-700 leading-tight">
+        {item.name}
+      </span>
     </div>
   );
 }
 
 export default function CategorySection() {
+  const navigate = useNavigate();
+
   const categories = [
-    { name: "Keyboard",  image: keyboardImg },
-    { name: "Kabel LAN", image: kabellanImg },
-    { name: "Laptop",    image: laptopImg },
-    { name: "Speaker",   image: soundImg },
-    { name: "Mouse",     image: mouseImg },
-    { name: "Komputer",  image: pcImg },
-    { name: "Handphone", image: handphoneImg },
-    { name: "Handphone", image: handphoneImg },
-    { name: "Handphone", image: handphoneImg },
+    { name: "Keyboard",      image: keyboardImg },
+    { name: "Kabel Lan",     image: kabellanImg },
+    { name: "Laptop",        image: laptopImg },
+    { name: "Speaker",       image: soundImg },
+    { name: "Mouse",         image: mouseImg },
+    { name: "Komputer (PC)", image: pcImg },
+    { name: "Handphone",     image: handphoneImg },
+    { name: "Handphone",     image: handphoneImg },
+    { name: "Handphone",     image: handphoneImg },
   ];
 
-  return (
-    <section style={{ padding: "60px 0", background: "#ffffff" }}>
-      <h2 className="section-title" style={{ textAlign: "center", marginBottom: 36 }}>Product Category</h2>
+  const [swiper, setSwiper] = useState(null);
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
 
-      {/* wrapper dengan padding untuk memberi ruang tombol nav */}
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 72px", position: "relative" }}>
+  const handleCategoryClick = (categoryName) => {
+    navigate(`/product?category=${encodeURIComponent(categoryName)}`);
+  };
+
+  return (
+    <section className="py-10 md:py-[60px] bg-white">
+      <h2 className="section-title text-center mb-6 md:mb-9">
+        Product Category
+      </h2>
+
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-[72px] relative">
+
+        {/* LEFT BUTTON */}
+        {!isBeginning && (
+          <button
+            onClick={() => swiper?.slidePrev()}
+            className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-10 
+            w-10 h-10 rounded-full bg-white shadow-md items-center justify-center 
+            text-gray-500 hover:bg-[#072B50] hover:text-white transition-all"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
+
+        {/* RIGHT BUTTON */}
+        {!isEnd && (
+          <button
+            onClick={() => swiper?.slideNext()}
+            className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-10 
+            w-10 h-10 rounded-full bg-white shadow-md items-center justify-center 
+            text-gray-500 hover:bg-[#072B50] hover:text-white transition-all"
+          >
+            <ChevronRight size={18} />
+          </button>
+        )}
+
         <Swiper
-          modules={[Navigation, Mousewheel, FreeMode]}
-          navigation
+          modules={[Mousewheel, FreeMode]}
+          onSwiper={setSwiper}
+          onSlideChange={(s) => {
+            setIsBeginning(s.isBeginning);
+            setIsEnd(s.isEnd);
+          }}
           mousewheel={{ forceToAxis: true }}
           freeMode
-          spaceBetween={0}
-          slidesPerView={7}
-          className="category-swiper"
+          spaceBetween={10}
+          slidesPerView={3}
           breakpoints={{
-            320:  { slidesPerView: 3, spaceBetween: 0 },
-            640:  { slidesPerView: 5, spaceBetween: 0 },
-            1024: { slidesPerView: 7, spaceBetween: 0 },
+            480:  { slidesPerView: 4, spaceBetween: 10 },
+            640:  { slidesPerView: 5, spaceBetween: 12 },
+            1024: { slidesPerView: 7, spaceBetween: 16 },
           }}
         >
           {categories.map((item, index) => (
-            <SwiperSlide key={index}>
-              <CategoryItem item={item} />
+            <SwiperSlide key={index} className="flex justify-center">
+              <CategoryItem
+                item={item}
+                onClick={() => handleCategoryClick(item.name)}
+              />
             </SwiperSlide>
           ))}
         </Swiper>

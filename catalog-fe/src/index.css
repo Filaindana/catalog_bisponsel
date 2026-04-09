@@ -32,11 +32,11 @@ body { font-family: "Inter", sans-serif; }
 /* ── Category swiper ──────────────────────── */
 .category-swiper .swiper-button-prev,
 .category-swiper .swiper-button-next {
-  width: 48px !important;
-  height: 48px !important;
+  width: 40px !important;
+  height: 40px !important;
   border-radius: 50%;
   background: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   color: #374151 !important;
   transition: all 0.25s ease;
@@ -47,7 +47,7 @@ body { font-family: "Inter", sans-serif; }
 .category-swiper .swiper-button-next { right: 0 !important; }
 .category-swiper .swiper-button-prev::after,
 .category-swiper .swiper-button-next::after {
-  font-size: 16px !important;
+  font-size: 6px !important;
   font-weight: 700;
 }
 .category-swiper .swiper-button-prev:hover,

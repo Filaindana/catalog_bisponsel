@@ -1,81 +1,102 @@
 import React from "react";
 
-export default function ProductCardCompact({ product, saved = false, onToggleSave, variant = "default", onCategoryClick }) {
-  const imgHeight = 150;
-
+export default function ProductCardCompact({
+  product,
+  saved = false,
+  onToggleSave,
+  variant = "default",
+  onCategoryClick,
+}) {
   return (
-    <div
-      className="pc-gradient-hover"
-      style={{ minWidth: 200, borderRadius: 16, cursor: "pointer", padding: 2, background: "#e5e7eb" }}
-    >
-      <div style={{ background: "#fff", borderRadius: 13, overflow: "hidden", fontFamily: "Inter, sans-serif" }}>
+    <div className="pc-gradient-hover min-w-[200px] rounded-[16px] cursor-pointer p-[2px] bg-gray-200">
+      <div className="bg-white rounded-[13px] overflow-hidden font-[Inter]">
 
-        {/* INFO DI ATAS GAMBAR */}
-        <div style={{ padding: "14px 14px 0", cursor: "default" }}>
+        {/* INFO */}
+        <div className="px-[14px] pt-[14px] cursor-default">
           <p
-            onClick={(e) => { e.stopPropagation(); onCategoryClick?.(); }}
-            style={{ fontSize: 12, color: "#6b7280", marginBottom: 4, cursor: onCategoryClick ? "pointer" : "default" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onCategoryClick?.();
+            }}
+            className="text-[12px] text-gray-500 mb-1"
           >
             {product.category}
           </p>
-          <p style={{ fontSize: 13, fontWeight: 800, color: "#111827", marginBottom: 4, lineHeight: 1.2 }}>{product.name}</p>
-          {product.spec && <p style={{ fontSize: 11, color: "#9ca3af", lineHeight: 1.4 }}>{product.spec}</p>}
+
+          <p className="text-[13px] font-extrabold text-gray-900 mb-1 leading-tight">
+            {product.name}
+          </p>
+
+          {product.spec && (
+            <p className="text-[11px] text-gray-400 leading-snug">
+              {product.spec}
+            </p>
+          )}
         </div>
 
-        {/* GAMBAR */}
-        <div
-          style={{ position: "relative", background: "#f9fafb", overflow: "hidden", marginTop: 10 }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#fff"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#f9fafb"; }}
-        >
-          {product.badge && (
-            <span style={{ position: "absolute", top: 12, left: 12, background: "#ef4444", color: "#fff", fontSize: 12, fontWeight: 700, padding: "4px 8px", borderRadius: 8, zIndex: 3 }}>
-              {product.badge}
-            </span>
-          )}
+        {/* IMAGE */}
+        <div className="relative bg-gray-50 overflow-hidden mt-2.5 group">
+
           {variant === "promo" && typeof product.discount === "number" && (
-            <span style={{ position: "absolute", top: 10, left: 10, zIndex: 3, background: "#e11d48", color: "#fff", fontSize: 12, fontWeight: 700, padding: "4px 10px", borderRadius: 20 }}>
+            <span className="absolute top-2.5 left-2.5 z-10 bg-rose-600 text-white text-[12px] font-bold px-3 py-1 rounded-full">
               {product.discount}%
             </span>
           )}
+
           <button
-            style={{ position: "absolute", top: 10, right: 10, zIndex: 3, display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: 8, padding: 8, boxShadow: "0 2px 8px rgba(0,0,0,0.12)", border: "none", cursor: "pointer", outline: "none", transition: "background 0.2s ease", background: saved ? "#072B50" : "#fff" }}
-            onClick={(e) => { e.stopPropagation(); onToggleSave?.(); }}
-            aria-label="Simpan produk"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSave?.();
+            }}
+            className={`absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-lg flex items-center justify-center shadow-md ${
+              saved
+                ? "bg-[#072B50] text-white"
+                : "bg-white text-[#072B50]"
+            }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-              fill={saved ? "#fff" : "none"} stroke={saved ? "none" : "#072B50"}>
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            <svg width="20" height="20" viewBox="0 0 24 24"
+              fill={saved ? "white" : "none"}
+              stroke={saved ? "none" : "#072B50"}>
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
             </svg>
           </button>
+
           <img
             src={product.image}
             alt={product.name}
-            style={{ width: "100%", objectFit: "contain", display: "block", padding: 14, height: imgHeight, transition: "transform 0.3s ease" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.04)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
+            className="w-full h-[150px] object-contain block p-[14px] transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
-        {/* HARGA & RATING */}
-        <div style={{ padding: "12px 14px 14px", cursor: "default" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderTop: "1px solid #f3f4f6", paddingTop: 12 }}>
+        {/* PRICE */}
+        <div className="px-[14px] pb-[14px] pt-3 cursor-default">
+          <div className="flex justify-between items-end border-t border-gray-100 pt-3">
             <div>
-              <p style={{ fontSize: 12, color: "#9ca3af", marginBottom: 4 }}>Harga</p>
-              <p style={{ fontSize: 14, fontWeight: 700, color: "#ef4444" }}>{product.price}</p>
+              <p className="text-[12px] text-gray-400 mb-1">Harga</p>
+              <p className="text-[14px] font-bold text-red-500">
+                {product.price}
+              </p>
             </div>
-            <div style={{ textAlign: "right" }}>
-              <p style={{ fontSize: 12, color: "#9ca3af", marginBottom: 4 }}>Review</p>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "#111827" }}>⭐ {product.rating}</p>
+
+            <div className="text-right">
+              <p className="text-[12px] text-gray-400 mb-1">Review</p>
+              <p className="text-[14px] font-semibold text-gray-900">
+                ⭐ {product.rating}
+              </p>
             </div>
           </div>
 
           {variant === "promo" && typeof product.discount === "number" && (
-            <div style={{ paddingTop: 10 }}>
-              <div style={{ height: 6, background: "#e5e7eb", borderRadius: 9999, overflow: "hidden" }}>
-                <div style={{ height: "100%", background: "#072B50", borderRadius: 9999, width: `${Math.min(100, product.stock ?? 0)}%` }} />
+            <div className="pt-2.5">
+              <div className="h-[6px] bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#072B50] rounded-full"
+                  style={{ width: `${Math.min(100, product.stock ?? 0)}%` }}
+                />
               </div>
-              <p style={{ fontSize: 12, color: "#6b7280", marginTop: 6 }}>Stok Tersedia • Produk Populer</p>
+              <p className="text-[12px] text-gray-500 mt-1.5">
+                Stok Tersedia • Produk Populer
+              </p>
             </div>
           )}
         </div>

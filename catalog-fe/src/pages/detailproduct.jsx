@@ -47,190 +47,84 @@ export default function DetailProduct() {
   const navigate = useNavigate();
   const swiperRef = useRef(null);
   const [activeImage, setActiveImage] = useState(0);
-  const [activeTab, setActiveTab] = useState(
-    "spesifikasi",
-  );
+  const [activeTab, setActiveTab] = useState("spesifikasi");
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [saved, setSaved] = useState(
-    relatedProducts.map(() => false),
-  );
+  const [saved, setSaved] = useState(relatedProducts.map(() => false));
 
   const formatPrice = (price) =>
     "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
 
   return (
-    <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
-      <div
-        style={{ maxWidth: "1100px", margin: "0 auto", padding: "24px 20px" }}
-      >
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-5xl mx-auto px-5 py-6">
+
         {/* BACK BUTTON */}
         <button
           onClick={() => navigate(-1)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "14px",
-            color: "#374151",
-            marginBottom: "24px",
-            padding: "6px 12px",
-            borderRadius: "8px",
-            transition: "background 0.2s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#e5e7eb")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+          className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer text-sm text-gray-700 mb-6 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
         >
           <ArrowLeft size={16} /> Kembali
         </button>
 
         {/* TOP SECTION */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "80px 1fr 1fr",
-            gap: "20px",
-            background: "#fff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            marginBottom: "24px",
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-[80px_1fr_1fr] gap-5 bg-white rounded-2xl p-6 shadow-sm mb-6">
+
           {/* THUMBNAIL */}
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
+          <div className="flex md:flex-col flex-row gap-2.5 overflow-x-auto md:overflow-visible">
             {product.images.map((img, i) => (
               <div
                 key={i}
                 onClick={() => setActiveImage(i)}
-                style={{
-                  width: "70px",
-                  height: "70px",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  border:
-                    activeImage === i
-                      ? "2px solid #072B50"
-                      : "2px solid #e5e7eb",
-                  cursor: "pointer",
-                  background: "#f9fafb",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transition: "border 0.2s ease",
-                }}
+                className={`w-[70px] h-[70px] flex-shrink-0 rounded-lg overflow-hidden cursor-pointer bg-gray-50 flex items-center justify-center transition-all ${
+                  activeImage === i
+                    ? "border-2 border-[#072B50]"
+                    : "border-2 border-gray-200"
+                }`}
               >
                 <img
                   src={img}
                   alt=""
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "contain",
-                    padding: "4px",
-                  }}
+                  className="w-full h-full object-contain p-1"
                 />
               </div>
             ))}
           </div>
 
           {/* GAMBAR BESAR */}
-          <div
-            style={{
-              background: "#f9fafb",
-              borderRadius: "12px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "20px",
-              position: "relative",
-            }}
-          >
+          <div className="bg-gray-50 rounded-xl flex items-center justify-center p-5 relative">
             <button
               onClick={() => setActiveImage((prev) => Math.max(0, prev - 1))}
-              style={{
-                position: "absolute",
-                left: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "16px",
-                zIndex: 1,
-              }}
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-gray-200 cursor-pointer flex items-center justify-center text-base z-10 hover:bg-gray-100 transition-colors"
             >
               ‹
             </button>
             <img
               src={product.images[activeImage]}
               alt={product.name}
-              style={{
-                width: "100%",
-                maxHeight: "340px",
-                objectFit: "contain",
-              }}
+              className="w-full max-h-[340px] object-contain"
             />
             <button
               onClick={() =>
                 setActiveImage((prev) =>
-                  Math.min(product.images.length - 1, prev + 1),
+                  Math.min(product.images.length - 1, prev + 1)
                 )
               }
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: "32px",
-                height: "32px",
-                borderRadius: "50%",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "16px",
-                zIndex: 1,
-              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-gray-200 cursor-pointer flex items-center justify-center text-base z-10 hover:bg-gray-100 transition-colors"
             >
               ›
             </button>
           </div>
 
           {/* INFO PRODUK */}
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "14px" }}
-          >
-            <p style={{ fontSize: "12px", color: "#6b7280", margin: 0 }}>
-              {product.category}
-            </p>
-            <h1
-              style={{
-                fontSize: "22px",
-                fontWeight: 700,
-                color: "#111827",
-                margin: 0,
-                lineHeight: 1.3,
-              }}
-            >
+          <div className="flex flex-col gap-3.5">
+            <p className="text-xs text-gray-500 m-0">{product.category}</p>
+            <h1 className="text-[22px] font-bold text-gray-900 m-0 leading-tight">
               {product.name}
             </h1>
 
             {/* RATING */}
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <div className="flex items-center gap-1.5">
               {Array.from({ length: 5 }, (_, i) => (
                 <Star
                   key={i}
@@ -239,66 +133,37 @@ export default function DetailProduct() {
                   stroke="#f59e0b"
                 />
               ))}
-              <span style={{ fontSize: "13px", color: "#6b7280" }}>
+              <span className="text-[13px] text-gray-500">
                 {product.rating} ({product.reviews} reviews)
               </span>
             </div>
 
             {/* HARGA */}
-            <p
-              style={{
-                fontSize: "26px",
-                fontWeight: 800,
-                color: "#ef4444",
-                margin: 0,
-              }}
-            >
+            <p className="text-[26px] font-extrabold text-red-500 m-0">
               {formatPrice(product.price)}
             </p>
 
             {/* STOK */}
-            <p
-              style={{
-                fontSize: "13px",
-                color: "#10b981",
-                margin: 0,
-                fontWeight: 500,
-              }}
-            >
+            <p className="text-[13px] text-emerald-500 m-0 font-medium">
               ✓ Stok tersedia ({product.stock} unit)
             </p>
 
             {/* WARNA */}
             <div>
-              <p
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#374151",
-                  margin: "0 0 8px 0",
-                }}
-              >
+              <p className="text-[13px] font-semibold text-gray-700 m-0 mb-2">
                 Colour
               </p>
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div className="flex gap-2">
                 {product.colors.map((color, i) => (
                   <div
                     key={i}
                     onClick={() => setSelectedColor(i)}
-                    style={{
-                      width: "28px",
-                      height: "28px",
-                      borderRadius: "50%",
-                      background: color,
-                      cursor: "pointer",
-                      border:
-                        selectedColor === i
-                          ? "3px solid #072B50"
-                          : "3px solid transparent",
-                      outline:
-                        selectedColor === i ? "2px solid #93c5fd" : "none",
-                      transition: "all 0.2s ease",
-                    }}
+                    className={`w-7 h-7 rounded-full cursor-pointer transition-all ${
+                      selectedColor === i
+                        ? "outline outline-2 outline-blue-300 border-[3px] border-[#072B50]"
+                        : "border-[3px] border-transparent"
+                    }`}
+                    style={{ backgroundColor: color }}
                   />
                 ))}
               </div>
@@ -306,62 +171,24 @@ export default function DetailProduct() {
 
             {/* QUANTITY */}
             <div>
-              <p
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: "#374151",
-                  margin: "0 0 8px 0",
-                }}
-              >
+              <p className="text-[13px] font-semibold text-gray-700 m-0 mb-2">
                 Jumlah
               </p>
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div className="flex items-center">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  style={{
-                    width: "36px",
-                    height: "36px",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "8px 0 0 8px",
-                    background: "#f9fafb",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    color: "#374151",
-                  }}
+                  className="w-9 h-9 border border-gray-200 rounded-l-lg bg-gray-50 cursor-pointer text-lg text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   −
                 </button>
-                <div
-                  style={{
-                    width: "48px",
-                    height: "36px",
-                    border: "1px solid #e5e7eb",
-                    borderLeft: "none",
-                    borderRight: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "14px",
-                    fontWeight: 600,
-                  }}
-                >
+                <div className="w-12 h-9 border-t border-b border-gray-200 flex items-center justify-center text-sm font-semibold">
                   {quantity}
                 </div>
                 <button
                   onClick={() =>
                     setQuantity((q) => Math.min(product.stock, q + 1))
                   }
-                  style={{
-                    width: "36px",
-                    height: "36px",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "0 8px 8px 0",
-                    background: "#f9fafb",
-                    cursor: "pointer",
-                    fontSize: "18px",
-                    color: "#374151",
-                  }}
+                  className="w-9 h-9 border border-gray-200 rounded-r-lg bg-gray-50 cursor-pointer text-lg text-gray-700 hover:bg-gray-100 transition-colors"
                 >
                   +
                 </button>
@@ -369,31 +196,12 @@ export default function DetailProduct() {
             </div>
 
             {/* TOMBOL WA */}
-            <div style={{ marginTop: "4px" }}>
+            <div className="mt-1">
               <a
                 href={`https://wa.me/6281359271816?text=Halo,%20saya%20ingin%20menanyakan%20produk%20*${encodeURIComponent(product.name)}*%20seharga%20${encodeURIComponent(formatPrice(product.price))}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  padding: "12px",
-                  borderRadius: "10px",
-                  background: "#25d366",
-                  color: "#fff",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  transition: "background 0.2s ease",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "#1ebe5d")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "#25d366")
-                }
+                className="flex items-center justify-center gap-2 py-3 rounded-xl bg-[#25d366] text-white text-sm font-bold no-underline hover:bg-[#1ebe5d] transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -412,42 +220,17 @@ export default function DetailProduct() {
         {/* tutup TOP SECTION */}
 
         {/* TAB DESKRIPSI / SPESIFIKASI */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            marginBottom: "24px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              borderBottom: "2px solid #f3f4f6",
-              marginBottom: "24px",
-            }}
-          >
-            {(["deskripsi", "spesifikasi"]).map((tab) => (
+        <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
+          <div className="flex border-b-2 border-gray-100 mb-6">
+            {["deskripsi", "spesifikasi"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                style={{
-                  padding: "10px 24px",
-                  border: "none",
-                  background: "none",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: activeTab === tab ? 700 : 500,
-                  color: activeTab === tab ? "#072B50" : "#6b7280",
-                  borderBottom:
-                    activeTab === tab
-                      ? "3px solid #072B50"
-                      : "3px solid transparent",
-                  marginBottom: "-2px",
-                  textTransform: "capitalize",
-                  transition: "all 0.2s ease",
-                }}
+                className={`px-6 py-2.5 border-none bg-transparent cursor-pointer text-sm capitalize transition-all -mb-0.5 ${
+                  activeTab === tab
+                    ? "font-bold text-[#072B50] border-b-[3px] border-[#072B50]"
+                    : "font-medium text-gray-500 border-b-[3px] border-transparent"
+                }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -455,133 +238,56 @@ export default function DetailProduct() {
           </div>
 
           {activeTab === "deskripsi" ? (
-            <p
-              style={{
-                fontSize: "14px",
-                color: "#374151",
-                lineHeight: 1.8,
-                margin: 0,
-              }}
-            >
+            <p className="text-sm text-gray-700 leading-relaxed m-0">
               {product.description}
             </p>
           ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ background: "#072B50" }}>
-                  <th
-                    style={{
-                      padding: "12px 16px",
-                      textAlign: "left",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#fff",
-                      width: "40%",
-                    }}
-                  >
-                    Attribute
-                  </th>
-                  <th
-                    style={{
-                      padding: "12px 16px",
-                      textAlign: "left",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#fff",
-                    }}
-                  >
-                    Details
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {product.specs.map((spec, i) => (
-                  <tr
-                    key={i}
-                    style={{ background: i % 2 === 0 ? "#f9fafb" : "#fff" }}
-                  >
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        fontSize: "13px",
-                        color: "#374151",
-                        fontWeight: 500,
-                        borderBottom: "1px solid #f3f4f6",
-                      }}
-                    >
-                      {spec.attribute}
-                    </td>
-                    <td
-                      style={{
-                        padding: "12px 16px",
-                        fontSize: "13px",
-                        color: "#6b7280",
-                        borderBottom: "1px solid #f3f4f6",
-                      }}
-                    >
-                      {spec.detail}
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-[#072B50]">
+                    <th className="px-4 py-3 text-left text-[13px] font-semibold text-white w-2/5">
+                      Attribute
+                    </th>
+                    <th className="px-4 py-3 text-left text-[13px] font-semibold text-white">
+                      Details
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {product.specs.map((spec, i) => (
+                    <tr
+                      key={i}
+                      className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                    >
+                      <td className="px-4 py-3 text-[13px] text-gray-700 font-medium border-b border-gray-100">
+                        {spec.attribute}
+                      </td>
+                      <td className="px-4 py-3 text-[13px] text-gray-500 border-b border-gray-100">
+                        {spec.detail}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
 
         {/* RELATED PRODUCTS */}
-        <div
-          style={{
-            background: "#fff",
-            borderRadius: "16px",
-            padding: "24px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-          }}
-        >
-          <h2
-            style={{
-              fontSize: "18px",
-              fontWeight: 700,
-              color: "#111827",
-              margin: "0 0 20px 0",
-              textAlign: "center",
-            }}
-          >
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <h2 className="text-lg font-bold text-gray-900 m-0 mb-5 text-center">
             Related Products
           </h2>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div className="flex items-center gap-3">
             <button
               onClick={() => swiperRef.current?.slidePrev()}
-              style={{
-                width: "36px",
-                height: "36px",
-                minWidth: "36px",
-                borderRadius: "50%",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "18px",
-                color: "#374151",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background =
-                  "#072B50";
-                e.currentTarget.style.color = "#fff";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background =
-                  "#fff";
-                e.currentTarget.style.color = "#374151";
-              }}
+              className="w-9 h-9 min-w-[36px] rounded-full bg-white border border-gray-200 shadow cursor-pointer flex items-center justify-center text-lg text-gray-700 transition-all hover:bg-[#072B50] hover:text-white"
             >
               ‹
             </button>
 
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-1 min-w-0">
               <Swiper
                 onSwiper={(swiper) => (swiperRef.current = swiper)}
                 spaceBetween={16}
@@ -595,9 +301,22 @@ export default function DetailProduct() {
                 {relatedProducts.map((item, index) => (
                   <SwiperSlide key={item.id}>
                     <ProductCard
-                      product={{ id: item.id, category: item.category, name: item.name, price: formatPrice(item.price), rating: item.rating, image: item.image }}
+                      product={{
+                        id: item.id,
+                        category: item.category,
+                        name: item.name,
+                        price: formatPrice(item.price),
+                        rating: item.rating,
+                        image: item.image,
+                      }}
                       saved={saved[index]}
-                      onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+                      onToggleSave={() =>
+                        setSaved((prev) => {
+                          const u = [...prev];
+                          u[index] = !u[index];
+                          return u;
+                        })
+                      }
                     />
                   </SwiperSlide>
                 ))}
@@ -606,37 +325,13 @@ export default function DetailProduct() {
 
             <button
               onClick={() => swiperRef.current?.slideNext()}
-              style={{
-                width: "36px",
-                height: "36px",
-                minWidth: "36px",
-                borderRadius: "50%",
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "18px",
-                color: "#374151",
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background =
-                  "#072B50";
-                e.currentTarget.style.color = "#fff";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background =
-                  "#fff";
-                e.currentTarget.style.color = "#374151";
-              }}
+              className="w-9 h-9 min-w-[36px] rounded-full bg-white border border-gray-200 shadow cursor-pointer flex items-center justify-center text-lg text-gray-700 transition-all hover:bg-[#072B50] hover:text-white"
             >
               ›
             </button>
           </div>
         </div>
+
       </div>
     </div>
   );

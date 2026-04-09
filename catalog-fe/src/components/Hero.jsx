@@ -65,59 +65,60 @@ export default function Hero() {
   const s = slides[idx];
 
   return (
-    <section style={{ position: "relative", height: "570px", overflow: "hidden", background: "#06122a" }}>
+    <section className="relative h-[570px] overflow-hidden bg-[#06122a]">
+
       {/* BG IMAGE */}
       <div
         key={`bg-${idx}`}
+        className="absolute inset-0 bg-cover bg-center"
         style={{
-          position: "absolute", inset: 0,
           backgroundImage: `url(${s.image})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
           animation: "hKB 5.5s ease forwards",
         }}
       />
 
       {/* OVERLAY */}
-      <div style={{
-        position: "absolute", inset: 0,
-        background: "linear-gradient(to right, rgba(6,18,42,0.95) 0%, rgba(6,18,42,0.80) 35%, rgba(6,18,42,0.35) 65%, rgba(6,18,42,0.05) 100%)",
-      }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: "linear-gradient(to right, rgba(6,18,42,0.95) 0%, rgba(6,18,42,0.80) 35%, rgba(6,18,42,0.35) 65%, rgba(6,18,42,0.05) 100%)",
+        }}
+      />
 
       {/* CONTENT */}
-      <div key={`c-${key}`} style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", paddingBottom: 48 }}>
-        <div style={{ maxWidth: 1400, width: "100%", margin: "0 auto", padding: "0 40px" }}>
-          <div style={{ maxWidth: 520 }}>
+      <div
+        key={`c-${key}`}
+        className="absolute inset-0 flex items-center pb-12"
+      >
+        <div className="max-w-[1400px] w-full mx-auto px-10">
+          <div className="max-w-[520px]">
 
             {/* Tag */}
-            <div className="h-tag" style={{
-              display: "inline-flex", alignItems: "center", gap: 7,
-              border: "1px solid rgba(255,255,255,0.22)", borderRadius: 30,
-              padding: "5px 13px", marginBottom: 20,
-              background: "rgba(255,255,255,0.07)",
-            }}>
-              <span style={{ width: 5, height: 5, borderRadius: "50%", background: "#60a5fa", boxShadow: "0 0 6px #60a5fa", flexShrink: 0 }} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.85)", letterSpacing: "1.2px", textTransform: "uppercase" }}>
+            <div className="h-tag inline-flex items-center gap-[7px] border border-white/[0.22] rounded-[30px] px-[13px] py-[5px] mb-5 bg-white/[0.07]">
+              <span className="w-[5px] h-[5px] rounded-full bg-blue-400 shrink-0" style={{ boxShadow: "0 0 6px #60a5fa" }} />
+              <span className="text-[11px] font-bold text-white/85 tracking-[1.2px] uppercase">
                 {s.tag}
               </span>
             </div>
 
             {/* H1 */}
-            <h1 className="h-h1" style={{ fontSize: 44, fontWeight: 800, lineHeight: 1.2, color: "#fff", margin: "0 0 18px 0", letterSpacing: "-0.4px" }}>
+            <h1 className="h-h1 text-[44px] font-extrabold leading-[1.2] text-white m-0 mb-[18px] tracking-[-0.4px]">
               {s.title}<br />
-              <span style={{
-                background: "linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}>
+              <span
+                style={{
+                  background: "linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
                 {s.titleAccent}
               </span>
               {s.titleEnd ? <> {s.titleEnd}</> : null}
             </h1>
 
             {/* Desc */}
-            <p className="h-desc" style={{ fontSize: 14, color: "rgba(255,255,255,0.68)", lineHeight: 1.85, margin: "0 0 32px 0", maxWidth: 420 }}>
+            <p className="h-desc text-sm text-white/[0.68] leading-[1.85] m-0 mb-8 max-w-[420px]">
               {s.desc}
             </p>
 
@@ -137,9 +138,13 @@ export default function Hero() {
       </div>
 
       {/* DOTS */}
-      <div style={{ position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)", zIndex: 10, display: "flex", alignItems: "center", gap: 10 }}>
+      <div className="absolute bottom-7 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2.5">
         {slides.map((_, i) => (
-          <button key={i} className={`h-dot ${i === idx ? "on" : "off"}`} onClick={() => { goTo(i); startAuto(); }} />
+          <button
+            key={i}
+            className={`h-dot ${i === idx ? "on" : "off"}`}
+            onClick={() => { goTo(i); startAuto(); }}
+          />
         ))}
       </div>
     </section>

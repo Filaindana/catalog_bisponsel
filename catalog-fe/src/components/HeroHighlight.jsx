@@ -9,22 +9,25 @@ export default function HeroHighlight() {
   ];
 
   return (
-    <div style={{ width: "100%", marginTop: -50, position: "relative", zIndex: 10 }}>
-      <div style={{
-        background: "linear-gradient(to right, #072B50, #1e40af, #7c3aed)",
-        padding: "28px 0",
-        color: "#fff",
-        boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
-      }}>
-        <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div className="w-full -mt-[50px] relative z-10">
+      <div
+        className="py-7 text-white"
+        style={{
+          background: "linear-gradient(to right, #072B50, #1e40af, #7c3aed)",
+          boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
+        }}
+      >
+        <div className="max-w-[1400px] mx-auto px-10 grid grid-cols-2 md:grid-cols-4 gap-6">
           {items.map((item, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 18, flex: 1, justifyContent: "center" }}>
-              <div style={{ width: 60, height: 60, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", color: "#072B50", boxShadow: "0 4px 10px rgba(0,0,0,0.15)", flexShrink: 0 }}>
+            <div key={i} className="flex items-center gap-[18px] justify-center">
+              <div className="w-[60px] h-[60px] shrink-0 rounded-full bg-white flex items-center justify-center text-[#072B50]"
+                style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }}
+              >
                 {item.icon}
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 17 }}>{item.title}</div>
-                <div style={{ fontSize: 14, opacity: 0.85, marginTop: 2 }}>{item.desc}</div>
+                <div className="font-bold text-[17px]">{item.title}</div>
+                <div className="text-sm opacity-85 mt-0.5">{item.desc}</div>
               </div>
             </div>
           ))}

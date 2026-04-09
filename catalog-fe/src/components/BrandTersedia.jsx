@@ -22,47 +22,63 @@ import xiaomiImg    from "../assets/xiaomi.png";
 import tecnoImg     from "../assets/tecno.png";
 
 const brands = [
-  { name: "ASUS",      image: asusImg },
-  { name: "Apple",     image: appleImg },
-  { name: "Lenovo",    image: lenovoImg },
-  { name: "HP",        image: hpImg },
-  { name: "Dell",      image: dellImg },
-  { name: "Acer",      image: acerImg },
-  { name: "Axioo",     image: axiooImg },
-  { name: "Pixel",     image: pixelImg },
-  { name: "Samsung",   image: samsungImg },
-  { name: "MSI",       image: msiImg },
+  { name: "ASUS", image: asusImg },
+  { name: "Apple", image: appleImg },
+  { name: "Lenovo", image: lenovoImg },
+  { name: "HP", image: hpImg },
+  { name: "Dell", image: dellImg },
+  { name: "Acer", image: acerImg },
+  { name: "Axioo", image: axiooImg },
+  { name: "Pixel", image: pixelImg },
+  { name: "Samsung", image: samsungImg },
+  { name: "MSI", image: msiImg },
   { name: "Microsoft", image: microsoftImg },
-  { name: "OnePlus",   image: oneplusImg },
-  { name: "Xiaomi",    image: xiaomiImg },
-  { name: "Vivo",      image: vivoImg },
-  { name: "OPPO",      image: oppoImg },
-  { name: "POCO",      image: pocoImg },
-  { name: "Logitech",  image: legitechImg },
-  { name: "ROG",       image: rogImg },
-  { name: "Huawei",    image: huaweiImg },
-  { name: "Fantech",   image: fantechImg },
-  { name: "Realme",    image: realmeImg },
-  { name: "Tecno",     image: tecnoImg },
+  { name: "OnePlus", image: oneplusImg },
+  { name: "Xiaomi", image: xiaomiImg },
+  { name: "Vivo", image: vivoImg },
+  { name: "OPPO", image: oppoImg },
+  { name: "POCO", image: pocoImg },
+  { name: "Logitech", image: legitechImg },
+  { name: "ROG", image: rogImg },
+  { name: "Huawei", image: huaweiImg },
+  { name: "Fantech", image: fantechImg },
+  { name: "Realme", image: realmeImg },
+  { name: "Tecno", image: tecnoImg },
 ];
 
 export default function BrandSection() {
   return (
-    <section style={{ padding: "50px 0", background: "#ffffff" }}>
-      <h2 className="section-title" style={{ textAlign: "center", marginBottom: 32 }}>Brand Tersedia</h2>
+    <section className="py-10 md:py-[50px] bg-white">
+      
+      <h2 className="section-title text-center mb-6 md:mb-8">
+        Brand Tersedia
+      </h2>
 
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "24px 32px", maxWidth: 1000, margin: "0 auto", padding: "0 20px" }}>
+      <div className="
+        max-w-[1000px] mx-auto px-4
+        grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8
+        gap-y-6 gap-x-4 sm:gap-x-6
+      ">
         {brands.map((brand, index) => (
           <div
             key={index}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.2s ease", filter: "grayscale(30%)", opacity: 0.85 }}
-            onMouseEnter={e => { e.currentTarget.style.filter = "grayscale(0%)"; e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1.08)"; }}
-            onMouseLeave={e => { e.currentTarget.style.filter = "grayscale(30%)"; e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "scale(1)"; }}
+            className="
+              flex items-center justify-center cursor-pointer
+              opacity-90
+              hover:opacity-100 hover:scale-110
+              active:scale-95
+              transition-all duration-300
+            "
           >
-            <img src={brand.image} alt={brand.name} style={{ height: 36, width: "auto", maxWidth: 100, objectFit: "contain" }} />
+            <img
+              src={brand.image}
+              alt={brand.name}
+              className="h-7 sm:h-8 md:h-9 object-contain max-w-[90px]"
+            />
           </div>
         ))}
       </div>
+
     </section>
   );
 }

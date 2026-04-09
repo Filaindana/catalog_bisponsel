@@ -1,5 +1,5 @@
-import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import laptopImg from "../assets/laptop.png";
 import mouseImg from "../assets/mouse.png";
 import keyboardImg from "../assets/keyboard.png";
@@ -81,6 +81,9 @@ function FilterSection({ title, children, defaultOpen = true }) {
 }
 
 export default function Product() {
+  // ── baca query param ?category=xxx dari URL ──
+  const [searchParams] = useSearchParams();
+
   const [saved, setSaved] = useState(allProducts.map(() => false));
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -92,6 +95,19 @@ export default function Product() {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState(20000000);
+
+  // ── auto-filter saat URL berubah ──
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    if (cat) {
+      setSelectedCategories([cat]);
+      setCurrentPage(1);
+      // scroll ke konten produk
+      setTimeout(() => {
+        document.getElementById("product-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [searchParams]);
 
   const productsPerPage = 15;
 
@@ -253,7 +269,7 @@ export default function Product() {
           textAlign: "center",
         }}
       >
-        {/* SEARCH BAR - absolute kanan atas */}
+        {/* SEARCH BAR */}
         <div style={{ position: "absolute", top: "20px", right: "40px" }}>
           <div
             style={{
@@ -304,7 +320,7 @@ export default function Product() {
           </div>
         </div>
 
-        {/* JUDUL & DESKRIPSI - tepat di tengah */}
+        {/* JUDUL */}
         <div>
           <h1
             style={{
@@ -317,14 +333,14 @@ export default function Product() {
             Catalog Product
           </h1>
           <p style={{ fontSize: "15px", color: "#d1d5db", margin: 0 }}>
-            Jelajahi koleksi produk dengan informasi dan detail spesifikasi
-            lengkap.
+            Jelajahi koleksi produk dengan informasi dan detail spesifikasi lengkap.
           </p>
         </div>
       </div>
 
       {/* MAIN CONTENT */}
       <div
+        id="product-content"
         style={{
           maxWidth: "1400px",
           margin: "0 auto",
@@ -362,13 +378,7 @@ export default function Product() {
               ),
             )}
           </FilterSection>
-          <hr
-            style={{
-              border: "none",
-              borderTop: "1px solid #f3f4f6",
-              margin: "0 0 20px 0",
-            }}
-          />
+          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
 
           <FilterSection title="Brand">
             {brands.map((brand) =>
@@ -377,13 +387,7 @@ export default function Product() {
               ),
             )}
           </FilterSection>
-          <hr
-            style={{
-              border: "none",
-              borderTop: "1px solid #f3f4f6",
-              margin: "0 0 20px 0",
-            }}
-          />
+          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
 
           <FilterSection title="Diskon">
             {discounts.map((d) =>
@@ -392,22 +396,10 @@ export default function Product() {
               ),
             )}
           </FilterSection>
-          <hr
-            style={{
-              border: "none",
-              borderTop: "1px solid #f3f4f6",
-              margin: "0 0 20px 0",
-            }}
-          />
+          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
 
           <FilterSection title="Harga">
-            <div
-              style={{
-                fontSize: "13px",
-                color: "#6b7280",
-                marginBottom: "8px",
-              }}
-            >
+            <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "8px" }}>
               Rp 4.000.069 - {formatPrice(priceRange)}
             </div>
             <input
@@ -422,13 +414,7 @@ export default function Product() {
               style={{ width: "100%", accentColor: "#072B50" }}
             />
           </FilterSection>
-          <hr
-            style={{
-              border: "none",
-              borderTop: "1px solid #f3f4f6",
-              margin: "0 0 20px 0",
-            }}
-          />
+          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
 
           <FilterSection title="Status Produk">
             {["Tersedia", "Tidak Tersedia"].map((status) =>
@@ -450,27 +436,20 @@ export default function Product() {
             }}
           >
             <div>
-              <p
-                style={{
-                  fontSize: "14px",
-                  color: "#374151",
-                  margin: "0 0 4px 0",
-                }}
-              >
+              <p style={{ fontSize: "14px", color: "#374151", margin: "0 0 4px 0" }}>
                 Showing{" "}
-                {filteredProducts.length === 0
-                  ? 0
-                  : (currentPage - 1) * productsPerPage + 1}
-                –
-                {Math.min(
-                  currentPage * productsPerPage,
-                  filteredProducts.length,
-                )}{" "}
+                {filteredProducts.length === 0 ? 0 : (currentPage - 1) * productsPerPage + 1}
+                –{Math.min(currentPage * productsPerPage, filteredProducts.length)}{" "}
                 of {filteredProducts.length} results
                 {searchQuery && (
                   <span style={{ color: "#6b7280" }}>
-                    {" "}
-                    untuk &quot;<strong>{searchQuery}</strong>&quot;
+                    {" "}untuk &quot;<strong>{searchQuery}</strong>&quot;
+                  </span>
+                )}
+                {/* Tampilkan kategori aktif dari URL */}
+                {selectedCategories.length > 0 && (
+                  <span style={{ color: "#072B50", fontWeight: 600 }}>
+                    {" "}· {selectedCategories.join(", ")}
                   </span>
                 )}
               </p>
@@ -499,17 +478,8 @@ export default function Product() {
             </div>
 
             {/* SORT DROPDOWN */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                position: "relative",
-              }}
-            >
-              <span style={{ fontSize: "13px", color: "#6b7280" }}>
-                Sort By:
-              </span>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative" }}>
+              <span style={{ fontSize: "13px", color: "#6b7280" }}>Sort By:</span>
               <div
                 onClick={() => setSortOpen(!sortOpen)}
                 style={{
@@ -558,18 +528,10 @@ export default function Product() {
                     minWidth: "160px",
                   }}
                 >
-                  {[
-                    "Terbaru",
-                    "Harga Terendah",
-                    "Harga Tertinggi",
-                    "Rating",
-                  ].map((opt) => (
+                  {["Terbaru", "Harga Terendah", "Harga Tertinggi", "Rating"].map((opt) => (
                     <div
                       key={opt}
-                      onClick={() => {
-                        setSortBy(opt);
-                        setSortOpen(false);
-                      }}
+                      onClick={() => { setSortBy(opt); setSortOpen(false); }}
                       style={{
                         padding: "10px 14px",
                         fontSize: "13px",
@@ -579,14 +541,8 @@ export default function Product() {
                         fontWeight: sortBy === opt ? 600 : 400,
                         transition: "background 0.15s ease",
                       }}
-                      onMouseEnter={(e) => {
-                        if (sortBy !== opt)
-                          e.currentTarget.style.background = "#f3f4f6";
-                      }}
-                      onMouseLeave={(e) => {
-                        if (sortBy !== opt)
-                          e.currentTarget.style.background = "#fff";
-                      }}
+                      onMouseEnter={(e) => { if (sortBy !== opt) e.currentTarget.style.background = "#f3f4f6"; }}
+                      onMouseLeave={(e) => { if (sortBy !== opt) e.currentTarget.style.background = "#fff"; }}
                     >
                       {opt}
                     </div>
@@ -596,26 +552,13 @@ export default function Product() {
             </div>
           </div>
 
-          {/* GRID - 5 kolom */}
+          {/* GRID */}
           {currentProducts.length === 0 ? (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "60px 0",
-                color: "#9ca3af",
-                fontSize: "15px",
-              }}
-            >
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af", fontSize: "15px" }}>
               Produk tidak ditemukan.
             </div>
           ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: "14px",
-              }}
-            >
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "14px" }}>
               {currentProducts.map((product, index) => (
                 <ProductCard
                   key={product.id}
@@ -631,11 +574,7 @@ export default function Product() {
                   }}
                   saved={saved[index]}
                   onCategoryClick={() => {
-                    toggleItem(
-                      selectedCategories,
-                      setSelectedCategories,
-                      product.category,
-                    );
+                    toggleItem(selectedCategories, setSelectedCategories, product.category);
                     setCurrentPage(1);
                   }}
                   compact
@@ -652,36 +591,14 @@ export default function Product() {
           )}
 
           {/* PAGINATION */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "6px",
-              marginTop: "30px",
-            }}
-          >
-            {paginationBtn(
-              "‹",
-              () => setCurrentPage((p) => Math.max(1, p - 1)),
-              false,
-              currentPage === 1,
-            )}
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "30px" }}>
+            {paginationBtn("‹", () => setCurrentPage((p) => Math.max(1, p - 1)), false, currentPage === 1)}
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <div key={page}>
-                {paginationBtn(
-                  page,
-                  () => setCurrentPage(page),
-                  currentPage === page,
-                )}
+                {paginationBtn(page, () => setCurrentPage(page), currentPage === page)}
               </div>
             ))}
-            {paginationBtn(
-              "›",
-              () => setCurrentPage((p) => Math.min(totalPages, p + 1)),
-              false,
-              currentPage === totalPages,
-            )}
+            {paginationBtn("›", () => setCurrentPage((p) => Math.min(totalPages, p + 1)), false, currentPage === totalPages)}
           </div>
         </div>
       </div>

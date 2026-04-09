@@ -26,7 +26,6 @@ export default function NewProduct() {
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
   };
-
   const onMouseMove = (e) => {
     if (!isDragging.current) return;
     e.preventDefault();
@@ -34,9 +33,7 @@ export default function NewProduct() {
     const walk = (x - startX.current) * 1.5;
     if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - walk;
   };
-
   const stopDrag = () => { isDragging.current = false; };
-
   const scrollBy = (dir) => {
     if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
   };
@@ -55,12 +52,18 @@ export default function NewProduct() {
               <span className="np-bounce">⟶</span> Geser untuk melihat lebih banyak
             </div>
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="flex gap-2">
             {[["‹", -1], ["›", 1]].map(([icon, dir]) => (
-              <button key={dir} onClick={() => scrollBy(dir)} style={{ width: 40, height: 40, borderRadius: "50%", background: "#fff", border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, color: "#374151", transition: "all 0.2s ease", padding: 0 }}
+              <button
+                key={dir}
+                onClick={() => scrollBy(dir)}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 cursor-pointer transition-all duration-200"
+                style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 0 }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
-              >{icon}</button>
+              >
+                {icon}
+              </button>
             ))}
           </div>
         </div>
@@ -69,14 +72,16 @@ export default function NewProduct() {
         <div style={{ marginBottom: -8, paddingBottom: 8, overflow: "hidden" }}>
           <div
             ref={(el) => { scrollRef.current = el; cardsRef.current = el; }}
-            style={{ display: "flex", gap: 20, overflowX: "auto", overflowY: "visible", scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
+            className="flex gap-5 overflow-x-auto overflow-y-visible"
+            style={{ scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
             {products.map((product, index) => (
-              <div key={index} style={{ flexShrink: 0 }}>
+              // ── sama persis dengan TopProduct: flex 0 0 220px, minWidth 220 ──
+              <div key={index} style={{ flex: "0 0 220px", minWidth: 220 }}>
                 <ProductCard
                   product={{ ...product, id: index + 1 }}
                   saved={saved[index]}

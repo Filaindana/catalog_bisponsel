@@ -1,6 +1,7 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
+@import "tailwindcss";
 
 /* ── Root Design System ───────────────────── */
 :root {
@@ -50,7 +51,6 @@ body {
 /* ── Swiper Navigation ───────────────────── */
 .category-swiper .swiper-button-prev,
 .category-swiper .swiper-button-next {
-<<<<<<< HEAD
   width: 40px !important;
   height: 40px !important;
   border-radius: 50%;
@@ -68,7 +68,6 @@ body {
 .category-swiper .swiper-button-next::after {
   font-size: 6px !important;
   font-weight: 700;
-=======
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -78,7 +77,6 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.25s ease;
   top: 42%;
->>>>>>> bb39475eacc90c0e9de776d5e76c3b3628f47b67
 }
 
 .category-swiper .swiper-button-prev:hover,

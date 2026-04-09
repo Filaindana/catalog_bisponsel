@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
+// import "./index.css";
 
 // Admin layout components
 import AdminNavbar from "./components/admin/Navbar.jsx";

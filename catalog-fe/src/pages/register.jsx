@@ -69,10 +69,6 @@ export default function Register() {
       alert(err.message);
     }
   };
-  // const navigate = useNavigate();
-  // const [showPassword, setShowPassword] = useState(false);
-  // const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  // const [agreeTerms, setAgreeTerms] = useState(false);
 
   const onFocus = (e) => {
     e.currentTarget.style.border = "1px solid #072B50";
@@ -84,7 +80,6 @@ export default function Register() {
   };
 
   return (
-    // <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
     <div
       style={{
         minHeight: "100vh",
@@ -462,21 +457,6 @@ export default function Register() {
             <div style={{ flex: 1, height: 1, background: "#e5e7eb" }} />
           </div>
 
-          {/* GOOGLE */}
-          {/* <div style={{ display: "flex", justifyContent: "center" }}>
-              <GoogleLogin
-                onSuccess={(r) => {
-                  console.log(r);
-                  navigate("/");
-                }}
-                onError={() => console.log("Daftar Google gagal")}
-                theme="outline"
-                shape="pill"
-                size="large"
-                text="signup_with"
-              />
-            </div> */}
-
           <p
             style={{
               textAlign: "center",
@@ -506,6 +486,5 @@ export default function Register() {
         </div>
       </div>
     </div>
-    // </GoogleOAuthProvider>
   );
 }

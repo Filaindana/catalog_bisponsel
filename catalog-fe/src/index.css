@@ -1,37 +1,56 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* ── Custom scrollbar ─────────────────────── */
-::-webkit-scrollbar { height: 6px; }
-::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-
+/* ── Root Design System ───────────────────── */
 :root {
+  --primary: #072b50;
+  --primary-light: #3b82f6;
+  --primary-soft: #60a5fa;
+  --text-dark: #1a1a1a;
+  --gray: #e5e7eb;
+
   font-family: "Inter", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 }
 
-html, body {
+/* ── Base ────────────────────────────────── */
+html,
+body {
   overflow-x: hidden;
   background: #ffffff;
 }
 
-body { font-family: "Inter", sans-serif; }
-
-/* ── Section title ────────────────────────── */
-.section-title {
-  font-family: "Inter", sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #072b50;
+/* ── Scrollbar ───────────────────────────── */
+::-webkit-scrollbar {
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
 }
 
-/* ── No-scrollbar utility ─────────────────── */
-.no-scrollbar { scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
+/* ── Utility ─────────────────────────────── */
+.no-scrollbar {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
-/* ── Category swiper ──────────────────────── */
+/* ── Section Title ───────────────────────── */
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* ── Swiper Navigation ───────────────────── */
 .category-swiper .swiper-button-prev,
 .category-swiper .swiper-button-next {
+<<<<<<< HEAD
   width: 40px !important;
   height: 40px !important;
   border-radius: 50%;
@@ -49,102 +68,125 @@ body { font-family: "Inter", sans-serif; }
 .category-swiper .swiper-button-next::after {
   font-size: 6px !important;
   font-weight: 700;
+=======
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid var(--gray);
+  color: #374151;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.25s ease;
+  top: 42%;
+>>>>>>> bb39475eacc90c0e9de776d5e76c3b3628f47b67
 }
+
 .category-swiper .swiper-button-prev:hover,
 .category-swiper .swiper-button-next:hover {
-  background: #072b50 !important;
-  color: #ffffff !important;
-  border-color: #072b50;
-  box-shadow: 0 6px 16px rgba(7, 43, 80, 0.35);
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
   transform: scale(1.08);
 }
-.category-swiper .swiper-button-disabled { opacity: 0.3 !important; pointer-events: none; }
-.category-circle { transition: all 0.3s ease; }
+
+/* ── Category Hover ──────────────────────── */
+.category-circle {
+  transition: all 0.3s ease;
+}
 .category-swiper .swiper-slide > div:hover .category-circle {
-  background: #f2f3f4 !important;
+  background: #f2f3f4;
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(7, 43, 80, 0.2);
-  border-color: #072b50 !important;
+  border-color: var(--primary);
 }
 
-/* ── Hero animations ──────────────────────── */
-@keyframes hKB {
-  from { transform: scale(1.05); }
-  to   { transform: scale(1); }
+/* ── Hero Animation ─────────────────────── */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-@keyframes hFadeUp {
-  from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
+
+.h-fade {
+  animation: fadeUp 0.6s ease both;
 }
-@keyframes hTagIn {
-  from { opacity: 0; transform: translateX(-10px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-.h-tag  { animation: hTagIn  0.5s 0.00s ease both; }
-.h-h1   { animation: hFadeUp 0.6s 0.10s ease both; }
-.h-desc { animation: hFadeUp 0.6s 0.25s ease both; }
-.h-btn  { animation: hFadeUp 0.6s 0.38s ease both; }
+
+/* ── Button CTA ─────────────────────────── */
 .h-cta {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 11px 26px; border-radius: 50px;
-  background: #fff; color: #072b50;
-  font-size: 14px; font-weight: 700;
-  border: 2px solid #fff; cursor: pointer;
-  transition: background 0.2s, color 0.2s, transform 0.15s;
-  font-family: inherit; outline: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 26px;
+  border-radius: 50px;
+  background: #fff;
+  color: var(--primary);
+  font-weight: 700;
+  border: 2px solid #fff;
+  transition: all 0.2s ease;
 }
-.h-cta:hover { background: transparent; color: #fff; transform: translateY(-2px); }
-.h-dot {
-  width: 12px; height: 12px; border-radius: 50%;
-  cursor: pointer; padding: 0; border: none;
-  transition: background 0.3s ease, transform 0.3s ease;
-  outline: none; flex-shrink: 0;
-}
-.h-dot.on  { background: #ffffff; transform: scale(1.1); }
-.h-dot.off { background: rgba(255,255,255,0.38); }
-.h-dot.off:hover { background: rgba(255,255,255,0.6); }
 
-/* ── ProductCard gradient border ──────────── */
+.h-cta:hover {
+  background: transparent;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Product Card Hover ─────────────────── */
 @keyframes gradientBorder {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
-.pc-gradient-hover {
-  transition: transform 0.2s cubic-bezier(0.2,0.8,0.2,1), background 0.2s ease;
-}
+
 .pc-gradient-hover:hover {
-  background: linear-gradient(135deg,#3b82f6,#072b50,#60a5fa,#3b82f6) !important;
-  background-size: 300% 300% !important;
-  animation: gradientBorder 2s ease infinite;
+  background: linear-gradient(
+    135deg,
+    var(--primary-light),
+    var(--primary),
+    var(--primary-soft)
+  );
+  background-size: 300% 300%;
+  animation: gradientBorder 2s infinite;
   transform: translateY(-4px);
 }
-.pc-gradient-hover:active { transform: scale(0.97) translateY(0); }
 
-/* ── Scroll hint bounce ───────────────────── */
-@keyframes npBounce {
-  0%, 100% { transform: translateX(0); }
-  50%       { transform: translateX(6px); }
-}
-.np-bounce { display: inline-block; animation: npBounce 1.4s ease-in-out infinite; }
-
-/* ── Promo countdown box ──────────────────── */
+/* ── Countdown Box ───────────────────────── */
 .ph-countdown-box {
-  display: flex; align-items: center; justify-content: center;
-  background: #facc15; color: #1a1a1a;
-  font-size: 20px; font-weight: 800;
-  border-radius: 8px; width: 42px; height: 42px;
-  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #facc15;
+  color: var(--text-dark);
+  font-size: 20px;
+  font-weight: 800;
+  border-radius: 8px;
+  width: 42px;
+  height: 42px;
 }
 
-/* ── fadeIn utility ───────────────────────── */
+/* ── Fade In ─────────────────────────────── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.animate-fadeIn { animation: fadeIn 0.2s ease-out; }
 
-/* ── PromoSection swiper pagination ──────── */
-.promo-section-swiper .swiper-pagination { bottom: 8px; }
-.promo-section-swiper .swiper-pagination-bullet { background: #fff; opacity: 0.6; }
-.promo-section-swiper .swiper-pagination-bullet-active { opacity: 1; }
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}

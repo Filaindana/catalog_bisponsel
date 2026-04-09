@@ -1,6 +1,6 @@
 import logo from "../assets/logo.png";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiUser, FiMenu, FiX } from "react-icons/fi";
+import { FiUser } from "react-icons/fi";
 import { useState } from "react";
 
 const navLinks = [
@@ -11,122 +11,191 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const navigate = useNavigate(); 
+
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const getUser = () => {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  };
+
+  const user = getUser(); // ✅ hanya 1x
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
-    <nav className="flex items-center justify-between px-6 md:px-10 py-3.5 border-b border-gray-200 bg-white sticky top-0 z-[100]">
-
+    <nav
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 40px",
+        borderBottom: "1px solid #ddd",
+        background: "#fff",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}
+    >
       {/* LOGO */}
-      <div className="flex items-center gap-2.5">
-        <img src={logo} alt="Logo" className="h-10 object-contain" />
-        <div className="flex flex-col leading-none">
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <img
+          src={logo}
+          alt="Logo"
+          style={{ height: 40, objectFit: "contain" }}
+        />
+        <div
+          style={{ display: "flex", flexDirection: "column", lineHeight: 1 }}
+        >
           <div>
-            <b className="text-lg text-[#FE0808]">BIZ </b>
-            <b className="text-lg text-[#072B50]">PONSEL</b>
+            <b style={{ fontSize: 18, color: "#FE0808" }}>BIZ </b>
+            <b style={{ fontSize: 18, color: "#072B50" }}>PONSEL</b>
           </div>
-          <span className="text-[11px] text-[#072B50] tracking-[2px] font-semibold mt-0.5">
+          <span
+            style={{
+              fontSize: 11,
+              color: "#072B50",
+              letterSpacing: "2px",
+              fontWeight: 600,
+              marginTop: 3,
+            }}
+          >
             CATALOG
           </span>
         </div>
       </div>
 
-      {/* DESKTOP MENU */}
-      <div className="hidden md:flex gap-1">
+      {/* MENU */}
+      <div style={{ display: "flex", gap: 4 }}>
         {navLinks.map(({ to, label, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
-            className={({ isActive }) =>
-              `px-3.5 py-2 rounded-lg text-sm transition ${
-                isActive
-                  ? "text-[#072B50] bg-[#072B501A] font-semibold"
-                  : "text-gray-700 hover:bg-[#072B501A] hover:text-[#072B50]"
-              }`
-            }
+            style={({ isActive }) => ({
+              textDecoration: "none",
+              padding: "8px 14px",
+              borderRadius: 8,
+              color: isActive ? "#072B50" : "#374151",
+              backgroundColor: isActive ? "rgba(7,43,80,0.1)" : "transparent",
+              fontWeight: isActive ? 600 : 400,
+              fontSize: 14,
+              transition: "all 0.2s",
+            })}
+            onMouseEnter={(e) => {
+              if (!e.currentTarget.dataset.active) {
+                e.currentTarget.style.backgroundColor = "rgba(7,43,80,0.1)";
+                e.currentTarget.style.color = "#072B50";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!e.currentTarget.classList.contains("active")) {
+                e.currentTarget.style.backgroundColor = "";
+                e.currentTarget.style.color = "";
+              }
+            }}
           >
             {label}
           </NavLink>
         ))}
       </div>
 
-      {/* DESKTOP LOGIN */}
-      <button
-        onClick={() => navigate("/login")}
-        className="hidden md:flex items-center gap-2 bg-[#072B50] text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-[#0e3d6e] transition"
-      >
-        <span className="bg-white rounded-full p-1 flex items-center justify-center">
-          <FiUser size={16} color="#072B50" />
-        </span>
-        Masuk / Daftar
-      </button>
-
-      {/* HAMBURGER */}
-      <button
-        onClick={() => setOpen(true)}
-        className="md:hidden text-2xl text-[#072B50]"
-      >
-        <FiMenu />
-      </button>
-
-      {/* MOBILE MENU */}
       <div
-        className={`fixed top-0 right-0 h-full w-[260px] bg-white shadow-lg z-[200] transform transition-transform duration-300 ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
+        style={{ position: "relative" }}
+        onMouseEnter={() => setShowDropdown(true)}
+        onMouseLeave={() => setShowDropdown(false)}
       >
-        {/* HEADER */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <span className="font-bold text-[#072B50]">Menu</span>
-          <button onClick={() => setOpen(false)}>
-            <FiX size={22} />
-          </button>
-        </div>
-
-        {/* MENU LIST */}
-        <div className="flex flex-col p-4 gap-2">
-          {navLinks.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm ${
-                  isActive
-                    ? "bg-[#072B501A] text-[#072B50] font-semibold"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-        </div>
-
-        {/* LOGIN */}
-        <div className="p-4 border-t">
-          <button
-            onClick={() => {
-              navigate("/login");
-              setOpen(false);
+        {/* LOGIN BUTTON */}
+        <button
+          onClick={() => navigate(user ? "/profile" : "/login")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            background: "#072B50",
+            color: "#fff",
+            border: "none",
+            borderRadius: 10,
+            padding: "10px 18px",
+            cursor: "pointer",
+            fontSize: 14,
+            fontWeight: 600,
+            transition: "background 0.2s ease",
+            fontFamily: "inherit",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#0e3d6e")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "#072B50")}
+        >
+          <span
+            style={{
+              background: "#fff",
+              borderRadius: "50%",
+              padding: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
-            className="w-full flex items-center justify-center gap-2 bg-[#072B50] text-white rounded-xl py-2 text-sm font-semibold hover:bg-[#0e3d6e] transition"
           >
-            <FiUser size={16} />
-            Masuk / Daftar
-          </button>
-        </div>
-      </div>
+            <FiUser size={16} color="#072B50" />
+          </span>
+          {user ? user.nama : "Masuk / Daftar"}
+        </button>
+        {user && showDropdown && (
+          <div
+            style={{
+              position: "absolute",
+              top: "110%",
+              right: 0,
+              background: "#fff",
+              borderRadius: 10,
+              boxShadow: "0 8px 20px rgba(0,0,0,0.08)",
+              minWidth: 160,
+              overflow: "hidden",
+              zIndex: 100,
+            }}
+          >
+            {/* MY PROFILE */}
+            <div
+              onClick={() => navigate("/profile")}
+              style={{
+                padding: "10px 14px",
+                fontSize: 14,
+                cursor: "pointer",
+                color: "#111827",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#f3f4f6")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+            >
+              My Profile
+            </div>
 
-      {/* OVERLAY */}
-      {open && (
-        <div
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 bg-black/30 z-[150]"
-        />
-      )}
+            {/* LOGOUT */}
+            <div
+              onClick={handleLogout}
+              style={{
+                padding: "10px 14px",
+                fontSize: 14,
+                cursor: "pointer",
+                color: "#dc2626",
+                fontWeight: 600,
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#fef2f2")
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#fff")}
+            >
+              Logout
+            </div>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }

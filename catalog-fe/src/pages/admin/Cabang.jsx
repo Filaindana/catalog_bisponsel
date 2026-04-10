@@ -16,96 +16,35 @@ const inputCls =
 
 const Field = ({ label, children, hint }) => (
   <div>
-    <label
-      style={{
-        display: "block",
-        fontSize: "11px",
-        fontWeight: 800,
-        color: "#6b7280",
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
-        marginBottom: "10px",
-      }}
-    >
+    <label className="block text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.08em] mb-2.5">
       {label}
     </label>
     {children}
-    {hint && (
-      <p
-        style={{
-          fontSize: "11px",
-          color: "#9ca3af",
-          marginTop: "6px",
-          marginBottom: 0,
-        }}
-      >
-        {hint}
-      </p>
-    )}
+    {hint && <p className="text-[11px] text-gray-400 mt-1.5">{hint}</p>}
   </div>
 );
+
+// eslint-disable-next-line no-unused-vars
 
 const Overlay = ({ onClose, children }) => (
   <div
     onClick={onClose}
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(10,15,30,0.6)",
-      backdropFilter: "blur(4px)",
-      zIndex: 1000,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "16px",
-    }}
+    className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+    style={{ background: "rgba(10,15,30,0.6)", backdropFilter: "blur(4px)" }}
   >
     <div onClick={(e) => e.stopPropagation()}>{children}</div>
   </div>
 );
 
 const SectionTitle = ({ icon, title }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      marginBottom: "16px",
-    }}
-  >
-    <div
-      style={{
-        width: "28px",
-        height: "28px",
-        borderRadius: "7px",
-        background: "rgba(7,43,80,0.08)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}
-    >
+  <div className="flex items-center gap-2 mb-4">
+    <div className="w-7 h-7 rounded-[7px] bg-[rgba(7,43,80,0.08)] flex items-center justify-center flex-shrink-0">
       {icon}
     </div>
-    <span
-      style={{
-        fontSize: "11px",
-        fontWeight: 800,
-        color: "#072B50",
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
-      }}
-    >
+    <span className="text-[11px] font-extrabold text-[#072B50] uppercase tracking-[0.08em]">
       {title}
     </span>
-    <div
-      style={{
-        flex: 1,
-        height: "1.5px",
-        background: "rgba(7,43,80,0.07)",
-        marginLeft: "4px",
-      }}
-    />
+    <div className="flex-1 h-[1.5px] bg-[rgba(7,43,80,0.07)] ml-1" />
   </div>
 );
 
@@ -119,225 +58,155 @@ function AddCabangModal({ onClose, onSave }) {
     jamTutup: "",
   });
   const [dragOver, setDragOver] = useState(false);
+  const [preview, setPreview] = useState(null);
+
+  const handleFileDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setPreview(URL.createObjectURL(file));
+    }
+  };
 
   return (
     <Overlay onClose={onClose}>
-      <div
-        style={{
-          width: "560px",
-          background: "#fff",
-          borderRadius: "20px",
-          maxHeight: "90vh",
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: "0 40px 100px rgba(0,0,0,0.3)",
-          overflow: "hidden",
-        }}
-      >
-        {/* HEADER */}
-        <div
-          style={{
-            padding: "24px 32px",
-            borderBottom: "1.5px solid #f1f5f9",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "12px",
-                background: "rgba(7,43,80,0.08)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Building2 size={20} color="#072B50" />
+      <div className="w-[580px] bg-white rounded-[20px] max-h-[92vh] flex flex-col overflow-hidden border border-[#e8edf5]" style={{ boxShadow: "0 8px 40px rgba(7,43,80,0.18)" }}>
+
+        {/* ── HEADER (navy) ── */}
+        <div className="bg-[#072B50] px-7 py-6 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center border border-white/20" style={{ background: "rgba(255,255,255,0.12)" }}>
+              <Building2 size={20} color="white" />
             </div>
             <div>
-              <h2
-                style={{
-                  fontSize: "17px",
-                  fontWeight: 800,
-                  color: "#0f172a",
-                  margin: "0 0 3px",
-                }}
-              >
-                Tambah Cabang Baru
-              </h2>
-              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
-                Isi semua informasi cabang di bawah ini
-              </p>
+              <p className="text-base font-extrabold text-white mb-0.5">Tambah Cabang Baru</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>Lengkapi semua informasi cabang</p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "8px",
-              border: "1.5px solid #e8edf5",
-              background: "#f8faff",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#64748b",
-            }}
-          >
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full border border-white/20" style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.8)" }}>
+              Draft
+            </span>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-lg flex items-center justify-center border border-white/20 cursor-pointer transition-colors hover:bg-white/20"
+              style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+            >
+              <X size={14} />
+            </button>
+          </div>
         </div>
 
-        {/* BODY */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
-          <SectionTitle
-            icon={<Upload size={13} color="#072B50" />}
-            title="Foto Cabang"
-          />
-          <div style={{ marginBottom: "28px" }}>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragOver(true);
-              }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragOver(false);
-              }}
-              style={{
-                border: `2px dashed ${dragOver ? "#072B50" : "rgba(7,43,80,0.2)"}`,
-                borderRadius: "14px",
-                padding: "24px",
-                background: dragOver ? "rgba(7,43,80,0.05)" : "#fafaff",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-            >
-              <div
-                style={{
-                  width: "48px",
-                  height: "48px",
-                  borderRadius: "14px",
-                  background: dragOver ? "#072B50" : "rgba(7,43,80,0.07)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Upload size={20} color={dragOver ? "#fff" : "#072B50"} />
-              </div>
-              <div style={{ textAlign: "center" }}>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    color: "#1e2433",
-                    margin: "0 0 4px",
-                  }}
-                >
-                  Drag & drop foto cabang di sini
-                </p>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#9ca3af",
-                    margin: "0 0 10px",
-                  }}
-                >
-                  atau
-                </p>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "9px 18px",
-                    background: "#072B50",
-                    borderRadius: "9px",
-                  }}
-                >
-                  <Upload size={13} color="#fff" />
-                  <span
-                    style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}
-                  >
-                    Pilih File
-                  </span>
+        {/* ── STEP BAR ── */}
+        <div className="flex items-center px-7 py-3.5 bg-[#f8fafc] border-b border-slate-200 flex-shrink-0">
+          {[
+            { num: 1, label: "Foto & Identitas" },
+            { num: 2, label: "Jam Operasional" },
+            { num: 3, label: "Lokasi" },
+          ].map((s, i) => (
+            <div key={s.num} className="flex items-center flex-1">
+              <div className="flex items-center gap-2">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-extrabold ${i === 0 ? "bg-[#072B50] text-white" : "bg-slate-200 text-slate-400"}`}>
+                  {s.num}
                 </div>
+                <span className={`text-xs font-${i === 0 ? "bold" : "medium"} ${i === 0 ? "text-[#072B50]" : "text-slate-400"}`}>
+                  {s.label}
+                </span>
               </div>
-              <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0 }}>
-                PNG, JPG — Maks. 2MB · Rekomendasi 1200×600px
-              </p>
+              {i < 2 && <div className="flex-1 h-px bg-slate-200 mx-3" />}
             </div>
+          ))}
+        </div>
+
+        {/* ── BODY ── */}
+        <div className="flex-1 overflow-y-auto px-7 py-6">
+
+          {/* Upload zone */}
+          <div className="mb-6">
+            <label className="block text-[11px] font-extrabold text-slate-500 uppercase tracking-[0.07em] mb-2.5">
+              Foto Cabang
+            </label>
+            {preview ? (
+              <div className="relative rounded-[14px] overflow-hidden border border-slate-200" style={{ height: 140 }}>
+                <img src={preview} alt="preview" className="w-full h-full object-cover" />
+                <button
+                  onClick={() => setPreview(null)}
+                  className="absolute top-2.5 right-2.5 w-7 h-7 rounded-lg bg-white/90 border border-slate-200 flex items-center justify-center cursor-pointer text-slate-500 hover:bg-white transition-colors"
+                >
+                  <X size={13} />
+                </button>
+              </div>
+            ) : (
+              <label
+                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={handleFileDrop}
+                className={`flex items-center gap-5 border-2 border-dashed rounded-[14px] px-6 py-5 cursor-pointer transition-all ${
+                  dragOver ? "border-[#072B50] bg-[rgba(7,43,80,0.05)]" : "border-slate-300 bg-[#f8fafc] hover:border-[#072B50] hover:bg-[rgba(7,43,80,0.03)]"
+                }`}
+              >
+                <input type="file" accept="image/*" className="hidden" onChange={handleFileDrop} />
+                <div className={`w-14 h-14 rounded-[14px] flex items-center justify-center flex-shrink-0 transition-colors ${dragOver ? "bg-[#072B50]" : "bg-[#e8edf7]"}`}>
+                  {dragOver
+                    ? <Upload size={22} color="white" />
+                    : <svg width="22" height="22" fill="none" stroke="#072B50" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  }
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-slate-700 mb-0.5">Seret foto ke sini atau klik untuk memilih</p>
+                  <p className="text-xs text-slate-400">PNG, JPG hingga 2MB · Rekomendasi 1200×600px</p>
+                </div>
+                <div className="flex items-center gap-1.5 px-4 py-2 bg-[#072B50] rounded-[9px] flex-shrink-0">
+                  <Upload size={12} color="white" />
+                  <span className="text-xs font-bold text-white">Pilih File</span>
+                </div>
+              </label>
+            )}
           </div>
 
-          <SectionTitle
-            icon={<Building2 size={13} color="#072B50" />}
-            title="Informasi Cabang"
-          />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "18px",
-              marginBottom: "28px",
-            }}
-          >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-              }}
-            >
-              <Field label="Nama Cabang">
+          {/* Nama + Kota */}
+          <div className="grid grid-cols-2 gap-4 mb-5">
+            <Field label="Nama Cabang">
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <Building2 size={14} />
+                </div>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Contoh: Cabang Jakarta Pusat"
-                  className={inputCls}
+                  placeholder="Cabang Jakarta Pusat"
+                  className={`${inputCls} pl-9`}
                 />
-              </Field>
-              <Field label="Kota">
+              </div>
+            </Field>
+            <Field label="Kota">
+              <div className="relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <MapPin size={14} />
+                </div>
                 <input
                   value={form.city}
                   onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  placeholder="Contoh: Jakarta"
-                  className={inputCls}
+                  placeholder="Jakarta"
+                  className={`${inputCls} pl-9`}
                 />
-              </Field>
-            </div>
+              </div>
+            </Field>
           </div>
 
-          <SectionTitle
-            icon={<Clock size={13} color="#072B50" />}
-            title="Jam Operasional"
-          />
-          <div style={{ marginBottom: "28px" }}>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-              }}
-            >
+          {/* Jam Operasional — card */}
+          <div className="rounded-xl border border-[#dce6f0] bg-[#f0f4fb] px-5 py-4 mb-5">
+            <div className="flex items-center gap-2 mb-3.5">
+              <Clock size={14} color="#072B50" />
+              <span className="text-[11px] font-extrabold text-[#072B50] uppercase tracking-[0.07em]">Jam Operasional</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
               <Field label="Jam Buka">
                 <input
                   type="time"
                   value={form.jamBuka}
-                  onChange={(e) =>
-                    setForm({ ...form, jamBuka: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, jamBuka: e.target.value })}
                   className={inputCls}
                 />
               </Field>
@@ -345,116 +214,81 @@ function AddCabangModal({ onClose, onSave }) {
                 <input
                   type="time"
                   value={form.jamTutup}
-                  onChange={(e) =>
-                    setForm({ ...form, jamTutup: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, jamTutup: e.target.value })}
                   className={inputCls}
                 />
               </Field>
             </div>
           </div>
 
-          <SectionTitle
-            icon={<MapPin size={13} color="#072B50" />}
-            title="Lokasi"
-          />
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "18px" }}
-          >
+          {/* Alamat */}
+          <div className="mb-4">
             <Field label="Alamat Lengkap">
               <textarea
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                placeholder="Contoh: Jl. Sudirman No. 123, Jakarta Pusat 10220"
-                className={`${inputCls} h-[88px] resize-none leading-relaxed`}
+                placeholder="Jl. Sudirman No. 123, Jakarta Pusat 10220"
+                className={`${inputCls} h-[84px] resize-none leading-relaxed`}
               />
             </Field>
-            <Field label="Link Google Maps (Opsional)">
+          </div>
+
+          {/* Maps */}
+          <Field
+            label={
+              <span>
+                Link Google Maps{" "}
+                <span className="normal-case font-medium tracking-normal text-slate-400">(opsional)</span>
+              </span>
+            }
+          >
+            <div className="relative">
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                <MapPin size={14} />
+              </div>
               <input
                 value={form.mapsLink}
                 onChange={(e) => setForm({ ...form, mapsLink: e.target.value })}
                 placeholder="https://maps.google.com/..."
-                className={inputCls}
+                className={`${inputCls} pl-9`}
               />
-            </Field>
+            </div>
             {form.mapsLink && (
-              <div
-                style={{
-                  padding: "12px 16px",
-                  background: "rgba(7,43,80,0.06)",
-                  borderRadius: "10px",
-                  border: "1.5px solid rgba(7,43,80,0.12)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <MapPin size={15} color="#072B50" />
-                <span
-                  style={{
-                    fontSize: "12px",
-                    color: "#072B50",
-                    fontWeight: 600,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {form.mapsLink}
-                </span>
+              <div className="mt-2.5 flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border border-[rgba(7,43,80,0.12)] bg-[rgba(7,43,80,0.05)]">
+                <MapPin size={13} color="#072B50" className="flex-shrink-0" />
+                <span className="text-xs text-[#072B50] font-semibold truncate">{form.mapsLink}</span>
               </div>
             )}
-          </div>
+          </Field>
         </div>
 
-        {/* FOOTER */}
-        <div
-          style={{
-            padding: "20px 32px",
-            borderTop: "1.5px solid #f1f5f9",
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "12px",
-            background: "#fafbff",
-            flexShrink: 0,
-          }}
-        >
-          <button
-            onClick={onClose}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              border: "1.5px solid #e2e8f0",
-              background: "#fff",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 700,
-              color: "#64748b",
-              fontFamily: "inherit",
-            }}
-          >
-            Batal
-          </button>
-          <button
-            onClick={() => {
-              onSave(form);
-              onClose();
-            }}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              border: "none",
-              background: "#072B50",
-              color: "#fff",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 700,
-              boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
-              fontFamily: "inherit",
-            }}
-          >
-            Simpan Cabang
-          </button>
+        {/* ── FOOTER ── */}
+        <div className="px-7 py-4 border-t border-slate-100 bg-[#fafbff] flex items-center justify-between flex-shrink-0">
+          <span className="flex items-center gap-1.5 text-xs text-slate-400">
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-slate-400 flex-shrink-0">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+            </svg>
+            Semua field wajib diisi kecuali link maps
+          </span>
+          <div className="flex gap-2.5">
+            <button
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-xl border-[1.5px] border-slate-200 bg-white text-sm font-bold text-slate-500 hover:bg-slate-50 cursor-pointer transition-colors font-[inherit]"
+            >
+              Batal
+            </button>
+            <button
+              onClick={() => { onSave(form); onClose(); }}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-0 bg-[#072B50] text-white text-sm font-bold hover:bg-[#0e3d6e] cursor-pointer transition-colors font-[inherit]"
+            >
+              <svg width="14" height="14" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Simpan Cabang
+            </button>
+          </div>
         </div>
       </div>
     </Overlay>
@@ -462,438 +296,152 @@ function AddCabangModal({ onClose, onSave }) {
 }
 
 const initialCabang = [
-  {
-    id: 1,
-    name: "Cabang Jakarta Pusat",
-    branchId: "BIZ-JKT-001",
-    city: "Jakarta",
-    address: "Jl. Jenderal Sudirman No. 123",
-  },
-  {
-    id: 2,
-    name: "Cabang Bandung",
-    branchId: "BIZ-BDG-002",
-    city: "Bandung",
-    address: "Jl. Asia Afrika No. 45",
-  },
-  {
-    id: 3,
-    name: "Cabang Surabaya",
-    branchId: "BIZ-SBY-003",
-    city: "Surabaya",
-    address: "Jl. Tunjungan No. 88",
-  },
+  { id: 1, name: "Cabang Jakarta Pusat", branchId: "BIZ-JKT-001", city: "Jakarta",  address: "Jl. Jenderal Sudirman No. 123" },
+  { id: 2, name: "Cabang Bandung",       branchId: "BIZ-BDG-002", city: "Bandung",  address: "Jl. Asia Afrika No. 45"        },
+  { id: 3, name: "Cabang Surabaya",      branchId: "BIZ-SBY-003", city: "Surabaya", address: "Jl. Tunjungan No. 88"          },
 ];
 
 export default function CabangPage() {
-  const [cabangs, setCabangs] = useState(initialCabang);
-  const [search, setSearch] = useState("");
+  const [cabangs, setCabangs]         = useState(initialCabang);
+  const [search, setSearch]           = useState("");
   const [selectedCity, setSelectedCity] = useState("All");
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal]     = useState(false);
 
-  const cities = [...new Set(cabangs.map((c) => c.city))];
+  const cities   = [...new Set(cabangs.map((c) => c.city))];
   const filtered = cabangs.filter(
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) &&
-      (selectedCity === "All" || c.city === selectedCity),
+      (selectedCity === "All" || c.city === selectedCity)
   );
 
   return (
     <div>
+
       {/* HEADER */}
-      <div
-        className="flex justify-between items-center"
-        style={{ marginBottom: "32px" }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "14px",
-              background: "#072B50",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+      <div className="flex justify-between items-center mb-8">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-[14px] bg-[#072B50] flex items-center justify-center">
             <Building2 size={22} color="#fff" />
           </div>
           <div>
-            <h1
-              style={{
-                fontSize: "22px",
-                fontWeight: 800,
-                color: "#0f172a",
-                margin: 0,
-              }}
-            >
-              Manajemen Cabang
-            </h1>
-            <p style={{ fontSize: "13px", color: "#94a3b8", margin: 0 }}>
-              Kelola semua cabang toko
-            </p>
+            <h1 className="text-[22px] font-extrabold text-slate-900">Manajemen Cabang</h1>
+            <p className="text-[13px] text-slate-400">Kelola semua cabang toko</p>
           </div>
         </div>
-
         <button
           onClick={() => setShowModal(true)}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            background: "#072B50",
-            color: "#fff",
-            padding: "12px 24px",
-            borderRadius: "12px",
-            border: "none",
-            fontSize: "14px",
-            fontWeight: 700,
-            cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
-            transition: "all 0.2s",
-            fontFamily: "inherit",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#0e4a8a";
-            e.currentTarget.style.transform = "translateY(-1px)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "#072B50";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
+          className="flex items-center gap-2 bg-[#072B50] hover:bg-[#0e4a8a] text-white px-6 py-3 rounded-xl border-0 text-sm font-bold cursor-pointer shadow-[0_4px_14px_rgba(7,43,80,0.3)] transition-all hover:-translate-y-px font-[inherit]"
         >
           <Plus size={16} /> Tambah Cabang
         </button>
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-3 gap-6" style={{ marginBottom: "32px" }}>
+      <div className="grid grid-cols-3 gap-6 mb-8">
         {[
-          {
-            icon: <Building2 size={20} color="#fff" />,
-            value: cabangs.length,
-            label: "Total Cabang",
-          },
-          {
-            icon: <MapPin size={20} color="#fff" />,
-            value: cities.length,
-            label: "Kota",
-          },
-          {
-            icon: <Eye size={20} color="#fff" />,
-            value: filtered.length,
-            label: "Ditampilkan",
-          },
+          { icon: <Building2 size={20} color="#fff" />, value: cabangs.length,  label: "Total Cabang" },
+          { icon: <MapPin    size={20} color="#fff" />, value: cities.length,   label: "Kota"         },
+          { icon: <Eye       size={20} color="#fff" />, value: filtered.length, label: "Ditampilkan"  },
         ].map((s, i) => (
-          <div
-            key={i}
-            className="bg-white rounded-2xl border shadow-sm"
-            style={{
-              padding: "24px 28px",
-              display: "flex",
-              alignItems: "center",
-              gap: "20px",
-            }}
-          >
-            <div
-              style={{
-                width: "52px",
-                height: "52px",
-                borderRadius: "14px",
-                background: "#072B50",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexShrink: 0,
-              }}
-            >
+          <div key={i} className="bg-white rounded-2xl border shadow-sm px-7 py-6 flex items-center gap-5">
+            <div className="w-[52px] h-[52px] rounded-[14px] bg-[#072B50] flex items-center justify-center flex-shrink-0">
               {s.icon}
             </div>
             <div>
-              <p
-                style={{
-                  fontSize: "28px",
-                  fontWeight: 800,
-                  color: "#0f172a",
-                  margin: "0 0 2px",
-                  lineHeight: 1,
-                }}
-              >
-                {s.value}
-              </p>
-              <p style={{ fontSize: "13px", color: "#94a3b8", margin: 0 }}>
-                {s.label}
-              </p>
+              <p className="text-[28px] font-extrabold text-slate-900 leading-none mb-0.5">{s.value}</p>
+              <p className="text-[13px] text-slate-400">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* FILTER */}
-      <div
-        className="bg-white rounded-2xl border shadow-sm flex justify-between items-center"
-        style={{ padding: "16px 24px", marginBottom: "24px" }}
-      >
-        <div style={{ position: "relative", width: "300px" }}>
+      <div className="bg-white rounded-2xl border shadow-sm flex justify-between items-center px-6 py-4 mb-6">
+        <div className="relative w-[300px]">
           <svg
-            style={{
-              position: "absolute",
-              left: "14px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#9ca3af",
-            }}
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+            width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" strokeWidth="2"
           >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
           </svg>
           <input
             type="text"
             placeholder="Cari cabang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "10px 16px 10px 42px",
-              borderRadius: "10px",
-              border: "1.5px solid #e8edf5",
-              background: "#f8faff",
-              fontSize: "14px",
-              outline: "none",
-              boxSizing: "border-box",
-              color: "#1e293b",
-            }}
+            className="w-full py-2.5 pl-10 pr-4 rounded-[10px] border-[1.5px] border-[#e8edf5] bg-[#f8faff] text-sm outline-none text-slate-800 focus:border-[#072B50] transition-colors"
           />
         </div>
-
         <select
           value={selectedCity}
           onChange={(e) => setSelectedCity(e.target.value)}
-          style={{
-            padding: "10px 16px",
-            borderRadius: "10px",
-            border: "1.5px solid #e8edf5",
-            background: "#f8faff",
-            fontSize: "14px",
-            outline: "none",
-            color: "#1e293b",
-            cursor: "pointer",
-          }}
+          className="py-2.5 px-4 rounded-[10px] border-[1.5px] border-[#e8edf5] bg-[#f8faff] text-sm outline-none text-slate-800 cursor-pointer"
         >
           <option value="All">Semua Kota</option>
-          {cities.map((city, i) => (
-            <option key={i}>{city}</option>
-          ))}
+          {cities.map((city, i) => <option key={i}>{city}</option>)}
         </select>
       </div>
 
       {/* TABLE */}
       <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
-        <div
-          style={{
-            background: "#072B50",
-            padding: "16px 24px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+
+        {/* Table header bar */}
+        <div className="bg-[#072B50] px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
             <Building2 size={16} color="rgba(255,255,255,0.7)" />
-            <span
-              style={{
-                fontSize: "11px",
-                fontWeight: 800,
-                color: "#fff",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-              }}
-            >
+            <span className="text-[11px] font-extrabold text-white uppercase tracking-[0.1em]">
               Katalog Cabang
             </span>
           </div>
-          <span
-            style={{
-              fontSize: "13px",
-              color: "rgba(255,255,255,0.6)",
-              fontWeight: 500,
-            }}
-          >
-            {filtered.length} total cabang
-          </span>
+          <span className="text-[13px] text-white/60 font-medium">{filtered.length} total cabang</span>
         </div>
 
         <table className="w-full">
           <thead>
-            <tr
-              style={{
-                background: "#f8faff",
-                borderBottom: "1.5px solid #f1f5f9",
-              }}
-            >
+            <tr className="bg-[#f8faff] border-b-[1.5px] border-slate-100">
               {["Nama", "Kota", "Alamat", "Aksi"].map((h, i) => (
                 <th
                   key={i}
-                  style={{
-                    padding: "14px 24px",
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    color: "#94a3b8",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                    textAlign: i === 3 ? "right" : "left",
-                  }}
+                  className={`px-6 py-3.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.08em] ${i === 3 ? "text-right" : "text-left"}`}
                 >
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-
           <tbody>
             {filtered.map((item) => (
               <tr
                 key={item.id}
-                style={{
-                  borderTop: "1px solid #f1f5f9",
-                  transition: "background 0.15s",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "#fafbff")
-                }
-                onMouseLeave={(e) => (e.currentTarget.style.background = "")}
+                className="border-t border-slate-100 hover:bg-[#fafbff] transition-colors"
               >
-                <td style={{ padding: "18px 24px" }}>
-                  <p
-                    style={{
-                      fontWeight: 700,
-                      fontSize: "14px",
-                      color: "#0f172a",
-                      margin: "0 0 3px",
-                    }}
-                  >
-                    {item.name}
-                  </p>
-                  <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
-                    {item.branchId}
-                  </p>
+                <td className="px-6 py-[18px]">
+                  <p className="font-bold text-sm text-slate-900 mb-0.5">{item.name}</p>
+                  <p className="text-xs text-slate-400">{item.branchId}</p>
                 </td>
-                <td style={{ padding: "18px 24px" }}>
-                  <span
-                    style={{
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      color: "#072B50",
-                    }}
-                  >
-                    {item.city}
-                  </span>
+                <td className="px-6 py-[18px]">
+                  <span className="text-sm font-semibold text-[#072B50]">{item.city}</span>
                 </td>
-                <td
-                  style={{
-                    padding: "18px 24px",
-                    fontSize: "14px",
-                    color: "#64748b",
-                  }}
-                >
-                  {item.address}
-                </td>
-                <td style={{ padding: "18px 24px", textAlign: "right" }}>
-                  <div style={{ display: "inline-flex", gap: "8px" }}>
-                    <button
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
-                        border: "none",
-                        background: "rgba(7,43,80,0.08)",
-                        color: "#072B50",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "background 0.15s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background =
-                          "rgba(7,43,80,0.16)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background =
-                          "rgba(7,43,80,0.08)")
-                      }
-                    >
+                <td className="px-6 py-[18px] text-sm text-slate-500">{item.address}</td>
+                <td className="px-6 py-[18px] text-right">
+                  <div className="inline-flex gap-2">
+                    <button className="w-9 h-9 rounded-[10px] border-0 bg-[rgba(7,43,80,0.08)] text-[#072B50] cursor-pointer flex items-center justify-center hover:bg-[rgba(7,43,80,0.16)] transition-colors">
                       <Eye size={15} />
                     </button>
-                    <button
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
-                        border: "none",
-                        background: "#fef9c3",
-                        color: "#b45309",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "background 0.15s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background = "#fef08a")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "#fef9c3")
-                      }
-                    >
+                    <button className="w-9 h-9 rounded-[10px] border-0 bg-yellow-100 text-amber-700 cursor-pointer flex items-center justify-center hover:bg-yellow-200 transition-colors">
                       <Pencil size={15} />
                     </button>
-                    <button
-                      style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
-                        border: "none",
-                        background: "#fee2e2",
-                        color: "#dc2626",
-                        cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        transition: "background 0.15s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background = "#fecaca")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background = "#fee2e2")
-                      }
-                    >
+                    <button className="w-9 h-9 rounded-[10px] border-0 bg-red-100 text-red-600 cursor-pointer flex items-center justify-center hover:bg-red-200 transition-colors">
                       <Trash2 size={15} />
                     </button>
                   </div>
                 </td>
               </tr>
             ))}
-
             {filtered.length === 0 && (
               <tr>
-                <td
-                  colSpan={4}
-                  style={{
-                    padding: "48px 24px",
-                    textAlign: "center",
-                    color: "#94a3b8",
-                    fontSize: "14px",
-                  }}
-                >
+                <td colSpan={4} className="px-6 py-12 text-center text-slate-400 text-sm">
                   Tidak ada cabang ditemukan
                 </td>
               </tr>
@@ -905,7 +453,7 @@ export default function CabangPage() {
       {showModal && (
         <AddCabangModal
           onClose={() => setShowModal(false)}
-          onSave={(data) => {
+          onSave={(data) =>
             setCabangs([
               ...cabangs,
               {
@@ -915,8 +463,8 @@ export default function CabangPage() {
                 city: data.city,
                 address: data.address,
               },
-            ]);
-          }}
+            ])
+          }
         />
       )}
     </div>

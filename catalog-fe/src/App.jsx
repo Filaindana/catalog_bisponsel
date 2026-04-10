@@ -37,17 +37,12 @@ function PublicLayout() {
 /* ── Admin layout ── */
 function AdminLayout() {
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-    >
+    <div className="min-h-screen bg-gray-50">
       <AdminNavbar />
-      <div style={{ display: "flex", flex: 1 }}>
-        <AdminSidebar />
-        <main style={{ flex: 1, overflowY: "auto", background: "#f4f7fe", padding: "60px 64px" }}>
-          {/* ⬇️ INI YANG PENTING */}
-          <Outlet />
-        </main>
-      </div>
+      <AdminSidebar />
+      <main className="ml-[200px] pt-16 p-8">
+        <Outlet />
+      </main>
     </div>
   );
 }

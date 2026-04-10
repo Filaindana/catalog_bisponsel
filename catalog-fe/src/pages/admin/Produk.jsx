@@ -14,6 +14,11 @@ import {
   Check,
   ChevronDown,
   Tag,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  Layers,
+  Camera,
 } from "lucide-react";
 
 const initialProducts = [
@@ -136,7 +141,6 @@ const warnaOptions = [
   "Red",
   "Purple",
 ];
-
 const warnaMap = {
   "Space Gray": "#6b7280",
   Silver: "#d1d5db",
@@ -151,72 +155,9 @@ const warnaMap = {
 
 const inputCls =
   "w-full px-4 py-[13px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] text-[14px] outline-none text-[#1e2433] bg-[#f8f9fc] transition-all font-[inherit] focus:border-[#072B50] focus:bg-white";
-
-const Field = ({ label, children, hint }) => (
-  <div>
-    <label
-      className="block text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.8px]"
-      style={{ marginBottom: "10px" }}
-    >
-      {label}
-    </label>
-    {children}
-    {hint && (
-      <p
-        className="text-[11px] text-gray-400 mb-0"
-        style={{ marginTop: "8px" }}
-      >
-        {hint}
-      </p>
-    )}
-  </div>
-);
-
-// ✅ DIPINDAHKAN KE LUAR — tidak lagi di dalam AddProductModal
-const SectionTitle = ({ icon, title }) => (
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      marginBottom: "16px",
-    }}
-  >
-    <div
-      style={{
-        width: "28px",
-        height: "28px",
-        borderRadius: "7px",
-        background: "rgba(7,43,80,0.08)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexShrink: 0,
-      }}
-    >
-      {icon}
-    </div>
-    <span
-      style={{
-        fontSize: "11px",
-        fontWeight: 800,
-        color: "#072B50",
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
-      }}
-    >
-      {title}
-    </span>
-    <div
-      style={{
-        flex: 1,
-        height: "1.5px",
-        background: "rgba(7,43,80,0.07)",
-        marginLeft: "4px",
-      }}
-    />
-  </div>
-);
+const labelCls =
+  "block text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.08em] mb-2";
+const hintCls = "text-[11px] text-gray-400 mt-1.5 mb-0";
 
 const CustomSelect = ({ value, onChange, options, placeholder }) => (
   <div className="relative">
@@ -234,8 +175,7 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => (
     </select>
     <ChevronDown
       size={14}
-      color="#9ca3af"
-      className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
+      className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
     />
   </div>
 );
@@ -243,7 +183,7 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => (
 const Overlay = ({ onClose, children }) => (
   <div
     onClick={onClose}
-    className="fixed inset-0 bg-[rgba(10,15,30,0.6)] backdrop-blur-[4px] z-[1000] flex items-center justify-center p-4"
+    className="fixed inset-0 bg-[rgba(4,10,24,0.72)] backdrop-blur-[6px] z-[1000] flex items-center justify-center p-4"
   >
     <div onClick={(e) => e.stopPropagation()}>{children}</div>
   </div>
@@ -270,16 +210,19 @@ function ViewProductModal({ product, onClose }) {
             <p className="text-[13px] text-white/70 m-0">{product.category}</p>
           </div>
         </div>
-
         <div className="-mt-7 mx-6 grid grid-cols-2 gap-3 relative z-10">
           {[
             {
               label: "Harga",
               value: formatPrice(product.price),
-              color: "#072B50",
+              cls: "text-[#072B50]",
             },
-            { label: "Stok", value: `${product.stock} Unit`, color: "#059669" },
-          ].map(({ label, value, color }) => (
+            {
+              label: "Stok",
+              value: `${product.stock} Unit`,
+              cls: "text-emerald-600",
+            },
+          ].map(({ label, value, cls }) => (
             <div
               key={label}
               className="bg-white rounded-2xl p-4 shadow-[0_4px_20px_rgba(0,0,0,0.12)] text-center"
@@ -287,13 +230,10 @@ function ViewProductModal({ product, onClose }) {
               <p className="text-[11px] text-gray-400 font-bold mb-1.5 uppercase tracking-[0.8px]">
                 {label}
               </p>
-              <p className="text-[15px] font-extrabold m-0" style={{ color }}>
-                {value}
-              </p>
+              <p className={`text-[15px] font-extrabold m-0 ${cls}`}>{value}</p>
             </div>
           ))}
         </div>
-
         <div className="px-7 pt-6 pb-7">
           <div className="flex flex-col gap-2.5 mt-2">
             {[
@@ -316,13 +256,13 @@ function ViewProductModal({ product, onClose }) {
               </div>
             ))}
             <div
-              className={`flex justify-between items-center px-4 py-3 rounded-[10px] border-[1.5px] ${product.promo ? "bg-[#f0fdf4] border-[#bbf7d0]" : "bg-[#fff5f5] border-[#fecaca]"}`}
+              className={`flex justify-between items-center px-4 py-3 rounded-[10px] border-[1.5px] ${product.promo ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"}`}
             >
               <span className="text-[13px] text-gray-500 font-medium">
                 Status Promo
               </span>
               <span
-                className={`text-xs font-bold px-3 py-1 rounded-full ${product.promo ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"}`}
+                className={`text-xs font-bold px-3 py-1 rounded-full ${product.promo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
               >
                 {product.promo ? "✓ Aktif" : "✗ Tidak"}
               </span>
@@ -341,7 +281,14 @@ function ViewProductModal({ product, onClose }) {
 }
 
 // ===================== MODAL TAMBAH =====================
+const STEPS = [
+  { id: 1, label: "Info Produk", icon: Info },
+  { id: 2, label: "Foto & Media", icon: Camera },
+  { id: 3, label: "Harga & Stok", icon: DollarSign },
+];
+
 function AddProductModal({ onClose, onSave }) {
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -360,571 +307,482 @@ function AddProductModal({ onClose, onSave }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div
-        style={{
-          width: "620px",
-          background: "#fff",
-          borderRadius: "20px",
-          maxHeight: "90vh",
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: "0 40px 100px rgba(0,0,0,0.3)",
-          overflow: "hidden",
-        }}
-      >
+      <div className="w-[640px] bg-white rounded-3xl max-h-[92vh] flex flex-col shadow-[0_48px_120px_rgba(0,0,0,0.35)] overflow-hidden">
         {/* HEADER */}
-        <div
-          style={{
-            padding: "24px 32px",
-            borderBottom: "1.5px solid #f1f5f9",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexShrink: 0,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div
-              style={{
-                width: "44px",
-                height: "44px",
-                borderRadius: "12px",
-                background: "rgba(7,43,80,0.08)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+        <div className="bg-gradient-to-br from-[#072B50] via-[#0e4a8a] to-[#1a6fc4] px-8 pt-7 pb-6 relative overflow-hidden shrink-0">
+          {/* decorative circles */}
+          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/[0.05]" />
+          <div className="absolute -bottom-5 left-[40%] w-20 h-20 rounded-full bg-white/[0.04]" />
+
+          {/* Title row */}
+          <div className="relative z-10 flex justify-between items-start mb-6">
+            <div className="flex items-center gap-3.5">
+              <div className="w-[46px] h-[46px] rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center shrink-0">
+                <Sparkles size={20} className="text-white" />
+              </div>
+              <div>
+                <h2 className="text-[18px] font-extrabold text-white m-0 tracking-tight">
+                  Tambah Produk Baru
+                </h2>
+                <p className="text-[12px] text-white/60 mt-0.5 m-0">
+                  Langkah {step} dari {STEPS.length} — {STEPS[step - 1].label}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-9 h-9 rounded-[10px] border border-white/20 bg-white/10 backdrop-blur-sm flex items-center justify-center text-white cursor-pointer shrink-0"
             >
-              <Package size={20} color="#072B50" />
-            </div>
-            <div>
-              <h2
-                style={{
-                  fontSize: "17px",
-                  fontWeight: 800,
-                  color: "#0f172a",
-                  margin: "0 0 3px",
-                }}
-              >
-                Tambah Produk Baru
-              </h2>
-              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
-                Isi semua informasi produk di bawah ini
-              </p>
-            </div>
+              <X size={16} />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              width: "34px",
-              height: "34px",
-              borderRadius: "8px",
-              border: "1.5px solid #e8edf5",
-              background: "#f8faff",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#64748b",
-            }}
-          >
-            <X size={16} />
-          </button>
+
+          {/* Step indicators */}
+          <div className="relative z-10 flex items-center">
+            {STEPS.map((s, i) => {
+              const Icon = s.icon;
+              const done = step > s.id;
+              const active = step === s.id;
+              return (
+                <div
+                  key={s.id}
+                  className={`flex items-center ${i < STEPS.length - 1 ? "flex-1" : ""}`}
+                >
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300
+                      ${done ? "bg-emerald-500" : active ? "bg-white shadow-[0_0_0_4px_rgba(255,255,255,0.2)]" : "bg-white/15 border-[1.5px] border-white/25"}`}
+                    >
+                      {done ? (
+                        <Check
+                          size={16}
+                          className="text-white"
+                          strokeWidth={3}
+                        />
+                      ) : (
+                        <Icon
+                          size={15}
+                          className={
+                            active ? "text-[#072B50]" : "text-white/70"
+                          }
+                        />
+                      )}
+                    </div>
+                    <span
+                      className={`text-[10px] font-bold whitespace-nowrap tracking-wide
+                      ${active ? "text-white" : done ? "text-emerald-300" : "text-white/45"}`}
+                    >
+                      {s.label}
+                    </span>
+                  </div>
+                  {i < STEPS.length - 1 && (
+                    <div className="flex-1 h-0.5 bg-white/15 mx-2 mb-5 rounded overflow-hidden">
+                      <div
+                        className={`h-full bg-emerald-500 transition-all duration-400 ${done ? "w-full" : "w-0"}`}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* BODY */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
-          {/* Informasi Dasar */}
-          <SectionTitle
-            icon={<Info size={13} color="#072B50" />}
-            title="Informasi Dasar"
-          />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "18px",
-              marginBottom: "28px",
-            }}
-          >
-            <Field
-              label="Nama Produk"
-              hint="Gunakan nama yang jelas dan deskriptif"
-            >
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Contoh: iPhone 15 Pro Max 256GB Natural Titanium"
-                className={inputCls}
-              />
-            </Field>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-              }}
-            >
-              <Field label="Kategori">
-                <CustomSelect
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm({ ...form, category: e.target.value })
-                  }
-                  options={kategoriOptions}
-                  placeholder="Pilih kategori..."
-                />
-              </Field>
-              <Field label="Brand">
-                <CustomSelect
-                  value={form.brand}
-                  onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                  options={brandOptions}
-                  placeholder="Pilih brand..."
-                />
-              </Field>
-            </div>
-          </div>
-
-          {/* Deskripsi & Spesifikasi */}
-          <SectionTitle
-            icon={<Tag size={13} color="#072B50" />}
-            title="Deskripsi & Spesifikasi"
-          />
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "18px",
-              marginBottom: "28px",
-            }}
-          >
-            <Field
-              label="Deskripsi Produk"
-              hint="Min. 50 karakter untuk deskripsi yang baik"
-            >
-              <textarea
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-                placeholder="Jelaskan fitur unggulan, keunggulan, dan detail penting produk ini..."
-                className={`${inputCls} h-[100px] resize-none leading-relaxed`}
-              />
-            </Field>
-            <Field label="Spesifikasi Lengkap">
-              <textarea
-                value={form.spesifikasi}
-                onChange={(e) =>
-                  setForm({ ...form, spesifikasi: e.target.value })
-                }
-                placeholder={
-                  "- Chipset: A17 Pro Bionic\n- RAM: 8GB\n- Storage: 256GB NVMe"
-                }
-                className={`${inputCls} h-[90px] resize-none font-mono text-xs leading-[1.7]`}
-              />
-            </Field>
-          </div>
-
-          {/* Foto Produk */}
-          <SectionTitle
-            icon={<ImageIcon size={13} color="#072B50" />}
-            title="Foto Produk"
-          />
-          <div style={{ marginBottom: "28px" }}>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragOver(true);
-              }}
-              onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setDragOver(false);
-              }}
-              style={{
-                border: `2px dashed ${dragOver ? "#072B50" : "rgba(7,43,80,0.2)"}`,
-                borderRadius: "14px",
-                padding: "28px 24px",
-                background: dragOver ? "rgba(7,43,80,0.05)" : "#fafaff",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "10px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-                marginBottom: "14px",
-              }}
-            >
-              <div
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "14px",
-                  background: dragOver ? "#072B50" : "rgba(7,43,80,0.07)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Upload size={22} color={dragOver ? "#fff" : "#072B50"} />
-              </div>
-              <div style={{ textAlign: "center" }}>
-                <p
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    color: "#1e2433",
-                    margin: "0 0 4px",
-                  }}
-                >
-                  Drag & drop foto produk di sini
-                </p>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#9ca3af",
-                    margin: "0 0 12px",
-                  }}
-                >
-                  atau
-                </p>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    padding: "9px 18px",
-                    background: "#072B50",
-                    borderRadius: "9px",
-                  }}
-                >
-                  <Upload size={13} color="#fff" />
-                  <span
-                    style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}
-                  >
-                    Pilih File
-                  </span>
+        <div className="flex-1 overflow-y-auto p-8">
+          {/* STEP 1 */}
+          {step === 1 && (
+            <div className="flex flex-col gap-5">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border-[1.5px] border-blue-200 flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-lg bg-[#072B50] flex items-center justify-center shrink-0">
+                  <Info size={14} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-[#072B50] m-0 mb-0.5">
+                    Informasi Dasar Produk
+                  </p>
+                  <p className="text-[12px] text-blue-500 m-0">
+                    Isi nama, kategori, brand, dan deskripsi produk Anda.
+                  </p>
                 </div>
               </div>
-              <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0 }}>
-                PNG, JPG, WebP — Maks. 5MB per file · Min. 800×800px
-              </p>
-            </div>
 
-            {uploadedFiles.length > 0 && (
+              <div>
+                <label className={labelCls}>Nama Produk</label>
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Contoh: iPhone 15 Pro Max 256GB Natural Titanium"
+                  className={inputCls}
+                />
+                <p className={hintCls}>
+                  Gunakan nama yang jelas dan deskriptif
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Kategori</label>
+                  <CustomSelect
+                    value={form.category}
+                    onChange={(e) =>
+                      setForm({ ...form, category: e.target.value })
+                    }
+                    options={kategoriOptions}
+                    placeholder="Pilih kategori..."
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Brand</label>
+                  <CustomSelect
+                    value={form.brand}
+                    onChange={(e) =>
+                      setForm({ ...form, brand: e.target.value })
+                    }
+                    options={brandOptions}
+                    placeholder="Pilih brand..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>Deskripsi Produk</label>
+                <textarea
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                  placeholder="Jelaskan fitur unggulan, keunggulan, dan detail penting produk ini..."
+                  className={`${inputCls} resize-none leading-relaxed h-[100px]`}
+                />
+                <p className={hintCls}>
+                  Min. 50 karakter untuk deskripsi yang baik
+                </p>
+              </div>
+
+              <div>
+                <label className={labelCls}>Spesifikasi</label>
+                <textarea
+                  value={form.spesifikasi}
+                  onChange={(e) =>
+                    setForm({ ...form, spesifikasi: e.target.value })
+                  }
+                  placeholder={
+                    "- Chipset: A17 Pro Bionic\n- RAM: 8GB\n- Storage: 256GB NVMe"
+                  }
+                  className={`${inputCls} resize-none font-mono text-xs leading-[1.7] h-[88px]`}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2 */}
+          {step === 2 && (
+            <div className="flex flex-col gap-5">
+              <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-4 border-[1.5px] border-purple-200 flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center shrink-0">
+                  <Camera size={14} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-violet-800 m-0 mb-0.5">
+                    Foto & Media Produk
+                  </p>
+                  <p className="text-[12px] text-violet-500 m-0">
+                    Upload minimal 1 foto berkualitas tinggi untuk produk ini.
+                  </p>
+                </div>
+              </div>
+
+              {/* Upload zone */}
               <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
                 }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOver(false);
+                }}
+                className={`rounded-2xl border-2 border-dashed px-6 py-10 flex flex-col items-center gap-3 cursor-pointer transition-all duration-200
+                  ${dragOver ? "border-violet-500 bg-violet-50/50" : "border-[rgba(7,43,80,0.18)] bg-[#fafaff]"}`}
               >
-                {uploadedFiles.map((file, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      background: "#f8f9fc",
-                      borderRadius: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      padding: "14px 16px",
-                      border: "1.5px solid rgba(7,43,80,0.12)",
-                    }}
-                  >
+                <div
+                  className={`w-16 h-16 rounded-[18px] flex items-center justify-center transition-all duration-200
+                  ${dragOver ? "bg-gradient-to-br from-violet-600 to-indigo-600 shadow-[0_8px_24px_rgba(124,58,237,0.3)]" : "bg-[rgba(7,43,80,0.07)]"}`}
+                >
+                  <Upload
+                    size={26}
+                    className={dragOver ? "text-white" : "text-[#072B50]"}
+                  />
+                </div>
+                <div className="text-center">
+                  <p className="text-[15px] font-bold text-[#1e2433] m-0 mb-1">
+                    Drag & drop foto produk di sini
+                  </p>
+                  <p className="text-[13px] text-gray-400 m-0 mb-4">
+                    atau klik tombol di bawah untuk memilih file
+                  </p>
+                  <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#072B50] to-[#0e4a8a] rounded-[10px] shadow-[0_4px_14px_rgba(7,43,80,0.25)]">
+                    <Upload size={14} className="text-white" />
+                    <span className="text-[13px] font-bold text-white">
+                      Pilih File
+                    </span>
+                  </div>
+                </div>
+                <p className="text-[11px] text-gray-400 m-0">
+                  PNG, JPG, WebP · Maks. 5MB per file · Min. 800×800px
+                </p>
+              </div>
+
+              {uploadedFiles.length > 0 && (
+                <div className="flex flex-col gap-2.5">
+                  <p className="text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.08em] mb-1">
+                    File Terupload ({uploadedFiles.length})
+                  </p>
+                  {uploadedFiles.map((file, i) => (
                     <div
-                      style={{
-                        width: "40px",
-                        height: "40px",
-                        borderRadius: "10px",
-                        background:
-                          file.progress === 100
-                            ? "#d1fae5"
-                            : "rgba(7,43,80,0.07)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
+                      key={i}
+                      className="bg-[#f8f9fc] rounded-2xl flex items-center gap-3.5 p-4 border-[1.5px] border-[rgba(7,43,80,0.1)] transition-all"
                     >
-                      {file.progress === 100 ? (
-                        <Check size={16} color="#059669" strokeWidth={3} />
-                      ) : (
-                        <ImageIcon size={16} color="#072B50" />
-                      )}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "6px",
-                        }}
+                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0
+                        ${file.progress === 100 ? "bg-gradient-to-br from-green-100 to-emerald-100" : "bg-[rgba(7,43,80,0.07)]"}`}
                       >
-                        <p
-                          style={{
-                            fontSize: "13px",
-                            fontWeight: 700,
-                            color: "#1e2433",
-                            margin: 0,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                            maxWidth: "200px",
-                          }}
-                        >
-                          {file.name}
+                        {file.progress === 100 ? (
+                          <Check
+                            size={18}
+                            className="text-emerald-600"
+                            strokeWidth={2.5}
+                          />
+                        ) : (
+                          <ImageIcon size={18} className="text-[#072B50]" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between mb-2">
+                          <p className="text-[13px] font-bold text-[#1e2433] m-0 truncate max-w-[200px]">
+                            {file.name}
+                          </p>
+                          <span
+                            className={`text-[12px] font-bold shrink-0 ${file.progress === 100 ? "text-emerald-600" : "text-[#072B50]"}`}
+                          >
+                            {file.progress === 100
+                              ? "✓ Selesai"
+                              : `${file.progress}%`}
+                          </span>
+                        </div>
+                        <div className="h-[5px] bg-[#e8eaf0] rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${file.progress === 100 ? "bg-gradient-to-r from-emerald-500 to-green-600" : "bg-gradient-to-r from-[#072B50] to-[#1a6fc4]"}`}
+                            style={{ width: `${file.progress}%` }}
+                          />
+                        </div>
+                        <p className="text-[11px] text-gray-400 mt-1.5 m-0">
+                          {file.size}
                         </p>
-                        <span
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            color:
-                              file.progress === 100 ? "#059669" : "#072B50",
-                          }}
-                        >
-                          {file.progress === 100
-                            ? "✓ Selesai"
-                            : `${file.progress}%`}
+                      </div>
+                      <button
+                        onClick={() =>
+                          setUploadedFiles(
+                            uploadedFiles.filter((_, idx) => idx !== i),
+                          )
+                        }
+                        className="w-[30px] h-[30px] rounded-lg border-none bg-red-100 cursor-pointer text-red-600 flex items-center justify-center shrink-0"
+                      >
+                        <X size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 3 */}
+          {step === 3 && (
+            <div className="flex flex-col gap-5">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-[1.5px] border-green-200 flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shrink-0">
+                  <DollarSign size={14} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-emerald-900 m-0 mb-0.5">
+                    Harga, Stok & Varian
+                  </p>
+                  <p className="text-[12px] text-emerald-600 m-0">
+                    Tetapkan harga jual, stok, dan pilihan warna produk.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Harga Jual (Rp)</label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-gray-400">
+                      Rp
+                    </span>
+                    <input
+                      type="number"
+                      value={form.price}
+                      onChange={(e) =>
+                        setForm({ ...form, price: e.target.value })
+                      }
+                      placeholder="0"
+                      className={`${inputCls} pl-10`}
+                    />
+                  </div>
+                  {form.price && (
+                    <div className="mt-2 px-3 py-2 bg-[rgba(7,43,80,0.06)] rounded-lg inline-flex items-center gap-1.5">
+                      <Layers size={12} className="text-[#072B50]" />
+                      <span className="text-[12px] text-[#072B50] font-bold">
+                        {formatPrice(Number(form.price))}
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className={labelCls}>Jumlah Stok</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={form.stock}
+                      onChange={(e) =>
+                        setForm({ ...form, stock: e.target.value })
+                      }
+                      placeholder="0"
+                      className={`${inputCls} pr-12`}
+                    />
+                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[12px] font-bold text-gray-400">
+                      Unit
+                    </span>
+                  </div>
+                  {form.stock && (
+                    <div
+                      className={`mt-2 px-3 py-2 rounded-lg inline-flex items-center gap-1.5 ${Number(form.stock) < 10 ? "bg-red-50" : "bg-emerald-50"}`}
+                    >
+                      {Number(form.stock) < 10 ? (
+                        <AlertTriangle size={12} className="text-red-500" />
+                      ) : (
+                        <Check size={12} className="text-emerald-500" />
+                      )}
+                      <span
+                        className={`text-[12px] font-bold ${Number(form.stock) < 10 ? "text-red-500" : "text-emerald-600"}`}
+                      >
+                        {Number(form.stock) < 10
+                          ? "Stok hampir habis"
+                          : "Stok aman"}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label className={labelCls}>Pilihan Warna</label>
+                <CustomSelect
+                  value={form.warna}
+                  onChange={(e) => setForm({ ...form, warna: e.target.value })}
+                  options={warnaOptions}
+                  placeholder="Pilih warna..."
+                />
+              </div>
+
+              {form.warna && (
+                <div className="flex items-center gap-3 bg-[#f8f9fc] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.12)] px-4 py-3.5">
+                  <div
+                    className="w-5 h-5 rounded-full border-2 border-black/10 shadow-md shrink-0"
+                    style={{ background: warnaMap[form.warna] || "#e5e7eb" }}
+                  />
+                  <span className="text-[13px] font-bold text-gray-700">
+                    {form.warna}
+                  </span>
+                  <span className="text-[12px] text-gray-400">dipilih</span>
+                  <div className="ml-auto bg-green-100 px-2.5 py-1 rounded-full">
+                    <span className="text-[11px] font-bold text-green-700">
+                      ✓ Siap
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {(form.name || form.price || form.stock) && (
+                <div className="bg-gradient-to-br from-[#072B50] to-[#0e4a8a] rounded-2xl p-5">
+                  <p className="text-[11px] font-extrabold text-white/50 uppercase tracking-[0.08em] mb-3.5">
+                    Ringkasan Produk
+                  </p>
+                  <div className="flex flex-col gap-2.5">
+                    {[
+                      { label: "Nama", value: form.name || "—" },
+                      { label: "Kategori", value: form.category || "—" },
+                      {
+                        label: "Harga",
+                        value: form.price
+                          ? formatPrice(Number(form.price))
+                          : "—",
+                      },
+                      {
+                        label: "Stok",
+                        value: form.stock ? `${form.stock} Unit` : "—",
+                      },
+                    ].map(({ label, value }) => (
+                      <div
+                        key={label}
+                        className="flex justify-between items-center"
+                      >
+                        <span className="text-[12px] text-white/50 font-semibold">
+                          {label}
+                        </span>
+                        <span className="text-[13px] text-white font-bold max-w-[220px] text-right truncate">
+                          {value}
                         </span>
                       </div>
-                      <div
-                        style={{
-                          height: "4px",
-                          background: "#e8eaf0",
-                          borderRadius: "2px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            height: "100%",
-                            borderRadius: "2px",
-                            width: `${file.progress}%`,
-                            background:
-                              file.progress === 100 ? "#10b981" : "#072B50",
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <button
-                      onClick={() =>
-                        setUploadedFiles(
-                          uploadedFiles.filter((_, idx) => idx !== i),
-                        )
-                      }
-                      style={{
-                        width: "28px",
-                        height: "28px",
-                        borderRadius: "7px",
-                        border: "none",
-                        background: "#fee2e2",
-                        cursor: "pointer",
-                        color: "#dc2626",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <X size={12} />
-                    </button>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Harga & Varian */}
-          <SectionTitle
-            icon={<DollarSign size={13} color="#072B50" />}
-            title="Harga & Varian"
-          />
-          <div
-            style={{ display: "flex", flexDirection: "column", gap: "18px" }}
-          >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "16px",
-              }}
-            >
-              <Field label="Harga Jual (Rp)">
-                <div style={{ position: "relative" }}>
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: "14px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: "#9ca3af",
-                    }}
-                  >
-                    Rp
-                  </span>
-                  <input
-                    type="number"
-                    value={form.price}
-                    onChange={(e) =>
-                      setForm({ ...form, price: e.target.value })
-                    }
-                    placeholder="0"
-                    className={`${inputCls} pl-[38px]`}
-                  />
                 </div>
-                {form.price && (
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: "#072B50",
-                      fontWeight: 600,
-                      marginTop: "5px",
-                      marginBottom: 0,
-                    }}
-                  >
-                    {formatPrice(Number(form.price))}
-                  </p>
-                )}
-              </Field>
-              <Field label="Jumlah Stok">
-                <div style={{ position: "relative" }}>
-                  <input
-                    type="number"
-                    value={form.stock}
-                    onChange={(e) =>
-                      setForm({ ...form, stock: e.target.value })
-                    }
-                    placeholder="0"
-                    className={`${inputCls} pr-[50px]`}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      right: "14px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      color: "#9ca3af",
-                    }}
-                  >
-                    Unit
-                  </span>
-                </div>
-                {form.stock && (
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      marginTop: "5px",
-                      marginBottom: 0,
-                      color: Number(form.stock) < 10 ? "#ef4444" : "#10b981",
-                    }}
-                  >
-                    {Number(form.stock) < 10
-                      ? "⚠ Stok hampir habis"
-                      : "✓ Stok aman"}
-                  </p>
-                )}
-              </Field>
+              )}
             </div>
-            <Field label="Pilihan Warna">
-              <CustomSelect
-                value={form.warna}
-                onChange={(e) => setForm({ ...form, warna: e.target.value })}
-                options={warnaOptions}
-                placeholder="Pilih warna..."
-              />
-            </Field>
-            {form.warna && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  background: "#f8f9fc",
-                  borderRadius: "10px",
-                  border: "1.5px solid rgba(7,43,80,0.12)",
-                  padding: "12px 16px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "20px",
-                    height: "20px",
-                    borderRadius: "50%",
-                    background: warnaMap[form.warna] || "#e5e7eb",
-                    border: "2px solid #e8eaf0",
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    color: "#374151",
-                  }}
-                >
-                  {form.warna}
-                </span>
-                <span style={{ fontSize: "12px", color: "#9ca3af" }}>
-                  dipilih
-                </span>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {/* FOOTER */}
-        <div
-          style={{
-            padding: "20px 32px",
-            borderTop: "1.5px solid #f1f5f9",
-            display: "flex",
-            justifyContent: "flex-end",
-            gap: "12px",
-            background: "#fafbff",
-            flexShrink: 0,
-          }}
-        >
+        <div className="px-8 py-5 border-t-[1.5px] border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
           <button
-            onClick={onClose}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              border: "1.5px solid #e2e8f0",
-              background: "#fff",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 700,
-              color: "#64748b",
-              fontFamily: "inherit",
-            }}
+            onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
+            className="flex items-center gap-1.5 px-5 py-3 rounded-xl border-[1.5px] border-slate-200 bg-white cursor-pointer text-[14px] font-bold text-slate-500 font-[inherit]"
           >
-            Batal
+            <ArrowLeft size={15} />
+            {step === 1 ? "Batal" : "Kembali"}
           </button>
-          <button
-            onClick={() => {
-              onSave(form);
-              onClose();
-            }}
-            style={{
-              padding: "12px 24px",
-              borderRadius: "12px",
-              border: "none",
-              background: "#072B50",
-              color: "#fff",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: 700,
-              boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
-              fontFamily: "inherit",
-            }}
-          >
-            Simpan Produk
-          </button>
+
+          <div className="flex gap-1.5">
+            {STEPS.map((s) => (
+              <div
+                key={s.id}
+                className={`h-1.5 rounded-full transition-all duration-300 ${step === s.id ? "w-5 bg-[#072B50]" : step > s.id ? "w-1.5 bg-[#072B50]" : "w-1.5 bg-slate-200"}`}
+              />
+            ))}
+          </div>
+
+          {step < STEPS.length ? (
+            <button
+              onClick={() => setStep(step + 1)}
+              className="flex items-center gap-1.5 px-6 py-3 rounded-xl border-none bg-gradient-to-r from-[#072B50] to-[#0e4a8a] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_14px_rgba(7,43,80,0.3)] font-[inherit]"
+            >
+              Lanjut <ArrowRight size={15} />
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                onSave(form);
+                onClose();
+              }}
+              className="flex items-center gap-1.5 px-6 py-3 rounded-xl border-none bg-gradient-to-r from-emerald-600 to-green-700 text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_14px_rgba(5,150,105,0.35)] font-[inherit]"
+            >
+              <Check size={15} strokeWidth={3} /> Simpan Produk
+            </button>
+          )}
         </div>
       </div>
     </Overlay>
@@ -1003,17 +861,14 @@ export default function Produk() {
   return (
     <div>
       {/* HEADER */}
-      <div style={{ marginBottom: "48px" }}>
-        <div
-          className="flex justify-between items-start"
-          style={{ marginBottom: "32px" }}
-        >
+      <div className="mb-12">
+        <div className="flex justify-between items-start mb-8">
           <div>
             <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_12px_rgba(7,43,80,0.3)]">
-                <Package size={20} color="#fff" />
+                <Package size={20} className="text-white" />
               </div>
-              <h1 className="text-[26px] font-extrabold text-[#072B50] m-0 tracking-[-0.5px]">
+              <h1 className="text-[26px] font-extrabold text-[#072B50] m-0 tracking-tight">
                 Daftar Produk
               </h1>
             </div>
@@ -1023,57 +878,33 @@ export default function Produk() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "#072B50",
-              color: "#fff",
-              padding: "12px 24px",
-              borderRadius: "12px",
-              border: "none",
-              fontSize: "14px",
-              fontWeight: 700,
-              cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#0e4a8a";
-              e.currentTarget.style.transform = "translateY(-1px)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#072B50";
-              e.currentTarget.style.transform = "translateY(0)";
-            }}
+            className="flex items-center gap-2 bg-[#072B50] text-white px-6 py-3 rounded-xl border-none text-[14px] font-bold cursor-pointer shadow-[0_4px_14px_rgba(7,43,80,0.3)] hover:bg-[#0e4a8a] hover:-translate-y-px transition-all"
           >
             <Plus size={16} /> Tambah Produk
           </button>
         </div>
 
-        {/* STAT CARDS */}
         <div className="grid grid-cols-3 gap-6">
           {[
             {
               label: "Total Produk",
               value: products.length,
-              icon: <Package size={20} color="#fff" />,
+              icon: <Package size={20} className="text-white" />,
             },
             {
               label: "Produk Promo",
               value: promoCount,
-              icon: <Tag size={20} color="#fff" />,
+              icon: <Tag size={20} className="text-white" />,
             },
             {
               label: "Stok Menipis",
               value: lowStockCount,
-              icon: <AlertTriangle size={20} color="#fff" />,
+              icon: <AlertTriangle size={20} className="text-white" />,
             },
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5"
-              style={{ padding: "28px" }}
+              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5 p-7"
             >
               <div className="w-12 h-12 rounded-2xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
                 {icon}
@@ -1093,12 +924,9 @@ export default function Produk() {
 
       {/* TABLE */}
       <div className="bg-white rounded-[20px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
-        <div
-          className="bg-[#072B50] flex items-center justify-between"
-          style={{ padding: "20px 28px" }}
-        >
+        <div className="bg-[#072B50] flex items-center justify-between px-7 py-5">
           <div className="flex items-center gap-2">
-            <Package size={16} color="#fff" />
+            <Package size={16} className="text-white" />
             <span className="text-[13px] font-bold text-white uppercase tracking-[0.8px]">
               Katalog Produk
             </span>
@@ -1115,8 +943,7 @@ export default function Produk() {
                 (h) => (
                   <th
                     key={h}
-                    className={`text-[11px] font-extrabold text-gray-400 tracking-[0.8px] ${h === "AKSI" ? "text-right" : "text-left"}`}
-                    style={{ padding: "18px 24px" }}
+                    className={`text-[11px] font-extrabold text-gray-400 tracking-[0.8px] px-6 py-[18px] ${h === "AKSI" ? "text-right" : "text-left"}`}
                   >
                     {h}
                   </th>
@@ -1128,28 +955,25 @@ export default function Produk() {
             {paginated.map((product, i) => (
               <tr
                 key={product.id}
-                className={`transition-colors hover:bg-[rgba(7,43,80,0.07)] ${i < paginated.length - 1 ? "border-b border-[#f8f9fc]" : ""}`}
+                className={`transition-colors hover:bg-[rgba(7,43,80,0.04)] ${i < paginated.length - 1 ? "border-b border-[#f8f9fc]" : ""}`}
               >
-                <td style={{ padding: "20px 24px" }}>
+                <td className="px-6 py-5">
                   <div className="w-12 h-12 rounded-xl bg-[rgba(7,43,80,0.07)] flex items-center justify-center text-2xl border-[1.5px] border-[rgba(7,43,80,0.15)]">
                     {product.image}
                   </div>
                 </td>
-                <td style={{ padding: "20px 24px" }}>
-                  <p className="text-[14px] font-bold text-[#072B50] mb-0.5">
+                <td className="px-6 py-5">
+                  <p className="text-[14px] font-bold text-[#072B50] mb-0.5 m-0">
                     {product.name}
                   </p>
                   <span className="text-[11px] font-bold text-gray-400 bg-[#f1f3f8] px-2 py-0.5 rounded-md">
                     {product.category}
                   </span>
                 </td>
-                <td
-                  style={{ padding: "20px 24px" }}
-                  className="text-[14px] font-bold text-[#072B50]"
-                >
+                <td className="px-6 py-5 text-[14px] font-bold text-[#072B50]">
                   {formatPrice(product.price)}
                 </td>
-                <td style={{ padding: "20px 24px" }}>
+                <td className="px-6 py-5">
                   <span
                     className={`text-[14px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}
                   >
@@ -1161,14 +985,14 @@ export default function Produk() {
                     </span>
                   )}
                 </td>
-                <td style={{ padding: "20px 24px" }}>
+                <td className="px-6 py-5">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"}`}
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
                   >
                     {product.promo ? "Ya" : "Tidak"}
                   </span>
                 </td>
-                <td style={{ padding: "20px 24px", textAlign: "right" }}>
+                <td className="px-6 py-5 text-right">
                   <div className="flex gap-2 justify-end">
                     <button
                       onClick={() => setViewProduct(product)}
@@ -1195,11 +1019,7 @@ export default function Produk() {
           </tbody>
         </table>
 
-        {/* PAGINATION */}
-        <div
-          className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]"
-          style={{ padding: "18px 28px" }}
-        >
+        <div className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff] px-7 py-[18px]">
           <p className="text-[13px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, products.length)} dari{" "}
@@ -1250,84 +1070,32 @@ export default function Produk() {
       {editProduct && (
         <Overlay onClose={() => setEditProduct(null)}>
           <div className="bg-white rounded-[20px] w-[460px] shadow-[0_32px_80px_rgba(0,0,0,0.25)] overflow-hidden">
-            <div
-              style={{
-                background: "#072B50",
-                padding: "24px 28px",
-                display: "flex",
-                alignItems: "center",
-                gap: "14px",
-              }}
-            >
-              <div
-                style={{
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.15)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Pencil size={18} color="#fff" />
+            <div className="bg-[#072B50] px-7 py-6 flex items-center gap-3.5">
+              <div className="w-[42px] h-[42px] rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                <Pencil size={18} className="text-white" />
               </div>
-              <div style={{ flex: 1 }}>
-                <h2
-                  style={{
-                    fontSize: "16px",
-                    fontWeight: 800,
-                    color: "#fff",
-                    margin: 0,
-                  }}
-                >
+              <div className="flex-1">
+                <h2 className="text-[16px] font-extrabold text-white m-0">
                   Edit Produk
                 </h2>
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(255,255,255,0.65)",
-                    margin: "3px 0 0",
-                  }}
-                >
+                <p className="text-[12px] text-white/65 mt-0.5 m-0">
                   {editProduct.name}
                 </p>
               </div>
               <button
                 onClick={() => setEditProduct(null)}
-                style={{
-                  background: "rgba(255,255,255,0.15)",
-                  border: "none",
-                  borderRadius: "10px",
-                  width: "34px",
-                  height: "34px",
-                  cursor: "pointer",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+                className="bg-white/15 border-none rounded-[10px] w-[34px] h-[34px] cursor-pointer text-white flex items-center justify-center"
               >
                 <X size={16} />
               </button>
             </div>
-            <div
-              style={{
-                padding: "32px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "20px",
-              }}
-            >
+            <div className="p-8 flex flex-col gap-5">
               {[
                 { label: "Nama Produk", key: "name" },
                 { label: "Kategori", key: "category" },
               ].map(({ label, key }) => (
                 <div key={key}>
-                  <label className="block text-[11px] font-extrabold text-gray-400 mb-1.5 uppercase tracking-[0.8px]">
-                    {label}
-                  </label>
+                  <label className={labelCls}>{label}</label>
                   <input
                     value={editForm[key]}
                     onChange={(e) =>
@@ -1343,9 +1111,7 @@ export default function Produk() {
                   { label: "Stok", key: "stock" },
                 ].map(({ label, key }) => (
                   <div key={key}>
-                    <label className="block text-[11px] font-extrabold text-gray-400 mb-1.5 uppercase tracking-[0.8px]">
-                      {label}
-                    </label>
+                    <label className={labelCls}>{label}</label>
                     <input
                       type="number"
                       value={editForm[key]}
@@ -1375,39 +1141,16 @@ export default function Produk() {
                   </p>
                 </div>
               </label>
-              <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+              <div className="flex gap-3 mt-2">
                 <button
                   onClick={() => setEditProduct(null)}
-                  style={{
-                    flex: 1,
-                    padding: "13px 20px",
-                    borderRadius: "12px",
-                    border: "1.5px solid rgba(7,43,80,0.15)",
-                    background: "#fff",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    color: "#374151",
-                    fontFamily: "inherit",
-                  }}
+                  className="flex-1 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  style={{
-                    flex: 2,
-                    padding: "13px 20px",
-                    borderRadius: "12px",
-                    border: "none",
-                    background: "#072B50",
-                    color: "#fff",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
-                    fontFamily: "inherit",
-                  }}
+                  className="flex-[2] py-3.5 rounded-xl border-none bg-[#072B50] text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_14px_rgba(7,43,80,0.3)] font-[inherit]"
                 >
                   Simpan Perubahan
                 </button>
@@ -1423,7 +1166,7 @@ export default function Produk() {
           <div className="bg-white rounded-[20px] w-[380px] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.25)]">
             <div className="bg-gradient-to-br from-red-500 to-red-600 py-8 px-7 text-center">
               <div className="w-16 h-16 rounded-[20px] bg-white/20 flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle size={30} color="#fff" />
+                <AlertTriangle size={30} className="text-white" />
               </div>
               <h3 className="text-[20px] font-extrabold text-white mb-2">
                 Hapus Produk?
@@ -1434,39 +1177,16 @@ export default function Produk() {
                 Produk akan dihapus permanen.
               </p>
             </div>
-            <div style={{ padding: "24px 28px", display: "flex", gap: "12px" }}>
+            <div className="flex gap-3 p-7">
               <button
                 onClick={() => setDeleteId(null)}
-                style={{
-                  flex: 1,
-                  padding: "13px 20px",
-                  borderRadius: "12px",
-                  border: "1.5px solid rgba(7,43,80,0.15)",
-                  background: "#fff",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: "#374151",
-                  fontFamily: "inherit",
-                }}
+                className="flex-1 py-3.5 rounded-xl border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] font-bold text-gray-700 font-[inherit]"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                style={{
-                  flex: 1,
-                  padding: "13px 20px",
-                  borderRadius: "12px",
-                  border: "none",
-                  background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
-                  fontFamily: "inherit",
-                }}
+                className="flex-1 py-3.5 rounded-xl border-none bg-gradient-to-r from-red-500 to-red-600 text-white cursor-pointer text-[14px] font-bold shadow-[0_4px_14px_rgba(239,68,68,0.35)] font-[inherit]"
               >
                 Ya, Hapus
               </button>

@@ -154,11 +154,67 @@ const inputCls =
 
 const Field = ({ label, children, hint }) => (
   <div>
-    <label className="block text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.8px]" style={{ marginBottom: "10px" }}>
+    <label
+      className="block text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.8px]"
+      style={{ marginBottom: "10px" }}
+    >
       {label}
     </label>
     {children}
-    {hint && <p className="text-[11px] text-gray-400 mb-0" style={{ marginTop: "8px" }}>{hint}</p>}
+    {hint && (
+      <p
+        className="text-[11px] text-gray-400 mb-0"
+        style={{ marginTop: "8px" }}
+      >
+        {hint}
+      </p>
+    )}
+  </div>
+);
+
+// ✅ DIPINDAHKAN KE LUAR — tidak lagi di dalam AddProductModal
+const SectionTitle = ({ icon, title }) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      marginBottom: "16px",
+    }}
+  >
+    <div
+      style={{
+        width: "28px",
+        height: "28px",
+        borderRadius: "7px",
+        background: "rgba(7,43,80,0.08)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexShrink: 0,
+      }}
+    >
+      {icon}
+    </div>
+    <span
+      style={{
+        fontSize: "11px",
+        fontWeight: 800,
+        color: "#072B50",
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+      }}
+    >
+      {title}
+    </span>
+    <div
+      style={{
+        flex: 1,
+        height: "1.5px",
+        background: "rgba(7,43,80,0.07)",
+        marginLeft: "4px",
+      }}
+    />
   </div>
 );
 
@@ -302,106 +358,375 @@ function AddProductModal({ onClose, onSave }) {
     { name: "product-side.jpg", progress: 65, size: "0.9 MB" },
   ]);
 
-  const SectionTitle = ({ icon, title }) => (
-    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px" }}>
-      <div style={{ width: "28px", height: "28px", borderRadius: "7px", background: "rgba(7,43,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-        {icon}
-      </div>
-      <span style={{ fontSize: "11px", fontWeight: 800, color: "#072B50", textTransform: "uppercase", letterSpacing: "0.08em" }}>{title}</span>
-      <div style={{ flex: 1, height: "1.5px", background: "rgba(7,43,80,0.07)", marginLeft: "4px" }} />
-    </div>
-  );
-
   return (
     <Overlay onClose={onClose}>
-      <div style={{ width: "620px", background: "#fff", borderRadius: "20px", maxHeight: "90vh", display: "flex", flexDirection: "column", boxShadow: "0 40px 100px rgba(0,0,0,0.3)", overflow: "hidden" }}>
-
+      <div
+        style={{
+          width: "620px",
+          background: "#fff",
+          borderRadius: "20px",
+          maxHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 40px 100px rgba(0,0,0,0.3)",
+          overflow: "hidden",
+        }}
+      >
         {/* HEADER */}
-        <div style={{ padding: "24px 32px", borderBottom: "1.5px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+        <div
+          style={{
+            padding: "24px 32px",
+            borderBottom: "1.5px solid #f1f5f9",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexShrink: 0,
+          }}
+        >
           <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div style={{ width: "44px", height: "44px", borderRadius: "12px", background: "rgba(7,43,80,0.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div
+              style={{
+                width: "44px",
+                height: "44px",
+                borderRadius: "12px",
+                background: "rgba(7,43,80,0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Package size={20} color="#072B50" />
             </div>
             <div>
-              <h2 style={{ fontSize: "17px", fontWeight: 800, color: "#0f172a", margin: "0 0 3px" }}>Tambah Produk Baru</h2>
-              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>Isi semua informasi produk di bawah ini</p>
+              <h2
+                style={{
+                  fontSize: "17px",
+                  fontWeight: 800,
+                  color: "#0f172a",
+                  margin: "0 0 3px",
+                }}
+              >
+                Tambah Produk Baru
+              </h2>
+              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
+                Isi semua informasi produk di bawah ini
+              </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ width: "34px", height: "34px", borderRadius: "8px", border: "1.5px solid #e8edf5", background: "#f8faff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>
+          <button
+            onClick={onClose}
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "8px",
+              border: "1.5px solid #e8edf5",
+              background: "#f8faff",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#64748b",
+            }}
+          >
             <X size={16} />
           </button>
         </div>
 
         {/* BODY */}
         <div style={{ flex: 1, overflowY: "auto", padding: "28px 32px" }}>
-
           {/* Informasi Dasar */}
-          <SectionTitle icon={<Info size={13} color="#072B50" />} title="Informasi Dasar" />
-          <div style={{ display: "flex", flexDirection: "column", gap: "18px", marginBottom: "28px" }}>
-            <Field label="Nama Produk" hint="Gunakan nama yang jelas dan deskriptif">
-              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Contoh: iPhone 15 Pro Max 256GB Natural Titanium" className={inputCls} />
+          <SectionTitle
+            icon={<Info size={13} color="#072B50" />}
+            title="Informasi Dasar"
+          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "18px",
+              marginBottom: "28px",
+            }}
+          >
+            <Field
+              label="Nama Produk"
+              hint="Gunakan nama yang jelas dan deskriptif"
+            >
+              <input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Contoh: iPhone 15 Pro Max 256GB Natural Titanium"
+                className={inputCls}
+              />
             </Field>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "16px",
+              }}
+            >
               <Field label="Kategori">
-                <CustomSelect value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} options={kategoriOptions} placeholder="Pilih kategori..." />
+                <CustomSelect
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm({ ...form, category: e.target.value })
+                  }
+                  options={kategoriOptions}
+                  placeholder="Pilih kategori..."
+                />
               </Field>
               <Field label="Brand">
-                <CustomSelect value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} options={brandOptions} placeholder="Pilih brand..." />
+                <CustomSelect
+                  value={form.brand}
+                  onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                  options={brandOptions}
+                  placeholder="Pilih brand..."
+                />
               </Field>
             </div>
           </div>
 
           {/* Deskripsi & Spesifikasi */}
-          <SectionTitle icon={<Tag size={13} color="#072B50" />} title="Deskripsi & Spesifikasi" />
-          <div style={{ display: "flex", flexDirection: "column", gap: "18px", marginBottom: "28px" }}>
-            <Field label="Deskripsi Produk" hint="Min. 50 karakter untuk deskripsi yang baik">
-              <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Jelaskan fitur unggulan, keunggulan, dan detail penting produk ini..." className={`${inputCls} h-[100px] resize-none leading-relaxed`} />
+          <SectionTitle
+            icon={<Tag size={13} color="#072B50" />}
+            title="Deskripsi & Spesifikasi"
+          />
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "18px",
+              marginBottom: "28px",
+            }}
+          >
+            <Field
+              label="Deskripsi Produk"
+              hint="Min. 50 karakter untuk deskripsi yang baik"
+            >
+              <textarea
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
+                placeholder="Jelaskan fitur unggulan, keunggulan, dan detail penting produk ini..."
+                className={`${inputCls} h-[100px] resize-none leading-relaxed`}
+              />
             </Field>
             <Field label="Spesifikasi Lengkap">
-              <textarea value={form.spesifikasi} onChange={(e) => setForm({ ...form, spesifikasi: e.target.value })} placeholder={"- Chipset: A17 Pro Bionic\n- RAM: 8GB\n- Storage: 256GB NVMe"} className={`${inputCls} h-[90px] resize-none font-mono text-xs leading-[1.7]`} />
+              <textarea
+                value={form.spesifikasi}
+                onChange={(e) =>
+                  setForm({ ...form, spesifikasi: e.target.value })
+                }
+                placeholder={
+                  "- Chipset: A17 Pro Bionic\n- RAM: 8GB\n- Storage: 256GB NVMe"
+                }
+                className={`${inputCls} h-[90px] resize-none font-mono text-xs leading-[1.7]`}
+              />
             </Field>
           </div>
 
           {/* Foto Produk */}
-          <SectionTitle icon={<ImageIcon size={13} color="#072B50" />} title="Foto Produk" />
+          <SectionTitle
+            icon={<ImageIcon size={13} color="#072B50" />}
+            title="Foto Produk"
+          />
           <div style={{ marginBottom: "28px" }}>
             <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
               onDragLeave={() => setDragOver(false)}
-              onDrop={(e) => { e.preventDefault(); setDragOver(false); }}
-              style={{ border: `2px dashed ${dragOver ? "#072B50" : "rgba(7,43,80,0.2)"}`, borderRadius: "14px", padding: "28px 24px", background: dragOver ? "rgba(7,43,80,0.05)" : "#fafaff", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", cursor: "pointer", transition: "all 0.2s", marginBottom: "14px" }}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragOver(false);
+              }}
+              style={{
+                border: `2px dashed ${dragOver ? "#072B50" : "rgba(7,43,80,0.2)"}`,
+                borderRadius: "14px",
+                padding: "28px 24px",
+                background: dragOver ? "rgba(7,43,80,0.05)" : "#fafaff",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "10px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                marginBottom: "14px",
+              }}
             >
-              <div style={{ width: "50px", height: "50px", borderRadius: "14px", background: dragOver ? "#072B50" : "rgba(7,43,80,0.07)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  borderRadius: "14px",
+                  background: dragOver ? "#072B50" : "rgba(7,43,80,0.07)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <Upload size={22} color={dragOver ? "#fff" : "#072B50"} />
               </div>
               <div style={{ textAlign: "center" }}>
-                <p style={{ fontSize: "14px", fontWeight: 700, color: "#1e2433", margin: "0 0 4px" }}>Drag & drop foto produk di sini</p>
-                <p style={{ fontSize: "12px", color: "#9ca3af", margin: "0 0 12px" }}>atau</p>
-                <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", padding: "9px 18px", background: "#072B50", borderRadius: "9px" }}>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#1e2433",
+                    margin: "0 0 4px",
+                  }}
+                >
+                  Drag & drop foto produk di sini
+                </p>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#9ca3af",
+                    margin: "0 0 12px",
+                  }}
+                >
+                  atau
+                </p>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "9px 18px",
+                    background: "#072B50",
+                    borderRadius: "9px",
+                  }}
+                >
                   <Upload size={13} color="#fff" />
-                  <span style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}>Pilih File</span>
+                  <span
+                    style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}
+                  >
+                    Pilih File
+                  </span>
                 </div>
               </div>
-              <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0 }}>PNG, JPG, WebP — Maks. 5MB per file · Min. 800×800px</p>
+              <p style={{ fontSize: "11px", color: "#9ca3af", margin: 0 }}>
+                PNG, JPG, WebP — Maks. 5MB per file · Min. 800×800px
+              </p>
             </div>
 
             {uploadedFiles.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "10px",
+                }}
+              >
                 {uploadedFiles.map((file, i) => (
-                  <div key={i} style={{ background: "#f8f9fc", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", padding: "14px 16px", border: "1.5px solid rgba(7,43,80,0.12)" }}>
-                    <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: file.progress === 100 ? "#d1fae5" : "rgba(7,43,80,0.07)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      {file.progress === 100 ? <Check size={16} color="#059669" strokeWidth={3} /> : <ImageIcon size={16} color="#072B50" />}
+                  <div
+                    key={i}
+                    style={{
+                      background: "#f8f9fc",
+                      borderRadius: "12px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                      padding: "14px 16px",
+                      border: "1.5px solid rgba(7,43,80,0.12)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "10px",
+                        background:
+                          file.progress === 100
+                            ? "#d1fae5"
+                            : "rgba(7,43,80,0.07)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {file.progress === 100 ? (
+                        <Check size={16} color="#059669" strokeWidth={3} />
+                      ) : (
+                        <ImageIcon size={16} color="#072B50" />
+                      )}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-                        <p style={{ fontSize: "13px", fontWeight: 700, color: "#1e2433", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "200px" }}>{file.name}</p>
-                        <span style={{ fontSize: "12px", fontWeight: 700, color: file.progress === 100 ? "#059669" : "#072B50" }}>{file.progress === 100 ? "✓ Selesai" : `${file.progress}%`}</span>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: 700,
+                            color: "#1e2433",
+                            margin: 0,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            maxWidth: "200px",
+                          }}
+                        >
+                          {file.name}
+                        </p>
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            color:
+                              file.progress === 100 ? "#059669" : "#072B50",
+                          }}
+                        >
+                          {file.progress === 100
+                            ? "✓ Selesai"
+                            : `${file.progress}%`}
+                        </span>
                       </div>
-                      <div style={{ height: "4px", background: "#e8eaf0", borderRadius: "2px" }}>
-                        <div style={{ height: "100%", borderRadius: "2px", width: `${file.progress}%`, background: file.progress === 100 ? "#10b981" : "#072B50" }} />
+                      <div
+                        style={{
+                          height: "4px",
+                          background: "#e8eaf0",
+                          borderRadius: "2px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            height: "100%",
+                            borderRadius: "2px",
+                            width: `${file.progress}%`,
+                            background:
+                              file.progress === 100 ? "#10b981" : "#072B50",
+                          }}
+                        />
                       </div>
                     </div>
-                    <button onClick={() => setUploadedFiles(uploadedFiles.filter((_, idx) => idx !== i))} style={{ width: "28px", height: "28px", borderRadius: "7px", border: "none", background: "#fee2e2", cursor: "pointer", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <button
+                      onClick={() =>
+                        setUploadedFiles(
+                          uploadedFiles.filter((_, idx) => idx !== i),
+                        )
+                      }
+                      style={{
+                        width: "28px",
+                        height: "28px",
+                        borderRadius: "7px",
+                        border: "none",
+                        background: "#fee2e2",
+                        cursor: "pointer",
+                        color: "#dc2626",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
                       <X size={12} />
                     </button>
                   </div>
@@ -411,47 +736,193 @@ function AddProductModal({ onClose, onSave }) {
           </div>
 
           {/* Harga & Varian */}
-          <SectionTitle icon={<DollarSign size={13} color="#072B50" />} title="Harga & Varian" />
-          <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+          <SectionTitle
+            icon={<DollarSign size={13} color="#072B50" />}
+            title="Harga & Varian"
+          />
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "18px" }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "16px",
+              }}
+            >
               <Field label="Harga Jual (Rp)">
                 <div style={{ position: "relative" }}>
-                  <span style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "13px", fontWeight: 700, color: "#9ca3af" }}>Rp</span>
-                  <input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="0" className={`${inputCls} pl-[38px]`} />
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: "14px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "#9ca3af",
+                    }}
+                  >
+                    Rp
+                  </span>
+                  <input
+                    type="number"
+                    value={form.price}
+                    onChange={(e) =>
+                      setForm({ ...form, price: e.target.value })
+                    }
+                    placeholder="0"
+                    className={`${inputCls} pl-[38px]`}
+                  />
                 </div>
-                {form.price && <p style={{ fontSize: "12px", color: "#072B50", fontWeight: 600, marginTop: "5px", marginBottom: 0 }}>{formatPrice(Number(form.price))}</p>}
+                {form.price && (
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      color: "#072B50",
+                      fontWeight: 600,
+                      marginTop: "5px",
+                      marginBottom: 0,
+                    }}
+                  >
+                    {formatPrice(Number(form.price))}
+                  </p>
+                )}
               </Field>
               <Field label="Jumlah Stok">
                 <div style={{ position: "relative" }}>
-                  <input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} placeholder="0" className={`${inputCls} pr-[50px]`} />
-                  <span style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", fontSize: "12px", fontWeight: 700, color: "#9ca3af" }}>Unit</span>
+                  <input
+                    type="number"
+                    value={form.stock}
+                    onChange={(e) =>
+                      setForm({ ...form, stock: e.target.value })
+                    }
+                    placeholder="0"
+                    className={`${inputCls} pr-[50px]`}
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      right: "14px",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      color: "#9ca3af",
+                    }}
+                  >
+                    Unit
+                  </span>
                 </div>
                 {form.stock && (
-                  <p style={{ fontSize: "12px", fontWeight: 600, marginTop: "5px", marginBottom: 0, color: Number(form.stock) < 10 ? "#ef4444" : "#10b981" }}>
-                    {Number(form.stock) < 10 ? "⚠ Stok hampir habis" : "✓ Stok aman"}
+                  <p
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: 600,
+                      marginTop: "5px",
+                      marginBottom: 0,
+                      color: Number(form.stock) < 10 ? "#ef4444" : "#10b981",
+                    }}
+                  >
+                    {Number(form.stock) < 10
+                      ? "⚠ Stok hampir habis"
+                      : "✓ Stok aman"}
                   </p>
                 )}
               </Field>
             </div>
             <Field label="Pilihan Warna">
-              <CustomSelect value={form.warna} onChange={(e) => setForm({ ...form, warna: e.target.value })} options={warnaOptions} placeholder="Pilih warna..." />
+              <CustomSelect
+                value={form.warna}
+                onChange={(e) => setForm({ ...form, warna: e.target.value })}
+                options={warnaOptions}
+                placeholder="Pilih warna..."
+              />
             </Field>
             {form.warna && (
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", background: "#f8f9fc", borderRadius: "10px", border: "1.5px solid rgba(7,43,80,0.12)", padding: "12px 16px" }}>
-                <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: warnaMap[form.warna] || "#e5e7eb", border: "2px solid #e8eaf0" }} />
-                <span style={{ fontSize: "13px", fontWeight: 600, color: "#374151" }}>{form.warna}</span>
-                <span style={{ fontSize: "12px", color: "#9ca3af" }}>dipilih</span>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  background: "#f8f9fc",
+                  borderRadius: "10px",
+                  border: "1.5px solid rgba(7,43,80,0.12)",
+                  padding: "12px 16px",
+                }}
+              >
+                <div
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    background: warnaMap[form.warna] || "#e5e7eb",
+                    border: "2px solid #e8eaf0",
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    color: "#374151",
+                  }}
+                >
+                  {form.warna}
+                </span>
+                <span style={{ fontSize: "12px", color: "#9ca3af" }}>
+                  dipilih
+                </span>
               </div>
             )}
           </div>
         </div>
 
         {/* FOOTER */}
-        <div style={{ padding: "20px 32px", borderTop: "1.5px solid #f1f5f9", display: "flex", justifyContent: "flex-end", gap: "12px", background: "#fafbff", flexShrink: 0 }}>
-          <button onClick={onClose} style={{ padding: "12px 24px", borderRadius: "12px", border: "1.5px solid #e2e8f0", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#64748b", fontFamily: "inherit" }}>
+        <div
+          style={{
+            padding: "20px 32px",
+            borderTop: "1.5px solid #f1f5f9",
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "12px",
+            background: "#fafbff",
+            flexShrink: 0,
+          }}
+        >
+          <button
+            onClick={onClose}
+            style={{
+              padding: "12px 24px",
+              borderRadius: "12px",
+              border: "1.5px solid #e2e8f0",
+              background: "#fff",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: 700,
+              color: "#64748b",
+              fontFamily: "inherit",
+            }}
+          >
             Batal
           </button>
-          <button onClick={() => { onSave(form); onClose(); }} style={{ padding: "12px 24px", borderRadius: "12px", border: "none", background: "#072B50", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(7,43,80,0.3)", fontFamily: "inherit" }}>
+          <button
+            onClick={() => {
+              onSave(form);
+              onClose();
+            }}
+            style={{
+              padding: "12px 24px",
+              borderRadius: "12px",
+              border: "none",
+              background: "#072B50",
+              color: "#fff",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: 700,
+              boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
+              fontFamily: "inherit",
+            }}
+          >
             Simpan Produk
           </button>
         </div>
@@ -533,7 +1004,10 @@ export default function Produk() {
     <div>
       {/* HEADER */}
       <div style={{ marginBottom: "48px" }}>
-        <div className="flex justify-between items-start" style={{ marginBottom: "32px" }}>
+        <div
+          className="flex justify-between items-start"
+          style={{ marginBottom: "32px" }}
+        >
           <div>
             <div className="flex items-center gap-3 mb-1.5">
               <div className="w-10 h-10 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_12px_rgba(7,43,80,0.3)]">
@@ -549,9 +1023,29 @@ export default function Produk() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            style={{ display:"flex", alignItems:"center", gap:"8px", background:"#072B50", color:"#fff", padding:"12px 24px", borderRadius:"12px", border:"none", fontSize:"14px", fontWeight:700, cursor:"pointer", boxShadow:"0 4px 14px rgba(7,43,80,0.3)", transition:"all 0.2s" }}
-            onMouseEnter={(e) => { e.currentTarget.style.background="#0e4a8a"; e.currentTarget.style.transform="translateY(-1px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background="#072B50"; e.currentTarget.style.transform="translateY(0)"; }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              background: "#072B50",
+              color: "#fff",
+              padding: "12px 24px",
+              borderRadius: "12px",
+              border: "none",
+              fontSize: "14px",
+              fontWeight: 700,
+              cursor: "pointer",
+              boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
+              transition: "all 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#0e4a8a";
+              e.currentTarget.style.transform = "translateY(-1px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "#072B50";
+              e.currentTarget.style.transform = "translateY(0)";
+            }}
           >
             <Plus size={16} /> Tambah Produk
           </button>
@@ -578,7 +1072,8 @@ export default function Produk() {
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5" style={{ padding: "28px" }}
+              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5"
+              style={{ padding: "28px" }}
             >
               <div className="w-12 h-12 rounded-2xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
                 {icon}
@@ -598,7 +1093,10 @@ export default function Produk() {
 
       {/* TABLE */}
       <div className="bg-white rounded-[20px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
-        <div className="bg-[#072B50] flex items-center justify-between" style={{ padding: "20px 28px" }}>
+        <div
+          className="bg-[#072B50] flex items-center justify-between"
+          style={{ padding: "20px 28px" }}
+        >
           <div className="flex items-center gap-2">
             <Package size={16} color="#fff" />
             <span className="text-[13px] font-bold text-white uppercase tracking-[0.8px]">
@@ -645,19 +1143,28 @@ export default function Produk() {
                     {product.category}
                   </span>
                 </td>
-                <td style={{ padding: "20px 24px" }} className="text-[14px] font-bold text-[#072B50]">
+                <td
+                  style={{ padding: "20px 24px" }}
+                  className="text-[14px] font-bold text-[#072B50]"
+                >
                   {formatPrice(product.price)}
                 </td>
                 <td style={{ padding: "20px 24px" }}>
-                  <span className={`text-[14px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}>
+                  <span
+                    className={`text-[14px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}
+                  >
                     {product.stock}
                   </span>
                   {product.stock < 10 && (
-                    <span className="text-[10px] text-red-500 block font-semibold">Stok menipis</span>
+                    <span className="text-[10px] text-red-500 block font-semibold">
+                      Stok menipis
+                    </span>
                   )}
                 </td>
                 <td style={{ padding: "20px 24px" }}>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-[#dcfce7] text-[#16a34a]" : "bg-[#fee2e2] text-[#dc2626]"}`}
+                  >
                     {product.promo ? "Ya" : "Tidak"}
                   </span>
                 </td>
@@ -689,7 +1196,10 @@ export default function Produk() {
         </table>
 
         {/* PAGINATION */}
-        <div className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]" style={{ padding: "18px 28px" }}>
+        <div
+          className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff]"
+          style={{ padding: "18px 28px" }}
+        >
           <p className="text-[13px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, products.length)} dari{" "}
@@ -740,22 +1250,76 @@ export default function Produk() {
       {editProduct && (
         <Overlay onClose={() => setEditProduct(null)}>
           <div className="bg-white rounded-[20px] w-[460px] shadow-[0_32px_80px_rgba(0,0,0,0.25)] overflow-hidden">
-            <div style={{ background: "#072B50", padding: "24px 28px", display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+            <div
+              style={{
+                background: "#072B50",
+                padding: "24px 28px",
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+              }}
+            >
+              <div
+                style={{
+                  width: "42px",
+                  height: "42px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.15)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
                 <Pencil size={18} color="#fff" />
               </div>
               <div style={{ flex: 1 }}>
-                <h2 style={{ fontSize: "16px", fontWeight: 800, color: "#fff", margin: 0 }}>Edit Produk</h2>
-                <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.65)", margin: "3px 0 0" }}>{editProduct.name}</p>
+                <h2
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: 800,
+                    color: "#fff",
+                    margin: 0,
+                  }}
+                >
+                  Edit Produk
+                </h2>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "rgba(255,255,255,0.65)",
+                    margin: "3px 0 0",
+                  }}
+                >
+                  {editProduct.name}
+                </p>
               </div>
               <button
                 onClick={() => setEditProduct(null)}
-                style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "10px", width: "34px", height: "34px", cursor: "pointer", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}
+                style={{
+                  background: "rgba(255,255,255,0.15)",
+                  border: "none",
+                  borderRadius: "10px",
+                  width: "34px",
+                  height: "34px",
+                  cursor: "pointer",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <X size={16} />
               </button>
             </div>
-            <div style={{ padding: "32px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div
+              style={{
+                padding: "32px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
               {[
                 { label: "Nama Produk", key: "name" },
                 { label: "Kategori", key: "category" },
@@ -814,13 +1378,36 @@ export default function Produk() {
               <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
                 <button
                   onClick={() => setEditProduct(null)}
-                  style={{ flex: 1, padding: "13px 20px", borderRadius: "12px", border: "1.5px solid rgba(7,43,80,0.15)", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#374151", fontFamily: "inherit" }}
+                  style={{
+                    flex: 1,
+                    padding: "13px 20px",
+                    borderRadius: "12px",
+                    border: "1.5px solid rgba(7,43,80,0.15)",
+                    background: "#fff",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#374151",
+                    fontFamily: "inherit",
+                  }}
                 >
                   Batal
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  style={{ flex: 2, padding: "13px 20px", borderRadius: "12px", border: "none", background: "#072B50", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(7,43,80,0.3)", fontFamily: "inherit" }}
+                  style={{
+                    flex: 2,
+                    padding: "13px 20px",
+                    borderRadius: "12px",
+                    border: "none",
+                    background: "#072B50",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    boxShadow: "0 4px 14px rgba(7,43,80,0.3)",
+                    fontFamily: "inherit",
+                  }}
                 >
                   Simpan Perubahan
                 </button>
@@ -850,13 +1437,36 @@ export default function Produk() {
             <div style={{ padding: "24px 28px", display: "flex", gap: "12px" }}>
               <button
                 onClick={() => setDeleteId(null)}
-                style={{ flex: 1, padding: "13px 20px", borderRadius: "12px", border: "1.5px solid rgba(7,43,80,0.15)", background: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, color: "#374151", fontFamily: "inherit" }}
+                style={{
+                  flex: 1,
+                  padding: "13px 20px",
+                  borderRadius: "12px",
+                  border: "1.5px solid rgba(7,43,80,0.15)",
+                  background: "#fff",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  color: "#374151",
+                  fontFamily: "inherit",
+                }}
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                style={{ flex: 1, padding: "13px 20px", borderRadius: "12px", border: "none", background: "linear-gradient(135deg, #ef4444, #dc2626)", color: "#fff", cursor: "pointer", fontSize: "14px", fontWeight: 700, boxShadow: "0 4px 14px rgba(239,68,68,0.35)", fontFamily: "inherit" }}
+                style={{
+                  flex: 1,
+                  padding: "13px 20px",
+                  borderRadius: "12px",
+                  border: "none",
+                  background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                  color: "#fff",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: 700,
+                  boxShadow: "0 4px 14px rgba(239,68,68,0.35)",
+                  fontFamily: "inherit",
+                }}
               >
                 Ya, Hapus
               </button>

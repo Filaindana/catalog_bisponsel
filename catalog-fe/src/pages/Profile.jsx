@@ -421,7 +421,7 @@ export default function Profile() {
                 <p className="text-lg font-extrabold text-white mb-1">{nama}</p>
                 <p className="text-sm text-white/65">{email}</p>
                 <div className="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold text-white/85 border border-white/20" style={{ background: "rgba(255,255,255,0.12)" }}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Member Aktif
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Online
                 </div>
               </div>
             </div>

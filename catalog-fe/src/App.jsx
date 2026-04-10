@@ -22,6 +22,7 @@ import Produk from "./pages/admin/Produk.jsx";
 import PromoAdmin from "./pages/admin/Promo.jsx";
 import Cabang from "./pages/admin/Cabang.jsx";
 import Pengaturan from "./pages/admin/Pengaturan.jsx";
+import Profile from "./pages/Profile.jsx";
 
 /* ── Public layout ── */
 function PublicLayout() {
@@ -69,6 +70,7 @@ function App() {
           {/* <Route path="product/:id" element={<DetailProduct />} /> */}
           <Route path="product/detail" element={<DetailProduct />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* Admin */}

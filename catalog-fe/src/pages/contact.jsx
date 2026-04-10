@@ -161,7 +161,6 @@ function BranchCard({ branch, index, onClick }) {
           {branch.name.replace("Cabang ","")}
         </p>
         <div className="flex items-center gap-2 mb-3.5">
-          <div className="w-5 h-0.5 rounded-full" style={{ background:accent }} />
           <div className="flex-1 h-px" style={{ background:"#dce6f0" }} />
         </div>
         <div className="flex flex-col gap-2.5 flex-1">

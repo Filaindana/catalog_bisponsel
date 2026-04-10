@@ -1,0 +1,492 @@
+import { useState, useRef, useEffect } from "react";
+
+const NAVY = "#072B50";
+const PC_IMG = "https://images.unsplash.com/photo-1593640408182-31c228f37e8e?w=400&q=80";
+const REAL_PW = "password123";
+
+const fmt = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
+
+const initialSaved = [
+  { id: 1, category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB • SSD 1TB", price: 17499000, rating: 4.8, image: PC_IMG },
+  { id: 2, category: "Komputer (PC)", name: "PC Gaming Compact i5 Gen 13", spec: "Core i5 • RTX 3060 • 8GB • SSD 512GB", price: 12999000, rating: 4.6, image: PC_IMG },
+  { id: 3, category: "Komputer (PC)", name: "PC Workstation AMD Threadripper", spec: "Threadripper • RTX 4070 • 32GB • SSD 2TB", price: 29499000, rating: 4.9, image: PC_IMG },
+];
+
+/* ── Icons ── */
+const IconUser = () => (
+  <svg width="15" height="15" fill="none" stroke={NAVY} strokeWidth="2" viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+  </svg>
+);
+const IconMail = () => (
+  <svg width="15" height="15" fill="none" stroke={NAVY} strokeWidth="2" viewBox="0 0 24 24">
+    <rect x="2" y="4" width="20" height="16" rx="2" /><path d="m2 7 10 7 10-7" />
+  </svg>
+);
+const IconCal = () => (
+  <svg width="15" height="15" fill="none" stroke={NAVY} strokeWidth="2" viewBox="0 0 24 24">
+    <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+  </svg>
+);
+const IconLock = () => (
+  <svg width="15" height="15" fill="none" stroke={NAVY} strokeWidth="2" viewBox="0 0 24 24">
+    <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+const IconEdit = () => (
+  <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+const IconX = () => (
+  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <path d="M18 6L6 18M6 6l12 12" />
+  </svg>
+);
+const IconCheck = () => (
+  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const IconEye = ({ off = false }) =>
+  off ? (
+    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  ) : (
+    <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+const IconAlert = () => (
+  <svg width="12" height="12" fill="none" stroke="#ef4444" strokeWidth="2" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" />
+  </svg>
+);
+const IconCheckCircle = () => (
+  <svg width="26" height="26" fill="none" stroke="#16a34a" strokeWidth="2" viewBox="0 0 24 24">
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const IconLogout = () => (
+  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+  </svg>
+);
+const IconBookmark = () => (
+  <svg width="20" height="20" fill="none" stroke={NAVY} strokeWidth="2" viewBox="0 0 24 24">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+);
+const IconBookmarkFill = () => (
+  <svg width="13" height="13" fill="white" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+);
+const IconStar = () => (
+  <svg width="12" height="12" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1" viewBox="0 0 24 24">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+  </svg>
+);
+const IconMailSend = () => (
+  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <rect x="2" y="4" width="20" height="16" rx="2" /><path d="m2 7 10 7 10-7" />
+  </svg>
+);
+
+/* ── Overlay wrapper ── */
+function Overlay({ open, onClose, children }) {
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-content-center p-4"
+      style={{ background: "rgba(7,43,80,0.42)", backdropFilter: "blur(5px)", display: open ? "flex" : "none", alignItems: "center", justifyContent: "center" }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-7 w-full shadow-2xl"
+        style={{ maxWidth: 360, animation: "pop .22s cubic-bezier(.34,1.3,.64,1) both" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </div>
+      <style>{`@keyframes pop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}`}</style>
+    </div>
+  );
+}
+
+/* ── Edit Field Modal ── */
+function EditFieldModal({ field, targetValue, onClose, onSave }) {
+  const [val, setVal] = useState(targetValue);
+  const [err, setErr] = useState("");
+  const inputRef = useRef(null);
+  useEffect(() => { inputRef.current?.focus(); }, []);
+
+  const validate = () => {
+    if (!val.trim()) { setErr(`${field} tidak boleh kosong`); return false; }
+    if (field === "Email") {
+      if (!val.includes("@")) { setErr('Email harus mengandung "@"'); return false; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) { setErr("Format email tidak valid"); return false; }
+    }
+    return true;
+  };
+
+  const handleSave = () => { setErr(""); if (!validate()) return; onSave(val.trim()); onClose(); };
+
+  return (
+    <Overlay open onClose={onClose}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base font-extrabold" style={{ color: NAVY }}>Edit {field}</h3>
+        <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 border-0 cursor-pointer transition-colors">
+          <IconX />
+        </button>
+      </div>
+
+      {/* Input */}
+      <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+        {field === "Email" ? "Alamat Email" : "Nama Lengkap"}
+      </label>
+      <input
+        ref={inputRef}
+        type={field === "Email" ? "email" : "text"}
+        value={val}
+        onChange={(e) => { setVal(e.target.value); setErr(""); }}
+        onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") onClose(); }}
+        placeholder={field === "Email" ? "contoh@email.com" : "Masukkan nama lengkap"}
+        className={`w-full px-4 py-2.5 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${err ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"}`}
+      />
+
+      {/* Error */}
+      {err && (
+        <div className="flex items-center gap-1.5 mt-2">
+          <IconAlert /><span className="text-xs text-red-500">{err}</span>
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="flex gap-2.5 mt-5">
+        <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition-colors">
+          Batal
+        </button>
+        <button onClick={handleSave} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white border-0 cursor-pointer flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity" style={{ background: NAVY }}>
+          <IconCheck /> Simpan
+        </button>
+      </div>
+    </Overlay>
+  );
+}
+
+/* ── Password Modal ── */
+function PasswordModal({ onClose }) {
+  const [oldPw, setOldPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [oldErr, setOldErr] = useState("");
+  const [newErr, setNewErr] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const oldRef = useRef(null);
+  useEffect(() => { oldRef.current?.focus(); }, []);
+
+  const oldCorrect = oldPw === REAL_PW;
+
+  const savePw = () => {
+    setOldErr(""); setNewErr("");
+    let ok = true;
+    if (!oldPw) { setOldErr("Password lama tidak boleh kosong"); ok = false; }
+    else if (!oldCorrect) { setOldErr("Password lama salah"); ok = false; }
+    if (!newPw && ok) { setNewErr("Password baru tidak boleh kosong"); ok = false; }
+    else if (newPw.length < 8 && newPw && ok) { setNewErr("Password baru minimal 8 karakter"); ok = false; }
+    else if (newPw === oldPw && newPw && ok) { setNewErr("Tidak boleh sama dengan password lama"); ok = false; }
+    if (!ok) return;
+    setSuccess(true);
+    setTimeout(() => onClose(), 1500);
+  };
+
+  const sendForgot = () => { if (!forgotEmail.includes("@")) return; setForgotSent(true); };
+
+  if (forgotMode) {
+    return (
+      <Overlay open onClose={onClose}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-base font-extrabold" style={{ color: NAVY }}>Lupa Password</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 border-0 cursor-pointer transition-colors"><IconX /></button>
+        </div>
+        {!forgotSent ? (
+          <>
+            <p className="text-[13px] text-slate-500 leading-relaxed mb-4">Masukkan email yang terdaftar. Kami akan mengirimkan link reset password.</p>
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Email Terdaftar</label>
+            <input
+              type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") sendForgot(); }}
+              placeholder="contoh@email.com" autoFocus
+              className="w-full px-4 py-2.5 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] border-slate-200 bg-slate-50 focus:border-[#072B50] focus:bg-white focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"
+            />
+            <div className="flex gap-2.5 mt-5">
+              <button onClick={() => setForgotMode(false)} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer">Kembali</button>
+              <button onClick={sendForgot} disabled={!forgotEmail.includes("@")}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white border-0 cursor-pointer flex items-center justify-center gap-1.5 transition-opacity"
+                style={{ background: NAVY, opacity: forgotEmail.includes("@") ? 1 : 0.45 }}>
+                <IconMailSend /> Kirim Link
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-3">
+            <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3"><IconCheckCircle /></div>
+            <p className="text-sm font-bold text-green-600 mb-2">Email terkirim!</p>
+            <p className="text-[12.5px] text-slate-500 leading-relaxed mb-4">Link reset password telah dikirim.<br />Cek inbox atau folder spam Anda.</p>
+            <button onClick={onClose} className="w-full py-2.5 rounded-xl text-sm font-bold text-white border-0 cursor-pointer" style={{ background: NAVY }}>Oke, Mengerti</button>
+          </div>
+        )}
+      </Overlay>
+    );
+  }
+
+  return (
+    <Overlay open onClose={onClose}>
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-base font-extrabold" style={{ color: NAVY }}>Ubah Password</h3>
+        <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 border-0 cursor-pointer transition-colors"><IconX /></button>
+      </div>
+
+      {success ? (
+        <div className="text-center py-4">
+          <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3"><IconCheckCircle /></div>
+          <p className="text-sm font-bold text-green-600">Password berhasil diperbarui!</p>
+        </div>
+      ) : (
+        <>
+          {/* Old password */}
+          <div className="mb-4">
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password Lama</label>
+            <div className="relative">
+              <input
+                ref={oldRef} type={showOld ? "text" : "password"} value={oldPw}
+                onChange={(e) => { setOldPw(e.target.value); setOldErr(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") savePw(); }}
+                placeholder="Masukkan password lama"
+                className={`w-full px-4 py-2.5 pr-11 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${oldErr ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"}`}
+              />
+              <button type="button" onClick={() => setShowOld((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 border-0 bg-transparent cursor-pointer flex p-0">
+                <IconEye off={showOld} />
+              </button>
+            </div>
+            {oldErr && <div className="flex items-center gap-1.5 mt-1.5"><IconAlert /><span className="text-xs text-red-500">{oldErr}</span></div>}
+          </div>
+
+          <hr className="border-0 border-t border-slate-100 my-4" />
+
+          {/* New password */}
+          <div className="mb-1">
+            <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password Baru</label>
+            <div className="relative">
+              <input
+                type={showNew ? "text" : "password"} value={newPw}
+                onChange={(e) => { setNewPw(e.target.value); setNewErr(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") savePw(); }}
+                disabled={!oldCorrect && oldPw.length > 0}
+                placeholder={!oldCorrect && oldPw.length > 0 ? "Masukkan password lama yang benar dulu" : "Minimal 8 karakter"}
+                className={`w-full px-4 py-2.5 pr-11 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${newErr ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"} ${!oldCorrect && oldPw.length > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+              />
+              {(oldCorrect || oldPw.length === 0) && (
+                <button type="button" onClick={() => setShowNew((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 border-0 bg-transparent cursor-pointer flex p-0">
+                  <IconEye off={showNew} />
+                </button>
+              )}
+            </div>
+            {newErr && <div className="flex items-center gap-1.5 mt-1.5"><IconAlert /><span className="text-xs text-red-500">{newErr}</span></div>}
+          </div>
+
+          <div className="flex justify-end mt-2 mb-4">
+            <button onClick={() => setForgotMode(true)} className="text-xs font-semibold border-0 bg-transparent cursor-pointer p-0 hover:underline" style={{ color: NAVY }}>
+              Lupa password?
+            </button>
+          </div>
+
+          <div className="flex gap-2.5">
+            <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-slate-500 border border-slate-200 bg-white hover:bg-slate-50 cursor-pointer transition-colors">Batal</button>
+            <button onClick={savePw} className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white border-0 cursor-pointer flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity" style={{ background: NAVY }}>
+              <IconCheck /> Simpan
+            </button>
+          </div>
+        </>
+      )}
+    </Overlay>
+  );
+}
+
+/* ── Info Row ── */
+function InfoRow({ icon, label, value, valueClass = "", onEdit, editLabel = "Edit" }) {
+  return (
+    <div className="flex items-center gap-3.5 px-5 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition-colors">
+      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">{icon}</div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">{label}</p>
+        <p className={`text-sm font-semibold text-slate-800 truncate ${valueClass}`}>{value}</p>
+      </div>
+      {onEdit && (
+        <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-500 hover:bg-blue-50 hover:text-[#072B50] hover:border-blue-200 cursor-pointer transition-all flex-shrink-0">
+          <IconEdit /> {editLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ── Saved Card ── */
+function SavedCard({ item, onRemove }) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-xl shadow-sm">
+      <div className="relative">
+        <img src={item.image} alt={item.name} className="w-full h-40 object-cover block bg-slate-100" onError={(e) => { e.target.style.background = "#f0f4fb"; }} />
+        <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
+          className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center border-0 cursor-pointer hover:scale-110 transition-transform"
+          style={{ background: NAVY }}>
+          <IconBookmarkFill />
+        </button>
+      </div>
+      <div className="p-4">
+        <p className="text-[10.5px] font-bold uppercase tracking-widest text-slate-400 mb-1">{item.category}</p>
+        <h3 className="text-sm font-extrabold leading-snug mb-1.5" style={{ color: NAVY }}>{item.name}</h3>
+        <p className="text-[11.5px] text-slate-500 leading-relaxed mb-3">{item.spec}</p>
+        <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
+          <p className="text-sm font-extrabold text-red-600">{fmt(item.price)}</p>
+          <div className="flex items-center gap-1 text-amber-500 font-bold text-[12.5px]">
+            <IconStar />{item.rating}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════
+   MAIN — Profile Page
+═══════════════════════════════ */
+export default function Profile() {
+  const [tab, setTab] = useState("userdata");
+  const [saved, setSaved] = useState(initialSaved);
+  const [nama, setNama] = useState("Vena Novita");
+  const [email, setEmail] = useState("venanovita@gmail.com");
+  const [editField, setEditField] = useState(null); // "Nama" | "Email" | null
+  const [pwModal, setPwModal] = useState(false);
+
+  const initials = nama.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
+  return (
+    <div className="min-h-screen bg-[#f4f6fb]">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+
+        {/* Title */}
+        <h1 className="text-[26px] font-extrabold tracking-tight mb-7" style={{ color: NAVY }}>Profil Saya</h1>
+
+        {/* Top bar */}
+        <div className="flex items-center justify-between mb-7">
+          <div className="flex gap-1 bg-slate-200 rounded-xl p-1">
+            {[{ key: "userdata", label: "User Data" }, { key: "saved", label: "Saved" }].map((t) => (
+              <button key={t.key} onClick={() => setTab(t.key)}
+                className="px-5 py-2 rounded-[9px] text-[13px] font-semibold border-0 cursor-pointer transition-all duration-200"
+                style={{
+                  background: tab === t.key ? NAVY : "transparent",
+                  color: tab === t.key ? "#fff" : "#64748b",
+                  boxShadow: tab === t.key ? "0 2px 8px rgba(7,43,80,.25)" : "none",
+                }}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+          {tab === "userdata" && (
+            <button className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[13px] font-bold border-0 cursor-pointer transition-colors">
+              <IconLogout /> Logout
+            </button>
+          )}
+        </div>
+
+        {/* USER DATA TAB */}
+        {tab === "userdata" && (
+          <div>
+            {/* Hero card */}
+            <div className="rounded-2xl p-7 mb-5 flex items-center gap-5 shadow-lg" style={{ background: NAVY }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-extrabold text-white flex-shrink-0 border-2 border-white/25" style={{ background: "rgba(255,255,255,0.15)" }}>
+                {initials}
+              </div>
+              <div>
+                <p className="text-lg font-extrabold text-white mb-1">{nama}</p>
+                <p className="text-sm text-white/65">{email}</p>
+                <div className="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold text-white/85 border border-white/20" style={{ background: "rgba(255,255,255,0.12)" }}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Member Aktif
+                </div>
+              </div>
+            </div>
+
+            {/* Informasi Pribadi */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-5 shadow-sm">
+              <div className="flex items-center gap-2.5 px-5 py-3.5 bg-slate-50 border-b border-slate-200">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center"><IconUser /></div>
+                <h2 className="text-[13.5px] font-bold" style={{ color: NAVY }}>Informasi Pribadi</h2>
+              </div>
+              <InfoRow icon={<IconUser />} label="Nama Lengkap" value={nama} onEdit={() => setEditField("Nama")} />
+              <InfoRow icon={<IconMail />} label="Email" value={email} onEdit={() => setEditField("Email")} />
+              <InfoRow icon={<IconCal />} label="Tanggal Bergabung" value="27 Februari 2026" />
+            </div>
+
+            {/* Keamanan */}
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="flex items-center gap-2.5 px-5 py-3.5 bg-slate-50 border-b border-slate-200">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center"><IconLock /></div>
+                <h2 className="text-[13.5px] font-bold" style={{ color: NAVY }}>Keamanan Akun</h2>
+              </div>
+              <InfoRow icon={<IconLock />} label="Password" value="••••••••••" valueClass="tracking-widest text-slate-400" onEdit={() => setPwModal(true)} editLabel="Ubah" />
+            </div>
+          </div>
+        )}
+
+        {/* SAVED TAB */}
+        {tab === "saved" && (
+          <div>
+            <div className="text-center pt-6 pb-5">
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto mb-3">
+                <IconBookmark />
+              </div>
+              <h2 className="text-lg font-extrabold mb-1" style={{ color: NAVY }}>Koleksi Saya</h2>
+              <p className="text-sm text-slate-400">Item yang Anda simpan akan muncul di sini</p>
+            </div>
+
+            {saved.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="text-5xl mb-3">🔖</div>
+                <h3 className="text-sm font-bold mb-1.5" style={{ color: NAVY }}>Belum ada item tersimpan</h3>
+                <p className="text-sm text-slate-400 mb-5">Simpan produk favorit kamu dari halaman produk</p>
+                <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity" style={{ background: NAVY }}>
+                  Jelajahi Produk
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {saved.map((item) => (
+                  <SavedCard key={item.id} item={item} onRemove={(id) => setSaved((p) => p.filter((x) => x.id !== id))} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
+      {editField === "Nama" && (
+        <EditFieldModal field="Nama" targetValue={nama} onClose={() => setEditField(null)} onSave={setNama} />
+      )}
+      {editField === "Email" && (
+        <EditFieldModal field="Email" targetValue={email} onClose={() => setEditField(null)} onSave={setEmail} />
+      )}
+      {pwModal && <PasswordModal onClose={() => setPwModal(false)} />}
+    </div>
+  );
+}

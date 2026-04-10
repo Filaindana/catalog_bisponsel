@@ -26,142 +26,57 @@ export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <div
-      style={{
-        width: "220px",
-        minWidth: "220px",
-        height: "100vh",
-        background: "#fff",
-        borderRight: "1px solid #f1f5f9",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className="fixed top-0 left-0 w-[200px] h-screen bg-white border-r border-slate-100 flex flex-col z-50">
       {/* LOGO */}
-      <div
-        style={{ padding: "20px 16px 16px", borderBottom: "1px solid #f1f5f9" }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div
-            style={{
-              width: "40px",
-              height: "40px",
-              borderRadius: "12px",
-              background: "#072B50",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            <img
-              src={logoImg}
-              alt="Logo"
-              style={{ width: "22px", height: "22px", objectFit: "contain" }}
-            />
+      <div className="px-4 pt-5 pb-4 border-b border-slate-100">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-indigo-700 flex items-center justify-center shrink-0">
+            <img src={logoImg} alt="Logo" className="w-5 h-5 object-contain" />
           </div>
           <div>
-            <h1
-              style={{
-                fontSize: "14px",
-                fontWeight: 800,
-                color: "#0f172a",
-                margin: 0,
-                lineHeight: 1.2,
-              }}
-            >
+            <h1 className="text-[13.5px] font-extrabold text-slate-900 m-0 leading-tight">
               BismarCatalog
             </h1>
-            <p style={{ fontSize: "11px", color: "#94a3b8", margin: 0 }}>
-              Admin Panel
-            </p>
+            <p className="text-[11px] text-slate-400 m-0">Admin Panel</p>
           </div>
         </div>
       </div>
 
       {/* MENU */}
-      <div
-        style={{
-          flex: 1,
-          padding: "10px 10px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "2px",
-        }}
-      >
+      <div className="flex-1 px-2.5 py-3 flex flex-col gap-0.5 overflow-y-auto">
         {menus.map((menu) => {
           const isActive = location.pathname === menu.path;
-
           return (
-            <div
+            <button
               key={menu.path}
               onClick={() => navigate(menu.path)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-                padding: "9px 12px",
-                borderRadius: "10px",
-                cursor: "pointer",
-                fontSize: "13px",
-                fontWeight: 600,
-                transition: "all 0.15s",
-                background: isActive ? "#072B50" : "transparent",
-                color: isActive ? "#fff" : "#64748b",
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.background = "rgba(7,43,80,0.06)";
-                  e.currentTarget.style.color = "#072B50";
+              className={`
+                w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px]
+                text-[13px] font-semibold transition-all duration-150 text-left border-none
+                ${
+                  isActive
+                    ? "bg-indigo-700 text-white cursor-default"
+                    : "bg-transparent text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
                 }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = "#64748b";
-                }
-              }}
+              `}
             >
               <span
-                style={{
-                  color: isActive ? "#fff" : "#94a3b8",
-                  display: "flex",
-                  alignItems: "center",
-                }}
+                className={`flex items-center shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
               >
                 {menu.icon}
               </span>
               {menu.label}
-            </div>
+            </button>
           );
         })}
       </div>
 
       {/* LOG OUT */}
-      <div style={{ padding: "10px 10px 20px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            padding: "9px 12px",
-            borderRadius: "10px",
-            cursor: "pointer",
-            fontSize: "13px",
-            fontWeight: 600,
-            color: "#ef4444",
-            transition: "all 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#fef2f2";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-          }}
-        >
+      <div className="px-2.5 pb-5 pt-2.5 border-t border-slate-100">
+        <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[13px] font-semibold text-red-500 hover:bg-red-50 transition-all duration-150 border-none bg-transparent text-left cursor-pointer">
           <LogOut size={16} />
           Log Out
-        </div>
+        </button>
       </div>
     </div>
   );

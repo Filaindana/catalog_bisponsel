@@ -308,13 +308,9 @@ function AddProductModal({ onClose, onSave }) {
   return (
     <Overlay onClose={onClose}>
       <div className="w-[640px] bg-white rounded-3xl max-h-[92vh] flex flex-col shadow-[0_48px_120px_rgba(0,0,0,0.35)] overflow-hidden">
-        {/* HEADER */}
         <div className="bg-gradient-to-br from-[#072B50] via-[#0e4a8a] to-[#1a6fc4] px-8 pt-7 pb-6 relative overflow-hidden shrink-0">
-          {/* decorative circles */}
           <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/[0.05]" />
           <div className="absolute -bottom-5 left-[40%] w-20 h-20 rounded-full bg-white/[0.04]" />
-
-          {/* Title row */}
           <div className="relative z-10 flex justify-between items-start mb-6">
             <div className="flex items-center gap-3.5">
               <div className="w-[46px] h-[46px] rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center shrink-0">
@@ -336,8 +332,6 @@ function AddProductModal({ onClose, onSave }) {
               <X size={16} />
             </button>
           </div>
-
-          {/* Step indicators */}
           <div className="relative z-10 flex items-center">
             {STEPS.map((s, i) => {
               const Icon = s.icon;
@@ -350,8 +344,7 @@ function AddProductModal({ onClose, onSave }) {
                 >
                   <div className="flex flex-col items-center gap-1.5">
                     <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300
-                      ${done ? "bg-emerald-500" : active ? "bg-white shadow-[0_0_0_4px_rgba(255,255,255,0.2)]" : "bg-white/15 border-[1.5px] border-white/25"}`}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${done ? "bg-emerald-500" : active ? "bg-white shadow-[0_0_0_4px_rgba(255,255,255,0.2)]" : "bg-white/15 border-[1.5px] border-white/25"}`}
                     >
                       {done ? (
                         <Check
@@ -369,8 +362,7 @@ function AddProductModal({ onClose, onSave }) {
                       )}
                     </div>
                     <span
-                      className={`text-[10px] font-bold whitespace-nowrap tracking-wide
-                      ${active ? "text-white" : done ? "text-emerald-300" : "text-white/45"}`}
+                      className={`text-[10px] font-bold whitespace-nowrap tracking-wide ${active ? "text-white" : done ? "text-emerald-300" : "text-white/45"}`}
                     >
                       {s.label}
                     </span>
@@ -388,9 +380,7 @@ function AddProductModal({ onClose, onSave }) {
           </div>
         </div>
 
-        {/* BODY */}
         <div className="flex-1 overflow-y-auto p-8">
-          {/* STEP 1 */}
           {step === 1 && (
             <div className="flex flex-col gap-5">
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 border-[1.5px] border-blue-200 flex gap-3 items-start">
@@ -406,7 +396,6 @@ function AddProductModal({ onClose, onSave }) {
                   </p>
                 </div>
               </div>
-
               <div>
                 <label className={labelCls}>Nama Produk</label>
                 <input
@@ -419,7 +408,6 @@ function AddProductModal({ onClose, onSave }) {
                   Gunakan nama yang jelas dan deskriptif
                 </p>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Kategori</label>
@@ -444,7 +432,6 @@ function AddProductModal({ onClose, onSave }) {
                   />
                 </div>
               </div>
-
               <div>
                 <label className={labelCls}>Deskripsi Produk</label>
                 <textarea
@@ -459,7 +446,6 @@ function AddProductModal({ onClose, onSave }) {
                   Min. 50 karakter untuk deskripsi yang baik
                 </p>
               </div>
-
               <div>
                 <label className={labelCls}>Spesifikasi</label>
                 <textarea
@@ -476,7 +462,6 @@ function AddProductModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* STEP 2 */}
           {step === 2 && (
             <div className="flex flex-col gap-5">
               <div className="bg-gradient-to-r from-purple-50 to-violet-50 rounded-2xl p-4 border-[1.5px] border-purple-200 flex gap-3 items-start">
@@ -492,8 +477,6 @@ function AddProductModal({ onClose, onSave }) {
                   </p>
                 </div>
               </div>
-
-              {/* Upload zone */}
               <div
                 onDragOver={(e) => {
                   e.preventDefault();
@@ -504,12 +487,10 @@ function AddProductModal({ onClose, onSave }) {
                   e.preventDefault();
                   setDragOver(false);
                 }}
-                className={`rounded-2xl border-2 border-dashed px-6 py-10 flex flex-col items-center gap-3 cursor-pointer transition-all duration-200
-                  ${dragOver ? "border-violet-500 bg-violet-50/50" : "border-[rgba(7,43,80,0.18)] bg-[#fafaff]"}`}
+                className={`rounded-2xl border-2 border-dashed px-6 py-10 flex flex-col items-center gap-3 cursor-pointer transition-all duration-200 ${dragOver ? "border-violet-500 bg-violet-50/50" : "border-[rgba(7,43,80,0.18)] bg-[#fafaff]"}`}
               >
                 <div
-                  className={`w-16 h-16 rounded-[18px] flex items-center justify-center transition-all duration-200
-                  ${dragOver ? "bg-gradient-to-br from-violet-600 to-indigo-600 shadow-[0_8px_24px_rgba(124,58,237,0.3)]" : "bg-[rgba(7,43,80,0.07)]"}`}
+                  className={`w-16 h-16 rounded-[18px] flex items-center justify-center transition-all duration-200 ${dragOver ? "bg-gradient-to-br from-violet-600 to-indigo-600 shadow-[0_8px_24px_rgba(124,58,237,0.3)]" : "bg-[rgba(7,43,80,0.07)]"}`}
                 >
                   <Upload
                     size={26}
@@ -534,7 +515,6 @@ function AddProductModal({ onClose, onSave }) {
                   PNG, JPG, WebP · Maks. 5MB per file · Min. 800×800px
                 </p>
               </div>
-
               {uploadedFiles.length > 0 && (
                 <div className="flex flex-col gap-2.5">
                   <p className="text-[11px] font-extrabold text-gray-500 uppercase tracking-[0.08em] mb-1">
@@ -546,8 +526,7 @@ function AddProductModal({ onClose, onSave }) {
                       className="bg-[#f8f9fc] rounded-2xl flex items-center gap-3.5 p-4 border-[1.5px] border-[rgba(7,43,80,0.1)] transition-all"
                     >
                       <div
-                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0
-                        ${file.progress === 100 ? "bg-gradient-to-br from-green-100 to-emerald-100" : "bg-[rgba(7,43,80,0.07)]"}`}
+                        className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${file.progress === 100 ? "bg-gradient-to-br from-green-100 to-emerald-100" : "bg-[rgba(7,43,80,0.07)]"}`}
                       >
                         {file.progress === 100 ? (
                           <Check
@@ -599,7 +578,6 @@ function AddProductModal({ onClose, onSave }) {
             </div>
           )}
 
-          {/* STEP 3 */}
           {step === 3 && (
             <div className="flex flex-col gap-5">
               <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-[1.5px] border-green-200 flex gap-3 items-start">
@@ -615,7 +593,6 @@ function AddProductModal({ onClose, onSave }) {
                   </p>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Harga Jual (Rp)</label>
@@ -678,7 +655,6 @@ function AddProductModal({ onClose, onSave }) {
                   )}
                 </div>
               </div>
-
               <div>
                 <label className={labelCls}>Pilihan Warna</label>
                 <CustomSelect
@@ -688,7 +664,6 @@ function AddProductModal({ onClose, onSave }) {
                   placeholder="Pilih warna..."
                 />
               </div>
-
               {form.warna && (
                 <div className="flex items-center gap-3 bg-[#f8f9fc] rounded-xl border-[1.5px] border-[rgba(7,43,80,0.12)] px-4 py-3.5">
                   <div
@@ -706,7 +681,6 @@ function AddProductModal({ onClose, onSave }) {
                   </div>
                 </div>
               )}
-
               {(form.name || form.price || form.stock) && (
                 <div className="bg-gradient-to-br from-[#072B50] to-[#0e4a8a] rounded-2xl p-5">
                   <p className="text-[11px] font-extrabold text-white/50 uppercase tracking-[0.08em] mb-3.5">
@@ -746,7 +720,6 @@ function AddProductModal({ onClose, onSave }) {
           )}
         </div>
 
-        {/* FOOTER */}
         <div className="px-8 py-5 border-t-[1.5px] border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
           <button
             onClick={() => (step > 1 ? setStep(step - 1) : onClose())}
@@ -755,7 +728,6 @@ function AddProductModal({ onClose, onSave }) {
             <ArrowLeft size={15} />
             {step === 1 ? "Batal" : "Kembali"}
           </button>
-
           <div className="flex gap-1.5">
             {STEPS.map((s) => (
               <div
@@ -764,7 +736,6 @@ function AddProductModal({ onClose, onSave }) {
               />
             ))}
           </div>
-
           {step < STEPS.length ? (
             <button
               onClick={() => setStep(step + 1)}
@@ -861,59 +832,56 @@ export default function Produk() {
   return (
     <div>
       {/* HEADER */}
-      <div className="mb-12">
-        <div className="flex justify-between items-start mb-8">
+      <div className="mb-8">
+        <div className="flex justify-between items-start mb-5">
           <div>
-            <div className="flex items-center gap-3 mb-1.5">
-              <div className="w-10 h-10 rounded-xl bg-[#072B50] flex items-center justify-center shadow-[0_4px_12px_rgba(7,43,80,0.3)]">
-                <Package size={20} className="text-white" />
-              </div>
-              <h1 className="text-[26px] font-extrabold text-[#072B50] m-0 tracking-tight">
-                Daftar Produk
-              </h1>
-            </div>
-            <p className="text-[14px] text-gray-500 m-0 pl-[52px]">
+            {/* Judul tanpa icon */}
+            <h1 className="text-[22px] font-extrabold text-[#072B50] m-0 tracking-tight">
+              Daftar Produk
+            </h1>
+            <p className="text-[13px] text-gray-500 mt-1 m-0">
               Kelola inventaris dan katalog produk Anda di sini.
             </p>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-[#072B50] text-white px-6 py-3 rounded-xl border-none text-[14px] font-bold cursor-pointer shadow-[0_4px_14px_rgba(7,43,80,0.3)] hover:bg-[#0e4a8a] hover:-translate-y-px transition-all"
+            className="flex items-center gap-2 bg-[#072B50] text-white px-5 py-2.5 rounded-xl border-none text-[13px] font-bold cursor-pointer shadow-[0_4px_14px_rgba(7,43,80,0.3)] hover:bg-[#0e4a8a] hover:-translate-y-px transition-all"
           >
-            <Plus size={16} /> Tambah Produk
+            <Plus size={15} /> Tambah Produk
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-6">
+        {/* Stat cards — lebih kecil */}
+        <div className="grid grid-cols-3 gap-4">
           {[
             {
               label: "Total Produk",
               value: products.length,
-              icon: <Package size={20} className="text-white" />,
+              icon: <Package size={16} className="text-white" />,
             },
             {
               label: "Produk Promo",
               value: promoCount,
-              icon: <Tag size={20} className="text-white" />,
+              icon: <Tag size={16} className="text-white" />,
             },
             {
               label: "Stok Menipis",
               value: lowStockCount,
-              icon: <AlertTriangle size={20} className="text-white" />,
+              icon: <AlertTriangle size={16} className="text-white" />,
             },
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="bg-white rounded-2xl border-[1.5px] border-[rgba(7,43,80,0.15)] flex items-center gap-5 p-7"
+              className="bg-white rounded-xl border-[1.5px] border-[rgba(7,43,80,0.12)] flex items-center gap-4 px-5 py-4"
             >
-              <div className="w-12 h-12 rounded-2xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_12px_rgba(0,0,0,0.15)]">
+              <div className="w-9 h-9 rounded-xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_10px_rgba(0,0,0,0.12)]">
                 {icon}
               </div>
               <div>
-                <p className="text-[28px] font-extrabold text-[#072B50] m-0 leading-none">
+                <p className="text-[22px] font-extrabold text-[#072B50] m-0 leading-none">
                   {value}
                 </p>
-                <p className="text-[13px] font-semibold text-[#072B50]/80 mt-1 mb-0">
+                <p className="text-[12px] font-semibold text-[#072B50]/70 mt-0.5 mb-0">
                   {label}
                 </p>
               </div>
@@ -922,12 +890,12 @@ export default function Produk() {
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-[20px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
-        <div className="bg-[#072B50] flex items-center justify-between px-7 py-5">
+      {/* TABLE — lebih compact */}
+      <div className="bg-white rounded-[16px] border-[1.5px] border-[rgba(7,43,80,0.15)] overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.08)]">
+        <div className="bg-[#072B50] flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-            <Package size={16} className="text-white" />
-            <span className="text-[13px] font-bold text-white uppercase tracking-[0.8px]">
+            <Package size={14} className="text-white" />
+            <span className="text-[12px] font-bold text-white uppercase tracking-[0.8px]">
               Katalog Produk
             </span>
           </div>
@@ -943,7 +911,7 @@ export default function Produk() {
                 (h) => (
                   <th
                     key={h}
-                    className={`text-[11px] font-extrabold text-gray-400 tracking-[0.8px] px-6 py-[18px] ${h === "AKSI" ? "text-right" : "text-left"}`}
+                    className={`text-[10px] font-extrabold text-gray-400 tracking-[0.8px] px-5 py-3.5 ${h === "AKSI" ? "text-right" : "text-left"}`}
                   >
                     {h}
                   </th>
@@ -955,27 +923,27 @@ export default function Produk() {
             {paginated.map((product, i) => (
               <tr
                 key={product.id}
-                className={`transition-colors hover:bg-[rgba(7,43,80,0.04)] ${i < paginated.length - 1 ? "border-b border-[#f8f9fc]" : ""}`}
+                className={`transition-colors hover:bg-[rgba(7,43,80,0.03)] ${i < paginated.length - 1 ? "border-b border-[#f4f5f9]" : ""}`}
               >
-                <td className="px-6 py-5">
-                  <div className="w-12 h-12 rounded-xl bg-[rgba(7,43,80,0.07)] flex items-center justify-center text-2xl border-[1.5px] border-[rgba(7,43,80,0.15)]">
+                <td className="px-5 py-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-[rgba(7,43,80,0.07)] flex items-center justify-center text-xl border-[1.5px] border-[rgba(7,43,80,0.12)]">
                     {product.image}
                   </div>
                 </td>
-                <td className="px-6 py-5">
-                  <p className="text-[14px] font-bold text-[#072B50] mb-0.5 m-0">
+                <td className="px-5 py-3.5">
+                  <p className="text-[13px] font-bold text-[#072B50] mb-0.5 m-0">
                     {product.name}
                   </p>
-                  <span className="text-[11px] font-bold text-gray-400 bg-[#f1f3f8] px-2 py-0.5 rounded-md">
+                  <span className="text-[10px] font-bold text-gray-400 bg-[#f1f3f8] px-2 py-0.5 rounded-md">
                     {product.category}
                   </span>
                 </td>
-                <td className="px-6 py-5 text-[14px] font-bold text-[#072B50]">
+                <td className="px-5 py-3.5 text-[13px] font-bold text-[#072B50]">
                   {formatPrice(product.price)}
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-5 py-3.5">
                   <span
-                    className={`text-[14px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}
+                    className={`text-[13px] font-bold ${product.stock < 10 ? "text-red-500" : "text-gray-700"}`}
                   >
                     {product.stock}
                   </span>
@@ -985,32 +953,32 @@ export default function Produk() {
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-5">
+                <td className="px-5 py-3.5">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${product.promo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
+                    className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${product.promo ? "bg-green-100 text-green-700" : "bg-red-100 text-red-600"}`}
                   >
                     {product.promo ? "Ya" : "Tidak"}
                   </span>
                 </td>
-                <td className="px-6 py-5 text-right">
-                  <div className="flex gap-2 justify-end">
+                <td className="px-5 py-3.5 text-right">
+                  <div className="flex gap-1.5 justify-end">
                     <button
                       onClick={() => setViewProduct(product)}
-                      className="w-[34px] h-[34px] rounded-[10px] border-none bg-[rgba(7,43,80,0.07)] text-[#072B50] cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                      className="w-8 h-8 rounded-[8px] border-none bg-[rgba(7,43,80,0.07)] text-[#072B50] cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
                     >
-                      <Eye size={14} />
+                      <Eye size={13} />
                     </button>
                     <button
                       onClick={() => openEdit(product)}
-                      className="w-[34px] h-[34px] rounded-[10px] border-none bg-yellow-50 text-yellow-600 cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                      className="w-8 h-8 rounded-[8px] border-none bg-yellow-50 text-yellow-600 cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
                     >
-                      <Pencil size={14} />
+                      <Pencil size={13} />
                     </button>
                     <button
                       onClick={() => setDeleteId(product.id)}
-                      className="w-[34px] h-[34px] rounded-[10px] border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
+                      className="w-8 h-8 rounded-[8px] border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:scale-110 transition-transform"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={13} />
                     </button>
                   </div>
                 </td>
@@ -1019,8 +987,8 @@ export default function Produk() {
           </tbody>
         </table>
 
-        <div className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.15)] bg-[#fafbff] px-7 py-[18px]">
-          <p className="text-[13px] text-gray-400 m-0">
+        <div className="flex justify-between items-center border-t-[1.5px] border-[rgba(7,43,80,0.1)] bg-[#fafbff] px-6 py-3.5">
+          <p className="text-[12px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, products.length)} dari{" "}
             {products.length} produk
@@ -1029,7 +997,7 @@ export default function Produk() {
             <button
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className="w-[34px] h-[34px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] text-gray-700 disabled:opacity-40"
+              className="w-8 h-8 rounded-[8px] border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[13px] text-gray-700 disabled:opacity-40"
             >
               ‹
             </button>
@@ -1037,7 +1005,7 @@ export default function Produk() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-[34px] h-[34px] rounded-[10px] cursor-pointer text-[13px] font-bold border transition-all ${currentPage === page ? "bg-[#072B50] text-white border-transparent shadow-[0_4px_10px_rgba(7,43,80,0.25)]" : "bg-white text-gray-700 border-[rgba(7,43,80,0.15)]"}`}
+                className={`w-8 h-8 rounded-[8px] cursor-pointer text-[12px] font-bold border transition-all ${currentPage === page ? "bg-[#072B50] text-white border-transparent shadow-[0_4px_10px_rgba(7,43,80,0.25)]" : "bg-white text-gray-700 border-[rgba(7,43,80,0.15)]"}`}
               >
                 {page}
               </button>
@@ -1045,7 +1013,7 @@ export default function Produk() {
             <button
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className="w-[34px] h-[34px] rounded-[10px] border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[14px] text-gray-700 disabled:opacity-40"
+              className="w-8 h-8 rounded-[8px] border-[1.5px] border-[rgba(7,43,80,0.15)] bg-white cursor-pointer text-[13px] text-gray-700 disabled:opacity-40"
             >
               ›
             </button>

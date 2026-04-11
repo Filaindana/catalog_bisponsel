@@ -108,64 +108,56 @@ function BannerChip({ color, name }) {
     </div>
   );
 }
-
-/* ══════════════════════════
-   VIEW MODAL
-══════════════════════════ */
 function ViewModal({ promo, onClose }) {
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-white rounded-2xl w-[440px] overflow-hidden shadow-2xl">
+      <div className="bg-[#FDFDFD] rounded-2xl w-[440px] overflow-hidden shadow-2xl">
+
         {/* Header */}
-        <div className="relative px-7 py-6 flex flex-col items-center text-center" style={{ background:NAVY }}>
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/5" />
-          <div className="absolute -bottom-4 left-4 w-16 h-16 rounded-full bg-white/5" />
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3" style={{ background:"rgba(255,255,255,0.15)" }}>
-            <Tag size={22} color="#fff" />
-          </div>
+        <div className="relative px-7 py-7 bg-[#072B50]">
+          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
+          <div className="absolute -bottom-4 left-4 w-16 h-16 rounded-full bg-white/5 pointer-events-none" />
+
           <h2 className="text-[18px] font-extrabold text-white m-0 mb-1">{promo.name}</h2>
           <p className="text-[12.5px] text-white/60 m-0">{promo.desc}</p>
-          <button onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center"
-            style={{ background:"rgba(255,255,255,0.12)", color:"#fff" }}>
+
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-white bg-white/10 hover:bg-white/20 transition-colors"
+          >
             <X size={14} />
           </button>
         </div>
 
-        <div className="p-6 flex flex-col gap-4">
+        {/* Body */}
+        <div className="p-6 flex flex-col gap-4 bg-[#FDFDFD]">
+
           {/* Status */}
-          <div className="flex justify-center">
+          <div>
             <StatusBadge status={promo.status} />
+          </div>
+
+          {/* Deskripsi */}
+          <div className="rounded-xl bg-[#f0f4f9] border border-[#dce6f0] px-4 py-3.5">
+            <p className="text-[10px] font-bold text-[#8a9bb0] uppercase tracking-wider mb-1.5">Deskripsi</p>
+            <p className="text-[13px] text-[#374151] leading-relaxed m-0">
+              {promo.fullDesc || promo.desc || "Tidak ada deskripsi tersedia untuk promo ini."}
+            </p>
           </div>
 
           {/* Dates */}
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label:"Mulai",   value:fmt(promo.startDate), icon:<Calendar size={13} style={{color:NAVY}}/> },
-              { label:"Selesai", value:fmt(promo.endDate),   icon:<Clock    size={13} style={{color:NAVY}}/> },
-            ].map(({ label, value, icon }) => (
-              <div key={label} className="rounded-xl border border-gray-100 bg-gray-50 px-4 py-3.5">
-                <div className="flex items-center gap-1.5 mb-1">{icon}
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
-                </div>
-                <span className="text-[13.5px] font-bold" style={{ color:NAVY }}>{value}</span>
+              { label:"Mulai",   value:fmt(promo.startDate) },
+              { label:"Selesai", value:fmt(promo.endDate)   },
+            ].map(({ label, value }) => (
+              <div key={label} className="rounded-xl border border-[#dce6f0] bg-[#f0f4f9] px-4 py-3.5">
+                <p className="text-[10px] font-bold text-[#8a9bb0] uppercase tracking-wider mb-1.5">{label}</p>
+                <p className="text-[13.5px] font-bold text-[#072B50] m-0">{value}</p>
               </div>
             ))}
           </div>
 
-          {/* Banner color */}
-          <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3.5">
-            <div className="w-9 h-9 rounded-lg shrink-0" style={{ background:promo.bannerColor }} />
-            <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider m-0 mb-0.5">Warna Banner</p>
-              <p className="text-[13px] font-bold m-0" style={{ color:NAVY }}>{promo.bannerColor.toUpperCase()}</p>
-            </div>
-          </div>
-
-          <button onClick={onClose}
-            className="w-full py-3 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 transition-colors hover:bg-gray-50">
-            Tutup
-          </button>
         </div>
       </div>
     </Overlay>
@@ -269,6 +261,7 @@ function AddModal({ onClose, onSave }) {
           <div>
             <ModalSection icon={<Zap size={11} style={{color:NAVY}}/>} title="Banner Promo" />
             <div className="flex flex-col gap-3.5">
+
 
               {/* Upload zone */}
               <div
@@ -568,15 +561,6 @@ export default function Promo() {
                     className={`${inputCls} cursor-pointer`}>
                     <option>Aktif</option><option>Segera</option><option>Berakhir</option>
                   </select>
-                </div>
-                <div>
-                  <label className={labelCls}>Warna Banner</label>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                    <input type="color" value={editForm.bannerColor}
-                      onChange={e => setEditForm({...editForm,bannerColor:e.target.value})}
-                      className="w-9 h-9 rounded-lg border-none cursor-pointer p-0 bg-transparent" />
-                    <span className="text-[12.5px] font-bold text-gray-700">{editForm.bannerColor.toUpperCase()}</span>
-                  </div>
                 </div>
               </div>
 

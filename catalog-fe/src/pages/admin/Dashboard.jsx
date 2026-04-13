@@ -36,8 +36,8 @@ const stats = [
     badge: "↑ 12% dari bulan lalu",
     badgeColor: "text-emerald-600 bg-emerald-50",
     icon: Package,
-    accentBg: "bg-blue-50",
-    accentText: "text-blue-500",
+    accentBg: "bg-blue-50", // ← berubah
+    accentText: "text-[#1e3a5f]",
   },
   {
     label: "Promo Aktif",
@@ -45,8 +45,8 @@ const stats = [
     badge: "Sama seperti bulan lalu",
     badgeColor: "text-slate-500 bg-slate-100",
     icon: Tag,
-    accentBg: "bg-violet-50",
-    accentText: "text-violet-500",
+    accentBg: "bg-blue-50", // ← berubah dari bg-violet-50
+    accentText: "text-[#1e3a5f]",
   },
   {
     label: "Total Cabang",
@@ -54,8 +54,8 @@ const stats = [
     badge: "↑ 1 cabang baru",
     badgeColor: "text-amber-600 bg-amber-50",
     icon: Building2,
-    accentBg: "bg-amber-50",
-    accentText: "text-amber-500",
+    accentBg: "bg-blue-50", // ← berubah dari bg-amber-50
+    accentText: "text-[#1e3a5f]",
   },
 ];
 
@@ -418,7 +418,7 @@ export default function Dashboard() {
         {/* KIRI — Prediksi Penjualan */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div className="flex items-start justify-between mb-5">
-            <div>
+            <div className="min-h-[52px]">
               <div className="flex items-center gap-2 mb-0.5">
                 <Sparkles size={13} className="text-violet-400" />
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -442,15 +442,15 @@ export default function Dashboard() {
           </div>
 
           {/* Mini bar chart prediksi */}
-          <div className="relative h-36 bg-slate-50 rounded-xl px-3 pt-3 pb-7">
-            {[33, 66].map((y) => (
-              <div
-                key={y}
-                className="absolute left-3 right-3 border-t border-slate-200/70"
-                style={{ top: `${y}%` }}
-              />
-            ))}
-            <div className="relative h-full flex items-end gap-1">
+          <div className="relative bg-slate-50 rounded-xl px-3 pt-3">
+            <div className="relative h-36 flex items-end gap-1">
+              {[33, 66].map((y) => (
+                <div
+                  key={y}
+                  className="absolute left-0 right-0 border-t border-slate-200/70"
+                  style={{ top: `${y}%` }}
+                />
+              ))}
               {prediksiData.map((d, i) => {
                 const isPred = d.actual === null;
                 const val = d.actual ?? d.predicted;
@@ -487,7 +487,9 @@ export default function Dashboard() {
                 );
               })}
             </div>
-            <div className="absolute bottom-1 left-3 right-3 flex gap-1">
+
+            {/* Label — di luar area bar */}
+            <div className="flex gap-1 mt-1 pb-2">
               {prediksiData.map((d, i) => (
                 <div key={i} className="flex-1 text-center">
                   <span
@@ -526,7 +528,7 @@ export default function Dashboard() {
         {/* KANAN — Analitik Katalog */}
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
           <div className="flex justify-between items-center mb-5">
-            <div>
+            <div className="min-h-[52px]">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
                 Performa
               </p>
@@ -545,15 +547,16 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="relative h-36 bg-slate-50 rounded-xl px-3 pt-3 pb-7">
-            {[33, 66].map((y) => (
-              <div
-                key={y}
-                className="absolute left-3 right-3 border-t border-slate-200/70"
-                style={{ top: `${y}%` }}
-              />
-            ))}
-            <div className="relative h-full flex items-end gap-2.5">
+          {/* Area bar */}
+          <div className="relative bg-slate-50 rounded-xl px-3 pt-3">
+            <div className="relative h-36 flex items-end gap-2.5">
+              {[33, 66].map((y) => (
+                <div
+                  key={y}
+                  className="absolute left-0 right-0 border-t border-slate-200/70"
+                  style={{ top: `${y}%` }}
+                />
+              ))}
               {chartData.map((bar, i) => {
                 const isMax = bar.v === maxV;
                 const isHov = hovered === i;
@@ -581,13 +584,17 @@ export default function Dashboard() {
                 );
               })}
             </div>
-            <div className="absolute bottom-1 left-3 right-3 flex gap-2.5">
+
+            {/* Label hari — di luar area bar */}
+            <div className="flex gap-2.5 mt-1 pb-2">
               {chartData.map((bar, i) => {
                 const active = bar.v === maxV || hovered === i;
                 return (
                   <div key={i} className="flex-1 text-center">
                     <span
-                      className={`text-[8px] font-semibold transition-colors ${active ? "text-slate-700" : "text-slate-300"}`}
+                      className={`text-[8px] font-semibold transition-colors ${
+                        active ? "text-slate-700" : "text-slate-300"
+                      }`}
                     >
                       {bar.day}
                     </span>

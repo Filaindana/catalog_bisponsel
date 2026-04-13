@@ -852,29 +852,30 @@ export default function Produk() {
         </div>
 
         {/* Stat cards — lebih kecil */}
+        {/* Stat cards — lebih kecil */}
         <div className="grid grid-cols-3 gap-4">
           {[
             {
               label: "Total Produk",
               value: products.length,
-              icon: <Package size={16} className="text-white" />,
+              icon: <Package size={16} className="text-[#072B50]" />,
             },
             {
               label: "Produk Promo",
               value: promoCount,
-              icon: <Tag size={16} className="text-white" />,
+              icon: <Tag size={16} className="text-[#072B50]" />,
             },
             {
               label: "Stok Menipis",
               value: lowStockCount,
-              icon: <AlertTriangle size={16} className="text-white" />,
+              icon: <AlertTriangle size={16} className="text-[#072B50]" />,
             },
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="bg-white rounded-xl border-[1.5px] border-[rgba(7,43,80,0.12)] flex items-center gap-4 px-5 py-4"
+              className="bg-white rounded-xl border-[1.5px] border-[rgba(7,43,80,0.12)] flex items-center gap-4 px-5 py-4 transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-md cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-xl bg-[#072B50] flex items-center justify-center shrink-0 shadow-[0_4px_10px_rgba(0,0,0,0.12)]">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                 {icon}
               </div>
               <div>

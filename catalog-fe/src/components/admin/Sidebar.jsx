@@ -30,7 +30,7 @@ export default function Sidebar() {
       {/* LOGO */}
       <div className="px-4 pt-5 pb-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-whit-700 flex items-center justify-center shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0">
             <img src={logoImg} alt="Logo" className="w-5 h-5 object-contain" />
           </div>
           <div>
@@ -51,17 +51,28 @@ export default function Sidebar() {
               key={menu.path}
               onClick={() => navigate(menu.path)}
               className={`
-                w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px]
-                text-[13px] font-semibold transition-all duration-150 text-left border-none
-                ${
-                  isActive
-                    ? "bg-indigo-700 text-white cursor-default"
-                    : "bg-transparent text-slate-500 hover:bg-indigo-50 hover:text-indigo-700 cursor-pointer"
-                }
+                group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px]
+                text-[13px] font-semibold transition-all duration-150 text-left border-none cursor-pointer
+                ${isActive ? "text-white" : "text-slate-500 hover:text-white"}
               `}
+              style={{
+                backgroundColor: isActive ? "#0e3d6e" : "transparent",
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive)
+                  e.currentTarget.style.backgroundColor = "#0e3d6e";
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive)
+                  e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
               <span
-                className={`flex items-center shrink-0 ${isActive ? "text-white" : "text-slate-400"}`}
+                className={`flex items-center shrink-0 ${
+                  isActive
+                    ? "text-white"
+                    : "text-slate-400 group-hover:text-white"
+                }`}
               >
                 {menu.icon}
               </span>

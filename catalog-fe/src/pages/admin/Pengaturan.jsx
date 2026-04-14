@@ -10,20 +10,52 @@ import {
   Upload,
   Trash2,
   Check,
+  Settings,
+  Building2,
 } from "lucide-react";
 
+/* ── Font inject ── */
+if (
+  typeof document !== "undefined" &&
+  !document.querySelector("[data-inter-pengaturan]")
+) {
+  const s = document.createElement("style");
+  s.setAttribute("data-inter-pengaturan", "true");
+  s.textContent = `
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    .pengaturan-admin, .pengaturan-admin * { font-family:'Inter',sans-serif !important; box-sizing:border-box; }
+
+    @keyframes scaleIn  { from{opacity:0;transform:scale(.95)} to{opacity:1;transform:scale(1)} }
+
+    .pengaturan-admin .stat-card  { transition: transform .2s, box-shadow .2s; }
+    .pengaturan-admin .stat-card:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(7,43,80,.13); }
+    .pengaturan-admin .input-field:focus { border-color:#072B50 !important; background:#fff !important; box-shadow:0 0 0 3px rgba(7,43,80,.08) !important; }
+  `;
+  document.head.appendChild(s);
+}
+
+const NAVY = "#072B50";
+
 const inputCls =
-  "w-full px-4 py-[11px] rounded-xl border border-slate-200 text-sm outline-none text-slate-800 bg-slate-50 transition-all font-[inherit] focus:border-[#072B50] focus:bg-white placeholder:text-slate-400";
-
+  "input-field w-full px-3.5 py-3 rounded-xl border border-gray-200 text-[13.5px] outline-none text-gray-800 bg-gray-50 transition-all";
 const labelCls =
-  "block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2";
+  "block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider";
 
-const SectionHeader = ({ title, subtitle }) => (
-  <div className="bg-[#072B50] px-6 py-4 flex items-center justify-between">
-    <div>
-      <p className="text-sm font-bold text-white">{title}</p>
-      {subtitle && <p className="text-xs text-white/50 mt-0.5">{subtitle}</p>}
+const Field = ({ label, children, hint }) => (
+  <div>
+    <label className={labelCls}>{label}</label>
+    {children}
+    {hint && <p className="text-[11px] text-gray-400 mt-1.5">{hint}</p>}
+  </div>
+);
+
+const ModalSection = ({ icon, title }) => (
+  <div className="flex items-center gap-2 mb-4 mt-1">
+    <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(7,43,80,0.08)" }}>
+      {icon}
     </div>
+    <span className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color: NAVY }}>{title}</span>
+    <div className="flex-1 h-px bg-gray-100 ml-1" />
   </div>
 );
 
@@ -41,8 +73,7 @@ export default function Pengaturan() {
   const [kontak, setKontak] = useState({
     whatsapp: "+62 81234567890",
     email: "support@bizponsel.com",
-    alamat:
-      "Jl. Sudirman No. 123, Gedung Bizponsel Lantai 15, Jakarta Pusat, 10220",
+    alamat: "Jl. Sudirman No. 123, Gedung Bizponsel Lantai 15, Jakarta Pusat, 10220",
   });
 
   const handleSaveProfile = () => {
@@ -55,46 +86,55 @@ export default function Pengaturan() {
     setTimeout(() => setSavedKontak(false), 2000);
   };
 
+  const STAT_CARDS = [
+    { label: "Profil Admin", value: "1", icon: <User size={18} color={NAVY} />, bg: "#e6eef6" },
+    { label: "Kontak Aktif", value: "3", icon: <Phone size={18} color={NAVY} />, bg: "#e6eef6" },
+    { label: "Pengaturan", value: "2", icon: <Settings size={18} color={NAVY} />, bg: "#e6eef6" },
+  ];
+
   return (
-    <div>
-      {/* HEADER */}
-      <div className="flex justify-between items-start mb-8">
+    <div className="pengaturan-admin">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-[22px] font-extrabold text-[#072B50] m-0 tracking-tight">
+          <h1 className="text-[22px] font-extrabold m-0 tracking-tight" style={{ color: NAVY }}>
             Pengaturan
           </h1>
-          <p className="text-[13px] text-slate-400 mt-1">
-            Kelola profil admin dan informasi kontak website.
-          </p>
+          <p className="text-[12.5px] text-gray-400 m-0 mt-0.5">Kelola profil admin dan informasi kontak website</p>
         </div>
       </div>
 
-      <div className="space-y-6">
-        {/* ─── PROFILE ADMIN ─── */}
-        <div className="bg-white rounded-[16px] border border-slate-200 overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.06)]">
-          <SectionHeader
-            title="Profil Admin"
-            subtitle="Informasi akun dan keamanan login"
-          />
+     
 
-          <div className="p-6 space-y-6">
+      <div className="flex flex-col gap-6">
+        {/* ── PROFIL ADMIN ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          {/* Section Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background: "#FDFDFD" }}>
+            <div className="flex items-center gap-2">
+              <User size={14} color={NAVY} />
+              <span className="text-[12.5px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Profil Admin</span>
+            </div>
+            <span className="text-[11px] text-gray-400">Informasi akun dan keamanan login</span>
+          </div>
+
+          <div className="p-6 flex flex-col gap-6">
             {/* Avatar */}
-            <div className="flex items-center gap-5 p-5 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-16 h-16 rounded-2xl bg-[#072B50]/10 border-2 border-[#072B50]/15 flex items-center justify-center text-3xl flex-shrink-0">
+            <div className="flex items-center gap-5 p-5 rounded-xl bg-gray-50 border border-gray-100">
+              <div className="w-16 h-16 rounded-2xl border-2 flex items-center justify-center text-3xl shrink-0" style={{ background: "rgba(7,43,80,0.08)", borderColor: "rgba(7,43,80,0.15)" }}>
                 👨
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-slate-700 mb-0.5">
-                  Foto Profil
-                </p>
-                <p className="text-xs text-slate-400 mb-3">
-                  JPG, PNG atau GIF · Maks. 2MB
-                </p>
+                <p className="text-[13.5px] font-bold m-0 mb-0.5" style={{ color: NAVY }}>Foto Profil</p>
+                <p className="text-[11.5px] text-gray-400 m-0 mb-3">JPG, PNG atau GIF · Maks. 2MB</p>
                 <div className="flex gap-2">
-                  <button className="flex items-center gap-1.5 bg-[#072B50] hover:bg-[#0e3d6e] text-white text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer border-0 font-[inherit] font-semibold">
+                  <button
+                    className="flex items-center gap-1.5 text-white text-[12px] px-4 py-2 rounded-lg cursor-pointer border-none font-bold transition-all hover:opacity-90"
+                    style={{ background: NAVY }}
+                  >
                     <Upload size={12} /> Upload Foto
                   </button>
-                  <button className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer border-0 font-[inherit] font-semibold">
+                  <button className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 text-[12px] px-4 py-2 rounded-lg cursor-pointer border-none font-bold transition-colors">
                     <Trash2 size={12} /> Hapus
                   </button>
                 </div>
@@ -103,167 +143,124 @@ export default function Pengaturan() {
 
             {/* Nama + Email */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Nama Lengkap</label>
+              <Field label="Nama Lengkap">
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <User size={14} className="text-slate-400" />
-                  </div>
+                  <User size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   <input
                     type="text"
                     value={profile.nama}
-                    onChange={(e) =>
-                      setProfile({ ...profile, nama: e.target.value })
-                    }
+                    onChange={(e) => setProfile({ ...profile, nama: e.target.value })}
                     className={`${inputCls} pl-9`}
                   />
                 </div>
-              </div>
-              <div>
-                <label className={labelCls}>Email Admin</label>
+              </Field>
+              <Field label="Email Admin">
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Mail size={14} className="text-slate-400" />
-                  </div>
+                  <Mail size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   <input
                     type="email"
                     value={profile.email}
-                    onChange={(e) =>
-                      setProfile({ ...profile, email: e.target.value })
-                    }
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                     className={`${inputCls} pl-9`}
                   />
                 </div>
-              </div>
+              </Field>
             </div>
 
             {/* Password */}
-            <div>
-              <label className={labelCls}>Password Baru</label>
+            <Field label="Password Baru" hint="Kosongkan jika tidak ingin mengubah password">
               <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <Lock size={14} className="text-slate-400" />
-                </div>
+                <Lock size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Masukkan password baru"
                   value={profile.password}
-                  onChange={(e) =>
-                    setProfile({ ...profile, password: e.target.value })
-                  }
+                  onChange={(e) => setProfile({ ...profile, password: e.target.value })}
                   className={`${inputCls} pl-9 pr-10`}
                 />
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 bg-transparent border-0 cursor-pointer p-0"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer p-0"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1.5">
-                Kosongkan jika tidak ingin mengubah password
-              </p>
-            </div>
+            </Field>
 
             {/* Footer */}
-            <div className="flex justify-end pt-2 border-t border-slate-100">
+            <div className="flex justify-end pt-2 border-t border-gray-100">
               <button
                 onClick={handleSaveProfile}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold cursor-pointer border-0 font-[inherit] transition-all ${
-                  savedProfile
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#072B50] hover:bg-[#0e3d6e] text-white"
-                }`}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90"
+                style={savedProfile
+                  ? { background: "#10b981", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }
+                  : { background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}
               >
-                {savedProfile ? (
-                  <>
-                    <Check size={14} /> Tersimpan!
-                  </>
-                ) : (
-                  "Simpan Perubahan"
-                )}
+                {savedProfile ? <><Check size={14} /> Tersimpan!</> : "Simpan Perubahan"}
               </button>
             </div>
           </div>
         </div>
 
-        {/* ─── KONTAK WEBSITE ─── */}
-        <div className="bg-white rounded-[16px] border border-slate-200 overflow-hidden shadow-[0_4px_24px_rgba(7,43,80,0.06)]">
-          <SectionHeader
-            title="Kontak Website"
-            subtitle="Ditampilkan di footer dan halaman kontak website"
-          />
+        {/* ── KONTAK WEBSITE ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          {/* Section Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background: "#FDFDFD" }}>
+            <div className="flex items-center gap-2">
+              <Building2 size={14} color={NAVY} />
+              <span className="text-[12.5px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Kontak Website</span>
+            </div>
+            <span className="text-[11px] text-gray-400">Ditampilkan di footer dan halaman kontak</span>
+          </div>
 
-          <div className="p-6 space-y-5">
+          <div className="p-6 flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Nomor WhatsApp</label>
+              <Field label="Nomor WhatsApp">
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Phone size={14} className="text-slate-400" />
-                  </div>
+                  <Phone size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   <input
                     type="text"
                     value={kontak.whatsapp}
-                    onChange={(e) =>
-                      setKontak({ ...kontak, whatsapp: e.target.value })
-                    }
+                    onChange={(e) => setKontak({ ...kontak, whatsapp: e.target.value })}
                     className={`${inputCls} pl-9`}
                   />
                 </div>
-              </div>
-              <div>
-                <label className={labelCls}>Email Perusahaan</label>
+              </Field>
+              <Field label="Email Perusahaan">
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <Mail size={14} className="text-slate-400" />
-                  </div>
+                  <Mail size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                   <input
                     type="email"
                     value={kontak.email}
-                    onChange={(e) =>
-                      setKontak({ ...kontak, email: e.target.value })
-                    }
+                    onChange={(e) => setKontak({ ...kontak, email: e.target.value })}
                     className={`${inputCls} pl-9`}
                   />
                 </div>
-              </div>
+              </Field>
             </div>
 
-            <div>
-              <label className={labelCls}>Alamat Kantor</label>
+            <Field label="Alamat Kantor">
               <div className="relative">
-                <div className="absolute left-3 top-3.5 pointer-events-none">
-                  <MapPin size={14} className="text-slate-400" />
-                </div>
+                <MapPin size={13} className="absolute left-3.5 top-3.5 text-gray-400 pointer-events-none" />
                 <textarea
                   rows={3}
                   value={kontak.alamat}
-                  onChange={(e) =>
-                    setKontak({ ...kontak, alamat: e.target.value })
-                  }
+                  onChange={(e) => setKontak({ ...kontak, alamat: e.target.value })}
                   className={`${inputCls} pl-9 resize-none leading-relaxed`}
                 />
               </div>
-            </div>
+            </Field>
 
             {/* Footer */}
-            <div className="flex justify-end pt-2 border-t border-slate-100">
+            <div className="flex justify-end pt-2 border-t border-gray-100">
               <button
                 onClick={handleSaveKontak}
-                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold cursor-pointer border-0 font-[inherit] transition-all ${
-                  savedKontak
-                    ? "bg-emerald-500 text-white"
-                    : "bg-[#072B50] hover:bg-[#0e3d6e] text-white"
-                }`}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90"
+                style={savedKontak
+                  ? { background: "#10b981", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }
+                  : { background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}
               >
-                {savedKontak ? (
-                  <>
-                    <Check size={14} /> Tersimpan!
-                  </>
-                ) : (
-                  "Simpan Pengaturan"
-                )}
+                {savedKontak ? <><Check size={14} /> Tersimpan!</> : "Simpan Pengaturan"}
               </button>
             </div>
           </div>

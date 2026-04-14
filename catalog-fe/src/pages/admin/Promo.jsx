@@ -818,8 +818,7 @@ export default function Promo() {
                     <div className="flex gap-1.5 justify-end">
                       <button
                         onClick={() => setViewPromo(promo)}
-                        className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center"
-                      >
+                        className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center">
                         <Eye size={13} />
                       </button>
                       <button

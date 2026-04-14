@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProduk, deleteProduk, createProduk } from "../../utils/services/produkService";
 import {
   Eye, Pencil, Trash2, Plus, X, Upload,
   Info, DollarSign, Package,
@@ -25,18 +26,6 @@ if (typeof document !== "undefined" && !document.querySelector("[data-inter-prod
   document.head.appendChild(s);
 }
 
-const initialProducts = [
-  { id:1, name:"Asus Vivo V14",      category:"Laptop & Komputer", price:8500000,  stock:24, promo:true,  image:"💻" },
-  { id:2, name:"Samsung Galaxy S21", category:"Smartphone",        price:12000000, stock:15, promo:false, image:"📱" },
-  { id:3, name:"iPad Air 5",         category:"Tablet",            price:10200000, stock:8,  promo:true,  image:"📟" },
-  { id:4, name:"iPad Air 5",         category:"Tablet",            price:10200000, stock:8,  promo:true,  image:"📟" },
-  { id:5, name:"iPad Air 5",         category:"Tablet",            price:10200000, stock:8,  promo:true,  image:"📟" },
-  { id:6, name:"Samsung Galaxy S21", category:"Smartphone",        price:12000000, stock:15, promo:false, image:"📱" },
-  { id:7, name:"iPad Air 5",         category:"Tablet",            price:10200000, stock:8,  promo:true,  image:"📟" },
-  { id:8, name:"iPad Air 5",         category:"Tablet",            price:10200000, stock:8,  promo:true,  image:"📟" },
-  { id:9, name:"iPad Air 5",         category:"Tablet",            price:10200000, stock:8,  promo:true,  image:"📟" },
-];
-
 const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
 const formatPrice = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
@@ -60,12 +49,12 @@ const CustomSelect = ({ value, onChange, options, placeholder }) => (
       <option value="">{placeholder}</option>
       {options.map(o => <option key={o} value={o}>{o}</option>)}
     </select>
-    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400" />
+    <ChevronDown size={14} className="absolute text-gray-400 -translate-y-1/2 pointer-events-none right-3 top-1/2" />
   </div>
 );
 
 const Overlay = ({ onClose, children }) => (
-  <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+  <div className="fixed inset-0 flex items-center justify-center p-4 z-1000"
     style={{ background:"rgba(5,12,30,0.6)", backdropFilter:"blur(10px)" }}
     onClick={onClose}>
     <div className="modal-wrap" onClick={e => e.stopPropagation()}>{children}</div>
@@ -75,10 +64,10 @@ const Overlay = ({ onClose, children }) => (
 /* ── Product Image Chip — mirip BannerChip di Promo ── */
 function ProductChip({ emoji, color = "#e6eef6" }) {
   return (
-    <div className="w-[86px] h-[52px] rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
+    <div className="w-21.5 h-13 rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
       style={{ background: color, boxShadow:"0 2px 8px rgba(7,43,80,0.1)" }}>
-      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white/30" />
-      <span className="text-2xl relative z-10">{emoji}</span>
+      <div className="absolute w-8 h-8 rounded-full -top-2 -right-2 bg-white/30" />
+      <span className="relative z-10 text-2xl">{emoji}</span>
     </div>
   );
 }
@@ -113,14 +102,14 @@ function PromoBadge({ aktif }) {
 function ViewProductModal({ product, onClose }) {
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-[#FDFDFD] rounded-2xl w-[440px] overflow-hidden shadow-2xl">
+      <div className="bg-[#FDFDFD] rounded-2xl w-110 overflow-hidden shadow-2xl">
         <div className="relative px-7 py-7 bg-[#072B50]">
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
-          <div className="absolute -bottom-4 left-4 w-16 h-16 rounded-full bg-white/5 pointer-events-none" />
+          <div className="absolute rounded-full pointer-events-none -top-8 -right-8 w-36 h-36 bg-white/5" />
+          <div className="absolute w-16 h-16 rounded-full pointer-events-none -bottom-4 left-4 bg-white/5" />
           <h2 className="text-[18px] font-extrabold text-white m-0 mb-1">{product.name}</h2>
           <p className="text-[12.5px] text-white/60 m-0">{product.category}</p>
           <button onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-white bg-white/10 hover:bg-white/20 transition-colors">
+            className="absolute flex items-center justify-center w-8 h-8 text-white transition-colors border-none rounded-lg cursor-pointer top-4 right-4 bg-white/10 hover:bg-white/20">
             <X size={14} />
           </button>
         </div>
@@ -181,14 +170,14 @@ function AddProductModal({ onClose, onSave }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[620px] bg-white rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-        <div className="px-7 pt-6 pb-5 relative overflow-hidden shrink-0"
+      <div className="w-155 bg-white rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+        <div className="relative pt-6 pb-5 overflow-hidden px-7 shrink-0"
           style={{ background:`linear-gradient(135deg, #072B50, #0e4a8a, #1a6fc4)` }}>
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/5" />
-          <div className="absolute -bottom-5 left-[40%] w-20 h-20 rounded-full bg-white/[0.04]" />
-          <div className="relative z-10 flex justify-between items-center mb-6">
+          <div className="absolute rounded-full -top-8 -right-8 w-36 h-36 bg-white/5" />
+          <div className="absolute -bottom-5 left-[40%] w-20 h-20 rounded-full bg-white/4" />
+          <div className="relative z-10 flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background:"rgba(255,255,255,0.15)" }}>
+              <div className="flex items-center justify-center w-10 h-10 rounded-xl" style={{ background:"rgba(255,255,255,0.15)" }}>
                 <Sparkles size={18} color="#fff" />
               </div>
               <div>
@@ -196,7 +185,7 @@ function AddProductModal({ onClose, onSave }) {
                 <p className="text-[11.5px] text-white/60 m-0">Langkah {step} dari {STEPS.length} — {STEPS[step-1].label}</p>
               </div>
             </div>
-            <button onClick={onClose} className="w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center"
+            <button onClick={onClose} className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer"
               style={{ background:"rgba(255,255,255,0.15)", color:"#fff" }}>
               <X size={14} />
             </button>
@@ -224,11 +213,11 @@ function AddProductModal({ onClose, onSave }) {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-7 py-6">
+        <div className="flex-1 py-6 overflow-y-auto px-7">
           {step === 1 && (
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background:NAVY }}>
+                <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0" style={{ background:NAVY }}>
                   <Info size={13} color="#fff" />
                 </div>
                 <div>
@@ -245,11 +234,11 @@ function AddProductModal({ onClose, onSave }) {
                 <Field label="Brand"><CustomSelect value={form.brand} onChange={e=>setForm({...form,brand:e.target.value})} options={brandOptions} placeholder="Pilih brand..." /></Field>
               </div>
               <Field label="Deskripsi Produk">
-                <textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Jelaskan fitur unggulan produk..." className={`${inputCls} h-[90px] resize-none`} />
+                <textarea value={form.description} onChange={e=>setForm({...form,description:e.target.value})} placeholder="Jelaskan fitur unggulan produk..." className={`${inputCls} h-22.5 resize-none`} />
                 <p className={hintCls}>Min. 50 karakter untuk deskripsi yang baik</p>
               </Field>
               <Field label="Spesifikasi">
-                <textarea value={form.spesifikasi} onChange={e=>setForm({...form,spesifikasi:e.target.value})} placeholder={"- Chipset: A17 Pro\n- RAM: 8GB\n- Storage: 256GB"} className={`${inputCls} h-[80px] resize-none font-mono text-xs`} />
+                <textarea value={form.spesifikasi} onChange={e=>setForm({...form,spesifikasi:e.target.value})} placeholder={"- Chipset: A17 Pro\n- RAM: 8GB\n- Storage: 256GB"} className={`${inputCls} h-20 resize-none font-mono text-xs`} />
               </Field>
             </div>
           )}
@@ -257,7 +246,7 @@ function AddProductModal({ onClose, onSave }) {
           {step === 2 && (
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-purple-50 border border-purple-100">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-violet-600">
+                <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0 bg-violet-600">
                   <Camera size={13} color="#fff" />
                 </div>
                 <div>
@@ -266,9 +255,9 @@ function AddProductModal({ onClose, onSave }) {
                 </div>
               </div>
               <div onDragOver={e=>{e.preventDefault();setDragOver(true);}} onDragLeave={()=>setDragOver(false)} onDrop={e=>{e.preventDefault();setDragOver(false);}}
-                className="rounded-xl p-8 flex flex-col items-center gap-3 cursor-pointer transition-all duration-200 border-2 border-dashed"
+                className="flex flex-col items-center gap-3 p-8 transition-all duration-200 border-2 border-dashed cursor-pointer rounded-xl"
                 style={{ borderColor:dragOver?NAVY:"#e2e8f0", background:dragOver?"rgba(7,43,80,0.04)":"#fafaff" }}>
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200" style={{ background:dragOver?NAVY:"rgba(7,43,80,0.07)" }}>
+                <div className="flex items-center justify-center transition-all duration-200 w-14 h-14 rounded-2xl" style={{ background:dragOver?NAVY:"rgba(7,43,80,0.07)" }}>
                   <Upload size={24} color={dragOver?"#fff":NAVY} />
                 </div>
                 <div className="text-center">
@@ -290,7 +279,7 @@ function AddProductModal({ onClose, onSave }) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between mb-1.5">
-                          <p className="text-[13px] font-bold text-gray-800 m-0 truncate max-w-[200px]">{file.name}</p>
+                          <p className="text-[13px] font-bold text-gray-800 m-0 truncate max-w-50">{file.name}</p>
                           <span className={`text-[12px] font-bold shrink-0 ${file.progress===100?"text-emerald-600":""}`} style={file.progress!==100?{color:NAVY}:{}}>
                             {file.progress===100?"✓ Selesai":`${file.progress}%`}
                           </span>
@@ -301,7 +290,7 @@ function AddProductModal({ onClose, onSave }) {
                         <p className="text-[11px] text-gray-400 mt-1 m-0">{file.size}</p>
                       </div>
                       <button onClick={()=>setUploadedFiles(uploadedFiles.filter((_,idx)=>idx!==i))}
-                        className="w-7 h-7 rounded-lg border-none bg-red-50 cursor-pointer text-red-500 flex items-center justify-center shrink-0">
+                        className="flex items-center justify-center text-red-500 border-none rounded-lg cursor-pointer w-7 h-7 bg-red-50 shrink-0">
                         <X size={12} />
                       </button>
                     </div>
@@ -314,7 +303,7 @@ function AddProductModal({ onClose, onSave }) {
           {step === 3 && (
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-green-50 border border-green-100">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 bg-emerald-600">
+                <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0 bg-emerald-600">
                   <DollarSign size={13} color="#fff" />
                 </div>
                 <div>
@@ -356,8 +345,8 @@ function AddProductModal({ onClose, onSave }) {
                 <CustomSelect value={form.warna} onChange={e=>setForm({...form,warna:e.target.value})} options={warnaOptions} placeholder="Pilih warna..." />
               </Field>
               {form.warna && (
-                <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3">
-                  <div className="w-5 h-5 rounded-full border-2 border-black/10 shadow-sm shrink-0" style={{ background:warnaMap[form.warna]||"#e5e7eb" }} />
+                <div className="flex items-center gap-3 px-4 py-3 border border-gray-100 rounded-xl bg-gray-50">
+                  <div className="w-5 h-5 border-2 rounded-full shadow-sm border-black/10 shrink-0" style={{ background:warnaMap[form.warna]||"#e5e7eb" }} />
                   <span className="text-[13px] font-bold text-gray-700">{form.warna}</span>
                   <div className="ml-auto bg-green-100 px-2.5 py-0.5 rounded-full">
                     <span className="text-[11px] font-bold text-green-700">✓ Siap</span>
@@ -365,7 +354,7 @@ function AddProductModal({ onClose, onSave }) {
                 </div>
               )}
               {(form.name||form.price||form.stock) && (
-                <div className="rounded-2xl p-5" style={{ background:`linear-gradient(135deg,#072B50,#0e4a8a)` }}>
+                <div className="p-5 rounded-2xl" style={{ background:`linear-gradient(135deg,#072B50,#0e4a8a)` }}>
                   <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-3">Ringkasan Produk</p>
                   <div className="flex flex-col gap-2">
                     {[
@@ -374,9 +363,9 @@ function AddProductModal({ onClose, onSave }) {
                       { label:"Harga",    value:form.price?formatPrice(Number(form.price)):"—" },
                       { label:"Stok",     value:form.stock?`${form.stock} Unit`:"—" },
                     ].map(({ label, value }) => (
-                      <div key={label} className="flex justify-between items-center">
+                      <div key={label} className="flex items-center justify-between">
                         <span className="text-[12px] text-white/50 font-medium">{label}</span>
-                        <span className="text-[12.5px] text-white font-bold truncate max-w-[220px] text-right">{value}</span>
+                        <span className="text-[12.5px] text-white font-bold truncate max-w-55 text-right">{value}</span>
                       </div>
                     ))}
                   </div>
@@ -386,7 +375,7 @@ function AddProductModal({ onClose, onSave }) {
           )}
         </div>
 
-        <div className="flex items-center justify-between px-7 py-4 border-t border-gray-100 bg-gray-50 shrink-0">
+        <div className="flex items-center justify-between py-4 border-t border-gray-100 px-7 bg-gray-50 shrink-0">
           <button onClick={()=>step>1?setStep(step-1):onClose()}
             className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
             <ArrowLeft size={14} /> {step===1?"Batal":"Kembali"}
@@ -405,7 +394,7 @@ function AddProductModal({ onClose, onSave }) {
             </button>
           ) : (
             <button onClick={()=>{ onSave(form); onClose(); }}
-              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold bg-gradient-to-r from-emerald-600 to-green-700"
+              className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold bg-linear-to-r from-emerald-600 to-green-700"
               style={{ boxShadow:"0 4px 14px rgba(5,150,105,0.32)" }}>
               <Check size={14} strokeWidth={3} /> Simpan Produk
             </button>
@@ -420,23 +409,94 @@ function AddProductModal({ onClose, onSave }) {
    MAIN PAGE
 ══════════════════════════ */
 export default function Produk() {
-  const [products, setProducts]         = useState(initialProducts);
   const [currentPage, setCurrentPage]   = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewProduct, setViewProduct]   = useState(null);
   const [editProduct, setEditProduct]   = useState(null);
   const [deleteId, setDeleteId]         = useState(null);
   const [editForm, setEditForm]         = useState({ name:"", category:"", price:"", stock:"", promo:false });
-
-  const totalPages    = Math.ceil(products.length / ITEMS_PER_PAGE);
-  const paginated     = products.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE);
+  const [products, setProducts] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const paginated     = products;
   const promoCount    = products.filter(p => p.promo).length;
   const lowStockCount = products.filter(p => p.stock < 10).length;
 
+  useEffect(() => {
+    const fetchProduk = async () => {
+      try {
+        const res = await getProduk(currentPage);
+
+        // mapping dari Laravel ke frontend kamu
+        const mapped = res.data.map((item) => ({
+          id: item.id,
+          name: item.nama,
+          category: item.kategori?.nama || "-",
+          price: item.harga,
+          stock: item.stok,
+          promo: item.adalah_promo,
+          image: "📦", // sementara
+        }));
+
+        setProducts(mapped);
+        setTotalPages(res.last_page);
+      } catch (err) {
+        console.error("Gagal ambil produk:", err);
+      }
+    };
+
+    fetchProduk();
+  }, [currentPage]);
+
   const openEdit = (p) => { setEditProduct(p); setEditForm({ name:p.name, category:p.category, price:String(p.price), stock:String(p.stock), promo:p.promo }); };
   const handleSaveEdit = () => { if (editProduct) setProducts(prev => prev.map(p => p.id===editProduct.id ? {...p,...editForm,price:Number(editForm.price),stock:Number(editForm.stock)} : p)); setEditProduct(null); };
-  const handleDelete   = () => { setProducts(prev => prev.filter(p => p.id!==deleteId)); setDeleteId(null); };
-  const handleAddSave  = (data) => setProducts(prev => [...prev, { id:Date.now(), name:data.name||"Produk Baru", category:data.category||"-", price:Number(data.price)||0, stock:Number(data.stock)||0, promo:false, image:"📦" }]);
+  
+  const handleDelete = async () => {
+    try {
+      await deleteProduk(deleteId);
+      setDeleteId(null);
+
+      // refresh data
+      const res = await getProduk(currentPage);
+      setProducts(res.data.map(item => ({
+        id: item.id,
+        name: item.nama,
+        category: item.kategori?.nama || "-",
+        price: item.harga,
+        stock: item.stok,
+        promo: item.adalah_promo,
+        image: "📦",
+      })));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+  const handleAddSave = async (data) => {
+  try {
+    await createProduk({
+      nama: data.name,
+      kategori_id: 1, // sementara (nanti bisa dynamic)
+      harga: Number(data.price),
+      stok: Number(data.stock),
+      deskripsi: data.description,
+    });
+
+    // refresh
+    const res = await getProduk(currentPage);
+    setProducts(res.data.map(item => ({
+      id: item.id,
+      name: item.nama,
+      category: item.kategori?.nama || "-",
+      price: item.harga,
+      stock: item.stok,
+      promo: item.adalah_promo,
+      image: "📦",
+    })));
+  } catch (err) {
+    console.error(err);
+  }
+};
 
   const chipColors = ["#e6eef6","#eef3fb","#e8f0fa","#ddeaf6","#e0ecf8","#e3edf8","#dce8f5","#e5eef8","#e1ebf7"];
 
@@ -450,7 +510,7 @@ export default function Produk() {
     <div className="produk-admin">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col justify-between gap-4 mb-8 sm:flex-row sm:items-center">
         <div>
           <h1 className="text-[22px] font-extrabold m-0 tracking-tight" style={{ color:NAVY }}>Daftar Produk</h1>
           <p className="text-[12.5px] text-gray-400 m-0 mt-0.5">Kelola inventaris dan katalog produk Anda di sini</p>
@@ -463,10 +523,10 @@ export default function Produk() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-7">
         {STAT_CARDS.map(({ label, value, icon, bg }) => (
-          <div key={label} className="stat-card bg-white rounded-2xl border border-gray-100 flex items-center gap-4 px-6 py-5 shadow-sm">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background:bg }}>{icon}</div>
+          <div key={label} className="flex items-center gap-4 px-6 py-5 bg-white border border-gray-100 shadow-sm stat-card rounded-2xl">
+            <div className="flex items-center justify-center w-11 h-11 rounded-xl shrink-0" style={{ background:bg }}>{icon}</div>
             <div>
               <p className="text-[26px] font-extrabold m-0 leading-none" style={{ color:NAVY }}>{value}</p>
               <p className="text-[12px] font-semibold text-gray-400 mt-1 m-0">{label}</p>
@@ -476,7 +536,7 @@ export default function Produk() {
       </div>
 
       {/* Table — struktur sama persis dengan Promo */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
 
         {/* Table header bar */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background:"#FDFDFD" }}>
@@ -488,9 +548,9 @@ export default function Produk() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse min-w-[640px]">
+          <table className="w-full border-collapse min-w-160">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
+              <tr className="border-b border-gray-100 bg-gray-50">
                 {["Foto","Nama Produk","Harga","Stok","Promo","Aksi"].map(h => (
                   <th key={h} className={`text-[11px] font-bold text-gray-400 tracking-widest uppercase px-5 py-4 ${h==="Aksi"?"text-right":"text-left"}`}>{h}</th>
                 ))}
@@ -532,13 +592,13 @@ export default function Produk() {
                   {/* Aksi — icon only, mirip Promo */}
                   <td className="px-5 py-4 text-right">
                     <div className="flex gap-1.5 justify-end">
-                      <button onClick={() => setViewItem(item)} className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center">
+                      <button onClick={() => setViewProduct(product)} className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer action-btn">
                         <Eye size={13} />
                       </button>
-                      <button onClick={() => setEditItem(item)} className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-amber-600">
+                      <button onClick={() => openEdit(product)} className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer action-btn text-amber-600">
                         <Pencil size={13} />
                       </button>
-                      <button onClick={() => setDeleteId(item.id)} className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-red-500">
+                      <button onClick={() => setDeleteId(product.id)} className="flex items-center justify-center w-8 h-8 text-red-500 border-none rounded-lg cursor-pointer action-btn">
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -550,7 +610,7 @@ export default function Produk() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <div className="flex flex-col justify-between gap-3 px-6 py-4 border-t border-gray-100 sm:flex-row sm:items-center bg-gray-50">
           <p className="text-[12.5px] text-gray-400 m-0">
             Menampilkan {(currentPage-1)*ITEMS_PER_PAGE+1}–{Math.min(currentPage*ITEMS_PER_PAGE,products.length)} dari {products.length} produk
           </p>
@@ -579,20 +639,20 @@ export default function Produk() {
       {/* Edit Modal */}
       {editProduct && (
         <Overlay onClose={()=>setEditProduct(null)}>
-          <div className="modal-wrap bg-white rounded-2xl w-[460px] overflow-hidden shadow-2xl">
+          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-115">
             <div className="flex items-center gap-3 px-6 py-5" style={{ background:NAVY }}>
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background:"rgba(255,255,255,0.15)" }}>
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl" style={{ background:"rgba(255,255,255,0.15)" }}>
                 <Pencil size={16} color="#fff" />
               </div>
               <div className="flex-1">
                 <h2 className="text-[15px] font-extrabold text-white m-0">Edit Produk</h2>
                 <p className="text-[11px] text-white/60 m-0">{editProduct.name}</p>
               </div>
-              <button onClick={()=>setEditProduct(null)} className="w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center" style={{ background:"rgba(255,255,255,0.15)", color:"#fff" }}>
+              <button onClick={()=>setEditProduct(null)} className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer" style={{ background:"rgba(255,255,255,0.15)", color:"#fff" }}>
                 <X size={14} />
               </button>
             </div>
-            <div className="p-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-4 p-6">
               {[{label:"Nama Produk",key:"name"},{label:"Kategori",key:"category"}].map(({ label, key }) => (
                 <div key={key}>
                   <label className={labelCls}>{label}</label>
@@ -616,7 +676,7 @@ export default function Produk() {
               </label>
               <div className="flex gap-2.5 mt-1">
                 <button onClick={()=>setEditProduct(null)} className="flex-1 py-3 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Batal</button>
-                <button onClick={handleSaveEdit} className="flex-[2] py-3 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold hover:opacity-90 transition-all" style={{ background:NAVY, boxShadow:`0 4px 14px rgba(7,43,80,0.28)` }}>Simpan Perubahan</button>
+                <button onClick={handleSaveEdit} className="flex-2 py-3 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold hover:opacity-90 transition-all" style={{ background:NAVY, boxShadow:`0 4px 14px rgba(7,43,80,0.28)` }}>Simpan Perubahan</button>
               </div>
             </div>
           </div>
@@ -626,9 +686,9 @@ export default function Produk() {
       {/* Delete Modal */}
       {deleteId !== null && (
         <Overlay onClose={()=>setDeleteId(null)}>
-          <div className="modal-wrap bg-white rounded-2xl w-[360px] overflow-hidden shadow-2xl">
-            <div className="py-8 px-7 text-center bg-gradient-to-br from-red-500 to-red-600">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
+          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-90">
+            <div className="py-8 text-center px-7 bg-linear-to-br from-red-500 to-red-600">
+              <div className="flex items-center justify-center mx-auto mb-4 w-14 h-14 rounded-2xl bg-white/20">
                 <AlertTriangle size={26} color="#fff" />
               </div>
               <h3 className="text-[18px] font-extrabold text-white mb-2 m-0">Hapus Produk?</h3>
@@ -636,7 +696,7 @@ export default function Produk() {
             </div>
             <div className="px-6 py-5 flex gap-2.5">
               <button onClick={()=>setDeleteId(null)} className="flex-1 py-3 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Batal</button>
-              <button onClick={handleDelete} className="flex-1 py-3 rounded-xl border-none bg-gradient-to-br from-red-500 to-red-600 text-white cursor-pointer text-[13.5px] font-bold">Ya, Hapus</button>
+              <button onClick={handleDelete} className="flex-1 py-3 rounded-xl border-none bg-linear-to-br from-red-500 to-red-600 text-white cursor-pointer text-[13.5px] font-bold">Ya, Hapus</button>
             </div>
           </div>
         </Overlay>

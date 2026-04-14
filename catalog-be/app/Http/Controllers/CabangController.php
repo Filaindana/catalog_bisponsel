@@ -16,6 +16,21 @@ class CabangController
             'status' => true,
             'data'   => $cabang,
         ]);
+        // return response()->json([
+        //     'status' => true,
+        //     'data' => $cabang->map(function ($item) {
+        //         return [
+        //             'id'        => $item->id,
+        //             'name'      => $item->nama,
+        //             'branchId'  => $item->kode,
+        //             'city'      => $item->kota,
+        //             'address'   => $item->alamat,
+        //             'jamBuka'   => $item->jam_buka,
+        //             'jamTutup'  => $item->jam_tutup,
+        //             'mapsLink'  => $item->maps_link,
+        //         ];
+        //     }),
+        // ]);
     }
 
     public function show(int $id): JsonResponse
@@ -36,6 +51,9 @@ class CabangController
             'kota'    => 'required|string|max:100',
             'alamat'  => 'required|string',
             'telepon' => 'nullable|string|max:20',
+            'jam_buka'   => 'nullable|date_format:H:i',
+            'jam_tutup'  => 'nullable|date_format:H:i',
+            'maps_link'  => 'nullable|url',
         ]);
 
         $cabang = Cabang::create($validated);
@@ -57,6 +75,9 @@ class CabangController
             'kota'    => 'sometimes|string|max:100',
             'alamat'  => 'sometimes|string',
             'telepon' => 'nullable|string|max:20',
+            'jam_buka'   => 'nullable|date_format:H:i',
+            'jam_tutup'  => 'nullable|date_format:H:i',
+            'maps_link'  => 'nullable|url',
         ]);
 
         $cabang->update($validated);

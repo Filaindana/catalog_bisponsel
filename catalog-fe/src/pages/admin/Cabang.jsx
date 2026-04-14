@@ -1,4 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getCabangs,
+  createCabang,
+  updateCabang,
+  deleteCabang,
+} from "../../utils/services/cabangService";
 import {
   Eye,
   Pencil,
@@ -55,9 +61,9 @@ const Field = ({ label, children }) => (
 );
 
 const ModalSection = ({ icon, title }) => (
-  <div className="flex items-center gap-2 mb-4 mt-1">
+  <div className="flex items-center gap-2 mt-1 mb-4">
     <div
-      className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+      className="flex items-center justify-center w-6 h-6 rounded-lg shrink-0"
       style={{ background: "rgba(7,43,80,0.08)" }}
     >
       {icon}
@@ -68,13 +74,13 @@ const ModalSection = ({ icon, title }) => (
     >
       {title}
     </span>
-    <div className="flex-1 h-px bg-gray-100 ml-1" />
+    <div className="flex-1 h-px ml-1 bg-gray-100" />
   </div>
 );
 
 const Overlay = ({ onClose, children }) => (
   <div
-    className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+    className="fixed inset-0 flex items-center justify-center p-4 z-1000"
     style={{ background: "rgba(5,12,30,0.6)", backdropFilter: "blur(10px)" }}
     onClick={onClose}
   >
@@ -96,13 +102,13 @@ function BranchChip({ city }) {
   const color = colors[city] || NAVY;
   return (
     <div
-      className="w-[86px] h-[52px] rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
+      className="w-21.5 h-13 rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
       style={{
         background: `linear-gradient(135deg,${color}dd,${color}88)`,
         boxShadow: `0 4px 12px ${color}44`,
       }}
     >
-      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white/15" />
+      <div className="absolute w-8 h-8 rounded-full -top-2 -right-2 bg-white/15" />
       <Building2 size={16} color="#fff" />
     </div>
   );
@@ -111,32 +117,51 @@ function BranchChip({ city }) {
 function ViewModal({ cabang, onClose, onEdit }) {
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-[#FDFDFD] rounded-2xl w-[440px] overflow-hidden shadow-2xl">
+      <div className="bg-[#FDFDFD] rounded-2xl w-110 overflow-hidden shadow-2xl">
         <div className="relative px-7 py-7 bg-[#072B50]">
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
-          <div className="absolute -bottom-4 left-4 w-16 h-16 rounded-full bg-white/5 pointer-events-none" />
-          <h2 className="text-[18px] font-extrabold text-white m-0 mb-1">{cabang.name}</h2>
+          <div className="absolute rounded-full pointer-events-none -top-8 -right-8 w-36 h-36 bg-white/5" />
+          <div className="absolute w-16 h-16 rounded-full pointer-events-none -bottom-4 left-4 bg-white/5" />
+          <h2 className="text-[18px] font-extrabold text-white m-0 mb-1">
+            {cabang.name}
+          </h2>
           <p className="text-[12.5px] text-white/60 m-0">{cabang.branchId}</p>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-white bg-white/10 hover:bg-white/20 transition-colors"
+            className="absolute flex items-center justify-center w-8 h-8 text-white transition-colors border-none rounded-lg cursor-pointer top-4 right-4 bg-white/10 hover:bg-white/20"
           >
             <X size={14} />
           </button>
         </div>
         <div className="p-6 flex flex-col gap-4 bg-[#FDFDFD]">
           <div className="rounded-xl bg-[#f0f4f9] border border-[#dce6f0] px-4 py-3.5">
-            <p className="text-[10px] font-bold text-[#8a9bb0] uppercase tracking-wider mb-1.5">Alamat</p>
-            <p className="text-[13px] text-[#374151] leading-relaxed m-0">{cabang.address || "—"}</p>
+            <p className="text-[10px] font-bold text-[#8a9bb0] uppercase tracking-wider mb-1.5">
+              Alamat
+            </p>
+            <p className="text-[13px] text-[#374151] leading-relaxed m-0">
+              {cabang.address || "—"}
+            </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {[
               { label: "Kota", value: cabang.city },
-              { label: "Jam Operasional", value: cabang.jamBuka && cabang.jamTutup ? `${cabang.jamBuka} – ${cabang.jamTutup}` : "—" },
+              {
+                label: "Jam Operasional",
+                value:
+                  cabang.jamBuka && cabang.jamTutup
+                    ? `${cabang.jamBuka} – ${cabang.jamTutup}`
+                    : "—",
+              },
             ].map(({ label, value }) => (
-              <div key={label} className="rounded-xl border border-[#dce6f0] bg-[#f0f4f9] px-4 py-3.5">
-                <p className="text-[10px] font-bold text-[#8a9bb0] uppercase tracking-wider mb-1.5">{label}</p>
-                <p className="text-[13.5px] font-bold text-[#072B50] m-0">{value || "—"}</p>
+              <div
+                key={label}
+                className="rounded-xl border border-[#dce6f0] bg-[#f0f4f9] px-4 py-3.5"
+              >
+                <p className="text-[10px] font-bold text-[#8a9bb0] uppercase tracking-wider mb-1.5">
+                  {label}
+                </p>
+                <p className="text-[13.5px] font-bold text-[#072B50] m-0">
+                  {value || "—"}
+                </p>
               </div>
             ))}
           </div>
@@ -148,7 +173,9 @@ function ViewModal({ cabang, onClose, onEdit }) {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-50 border border-blue-100 no-underline"
             >
               <MapPin size={13} className="text-blue-500 shrink-0" />
-              <span className="text-[12.5px] font-semibold text-blue-700 truncate">{cabang.mapsLink}</span>
+              <span className="text-[12.5px] font-semibold text-blue-700 truncate">
+                {cabang.mapsLink}
+              </span>
             </a>
           )}
           <div className="flex gap-2.5 mt-1">
@@ -160,8 +187,11 @@ function ViewModal({ cabang, onClose, onEdit }) {
             </button>
             <button
               onClick={onEdit}
-              className="flex-[2] py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
-              style={{ background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.3)` }}
+              className="flex-2 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
+              style={{
+                background: NAVY,
+                boxShadow: `0 4px 14px rgba(7,43,80,0.3)`,
+              }}
             >
               Edit Cabang
             </button>
@@ -175,7 +205,14 @@ function ViewModal({ cabang, onClose, onEdit }) {
 function CabangFormModal({ onClose, onSave, initial = null }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(
-    initial ?? { name: "", city: "", address: "", mapsLink: "", jamBuka: "", jamTutup: "" }
+    initial ?? {
+      name: "",
+      city: "",
+      address: "",
+      mapsLink: "",
+      jamBuka: "",
+      jamTutup: "",
+    },
   );
   const [dragOver, setDragOver] = useState(false);
   const [preview, setPreview] = useState(initial?.photo ?? null);
@@ -184,65 +221,96 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0];
-    if (file && file.type.startsWith("image/")) setPreview(URL.createObjectURL(file));
+    if (file && file.type.startsWith("image/"))
+      setPreview(URL.createObjectURL(file));
   };
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[540px] bg-white rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="w-135 bg-white rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-7 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between py-5 border-b border-gray-100 px-7">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: "rgba(7,43,80,0.08)" }}>
+            <div
+              className="flex items-center justify-center w-10 h-10 rounded-xl"
+              style={{ background: "rgba(7,43,80,0.08)" }}
+            >
               <Building2 size={18} style={{ color: NAVY }} />
             </div>
             <div>
-              <h2 className="text-[16px] font-extrabold m-0 mb-0.5" style={{ color: NAVY }}>
+              <h2
+                className="text-[16px] font-extrabold m-0 mb-0.5"
+                style={{ color: NAVY }}
+              >
                 {isEdit ? "Edit Cabang" : "Tambah Cabang Baru"}
               </h2>
               <p className="text-[11.5px] text-gray-400 m-0">
-                {isEdit ? "Perbarui informasi cabang" : "Lengkapi semua informasi cabang"}
+                {isEdit
+                  ? "Perbarui informasi cabang"
+                  : "Lengkapi semua informasi cabang"}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 cursor-pointer flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+            className="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors border border-gray-200 rounded-lg cursor-pointer bg-gray-50 hover:text-gray-700"
           >
             <X size={14} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-6">
+        <div className="flex flex-col flex-1 gap-6 py-6 overflow-y-auto px-7">
           {/* Foto */}
           <div>
-            <ModalSection icon={<Upload size={11} style={{ color: NAVY }} />} title="Foto Cabang" />
+            <ModalSection
+              icon={<Upload size={11} style={{ color: NAVY }} />}
+              title="Foto Cabang"
+            />
             {preview ? (
-              <div className="relative rounded-xl overflow-hidden border border-gray-200 h-32">
-                <img src={preview} alt="preview" className="w-full h-full object-cover" />
+              <div className="relative h-32 overflow-hidden border border-gray-200 rounded-xl">
+                <img
+                  src={preview}
+                  alt="preview"
+                  className="object-cover w-full h-full"
+                />
                 <button
                   onClick={() => setPreview(null)}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-white/90 border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-white cursor-pointer"
+                  className="absolute flex items-center justify-center text-gray-500 border border-gray-200 rounded-lg cursor-pointer top-2 right-2 w-7 h-7 bg-white/90 hover:bg-white"
                 >
                   <X size={12} />
                 </button>
               </div>
             ) : (
               <label
-                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleFileDrop}
-                className="flex items-center gap-4 border-2 border-dashed rounded-xl px-5 py-4 cursor-pointer transition-all"
-                style={{ borderColor: dragOver ? NAVY : "#e2e8f0", background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff" }}
+                className="flex items-center gap-4 px-5 py-4 transition-all border-2 border-dashed cursor-pointer rounded-xl"
+                style={{
+                  borderColor: dragOver ? NAVY : "#e2e8f0",
+                  background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
+                }}
               >
-                <input type="file" accept="image/*" className="hidden" onChange={handleFileDrop} />
-                <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileDrop}
+                />
+                <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl shrink-0">
                   <Upload size={18} className="text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-[13px] font-semibold text-gray-700 m-0">Seret foto ke sini atau klik untuk memilih</p>
-                  <p className="text-[11px] text-gray-400 m-0 mt-0.5">PNG, JPG — Maks. 2MB</p>
+                  <p className="text-[13px] font-semibold text-gray-700 m-0">
+                    Seret foto ke sini atau klik untuk memilih
+                  </p>
+                  <p className="text-[11px] text-gray-400 m-0 mt-0.5">
+                    PNG, JPG — Maks. 2MB
+                  </p>
                 </div>
               </label>
             )}
@@ -250,42 +318,92 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
 
           {/* Info */}
           <div>
-            <ModalSection icon={<Building2 size={11} style={{ color: NAVY }} />} title="Informasi Cabang" />
+            <ModalSection
+              icon={<Building2 size={11} style={{ color: NAVY }} />}
+              title="Informasi Cabang"
+            />
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-3">
                 <Field label="Nama Cabang">
-                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Cabang Jakarta Pusat" className={inputCls} />
+                  <input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Cabang Jakarta Pusat"
+                    className={inputCls}
+                  />
                 </Field>
                 <Field label="Kota">
-                  <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Jakarta" className={inputCls} />
+                  <input
+                    value={form.city}
+                    onChange={(e) => setForm({ ...form, city: e.target.value })}
+                    placeholder="Jakarta"
+                    className={inputCls}
+                  />
                 </Field>
               </div>
               <Field label="Alamat Lengkap">
-                <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Jl. Sudirman No. 123, Jakarta Pusat 10220" className={`${inputCls} h-20 resize-none`} />
+                <textarea
+                  value={form.address}
+                  onChange={(e) =>
+                    setForm({ ...form, address: e.target.value })
+                  }
+                  placeholder="Jl. Sudirman No. 123, Jakarta Pusat 10220"
+                  className={`${inputCls} h-20 resize-none`}
+                />
               </Field>
             </div>
           </div>
 
           {/* Jam */}
           <div>
-            <ModalSection icon={<Clock size={11} style={{ color: NAVY }} />} title="Jam Operasional" />
+            <ModalSection
+              icon={<Clock size={11} style={{ color: NAVY }} />}
+              title="Jam Operasional"
+            />
             <div className="grid grid-cols-2 gap-3">
               <Field label="Jam Buka">
-                <input type="time" value={form.jamBuka} onChange={(e) => setForm({ ...form, jamBuka: e.target.value })} className={inputCls} />
+                <input
+                  type="time"
+                  value={form.jamBuka}
+                  onChange={(e) =>
+                    setForm({ ...form, jamBuka: e.target.value })
+                  }
+                  className={inputCls}
+                />
               </Field>
               <Field label="Jam Tutup">
-                <input type="time" value={form.jamTutup} onChange={(e) => setForm({ ...form, jamTutup: e.target.value })} className={inputCls} />
+                <input
+                  type="time"
+                  value={form.jamTutup}
+                  onChange={(e) =>
+                    setForm({ ...form, jamTutup: e.target.value })
+                  }
+                  className={inputCls}
+                />
               </Field>
             </div>
           </div>
 
           {/* Maps */}
           <div>
-            <ModalSection icon={<MapPin size={11} style={{ color: NAVY }} />} title="Google Maps" />
+            <ModalSection
+              icon={<MapPin size={11} style={{ color: NAVY }} />}
+              title="Google Maps"
+            />
             <Field label="Link Google Maps (opsional)">
               <div className="relative">
-                <MapPin size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input value={form.mapsLink} onChange={(e) => setForm({ ...form, mapsLink: e.target.value })} placeholder="https://maps.google.com/..." className={`${inputCls} pl-9`} />
+                <MapPin
+                  size={13}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                />
+                <input
+                  value={form.mapsLink}
+                  onChange={(e) =>
+                    setForm({ ...form, mapsLink: e.target.value })
+                  }
+                  placeholder="https://maps.google.com/..."
+                  className={`${inputCls} pl-9`}
+                />
               </div>
             </Field>
           </div>
@@ -293,13 +411,22 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
 
         {/* Footer */}
         <div className="flex justify-end gap-2.5 px-7 py-4 border-t border-gray-100 bg-gray-50">
-          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors">
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+          >
             Batal
           </button>
           <button
-            onClick={() => { onSave({ ...form, photo: preview }); onClose(); }}
+            onClick={() => {
+              onSave({ ...form, photo: preview });
+              onClose();
+            }}
             className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
-            style={{ background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.3)` }}
+            style={{
+              background: NAVY,
+              boxShadow: `0 4px 14px rgba(7,43,80,0.3)`,
+            }}
           >
             {isEdit ? "Simpan Perubahan" : "Simpan Cabang"}
           </button>
@@ -309,17 +436,17 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
   );
 }
 
-const initialCabang = [
-  { id: 1, name: "Cabang Jakarta Pusat", branchId: "BIZ-JKT-001", city: "Jakarta", address: "Jl. Jenderal Sudirman No. 123", jamBuka: "08:00", jamTutup: "17:00", mapsLink: "", photo: null },
-  { id: 2, name: "Cabang Bandung", branchId: "BIZ-BDG-002", city: "Bandung", address: "Jl. Asia Afrika No. 45", jamBuka: "09:00", jamTutup: "18:00", mapsLink: "", photo: null },
-  { id: 3, name: "Cabang Surabaya", branchId: "BIZ-SBY-003", city: "Surabaya", address: "Jl. Tunjungan No. 88", jamBuka: "08:30", jamTutup: "17:30", mapsLink: "", photo: null },
-  { id: 4, name: "Cabang Yogyakarta", branchId: "BIZ-YGY-004", city: "Yogyakarta", address: "Jl. Malioboro No. 12", jamBuka: "09:00", jamTutup: "17:00", mapsLink: "", photo: null },
-  { id: 5, name: "Cabang Medan", branchId: "BIZ-MDN-005", city: "Medan", address: "Jl. Imam Bonjol No. 7", jamBuka: "08:00", jamTutup: "16:00", mapsLink: "", photo: null },
-  { id: 6, name: "Cabang Semarang", branchId: "BIZ-SMG-006", city: "Semarang", address: "Jl. Pandanaran No. 55", jamBuka: "08:30", jamTutup: "17:30", mapsLink: "", photo: null },
-];
+// const initialCabang = [
+//   { id: 1, name: "Cabang Jakarta Pusat", branchId: "BIZ-JKT-001", city: "Jakarta", address: "Jl. Jenderal Sudirman No. 123", jamBuka: "08:00", jamTutup: "17:00", mapsLink: "", photo: null },
+//   { id: 2, name: "Cabang Bandung", branchId: "BIZ-BDG-002", city: "Bandung", address: "Jl. Asia Afrika No. 45", jamBuka: "09:00", jamTutup: "18:00", mapsLink: "", photo: null },
+//   { id: 3, name: "Cabang Surabaya", branchId: "BIZ-SBY-003", city: "Surabaya", address: "Jl. Tunjungan No. 88", jamBuka: "08:30", jamTutup: "17:30", mapsLink: "", photo: null },
+//   { id: 4, name: "Cabang Yogyakarta", branchId: "BIZ-YGY-004", city: "Yogyakarta", address: "Jl. Malioboro No. 12", jamBuka: "09:00", jamTutup: "17:00", mapsLink: "", photo: null },
+//   { id: 5, name: "Cabang Medan", branchId: "BIZ-MDN-005", city: "Medan", address: "Jl. Imam Bonjol No. 7", jamBuka: "08:00", jamTutup: "16:00", mapsLink: "", photo: null },
+//   { id: 6, name: "Cabang Semarang", branchId: "BIZ-SMG-006", city: "Semarang", address: "Jl. Pandanaran No. 55", jamBuka: "08:30", jamTutup: "17:30", mapsLink: "", photo: null },
+// ];
 
 export default function CabangPage() {
-  const [cabangs, setCabangs] = useState(initialCabang);
+  const [cabangs, setCabangs] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
   const [viewItem, setViewItem] = useState(null);
@@ -327,120 +454,263 @@ export default function CabangPage() {
   const [deleteId, setDeleteId] = useState(null);
 
   const totalPages = Math.ceil(cabangs.length / ITEMS_PER_PAGE);
-  const paginated = cabangs.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginated = cabangs.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
   const cities = [...new Set(cabangs.map((c) => c.city))];
 
-  const handleAdd = (data) =>
-    setCabangs([...cabangs, {
-      id: Date.now(),
-      name: data.name,
-      branchId: `BIZ-${data.city.slice(0, 3).toUpperCase()}-${String(cabangs.length + 1).padStart(3, "0")}`,
-      city: data.city,
-      address: data.address,
-      jamBuka: data.jamBuka,
-      jamTutup: data.jamTutup,
-      mapsLink: data.mapsLink,
-      photo: data.photo ?? null,
-    }]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getCabangs();
 
-  const handleEdit = (data) =>
-    setCabangs(cabangs.map((c) => c.id === editItem.id ? { ...c, ...data, photo: data.photo ?? c.photo } : c));
+        // mapping backend → frontend
+        const mapped = data.map((c) => ({
+          id: c.id,
+          name: c.nama,
+          branchId: c.kode,
+          city: c.kota,
+          address: c.alamat,
+          jamBuka: c.jam_buka || "",
+          jamTutup: c.jam_tutup || "",
+          mapsLink: "",
+          photo: null,
+        }));
 
-  const handleDelete = () => {
-    setCabangs(cabangs.filter((c) => c.id !== deleteId));
-    setDeleteId(null);
+        setCabangs(mapped);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleAdd = async (data) => {
+    try {
+      const payload = {
+        ...data,
+        branchId: `BIZ-${data.city.slice(0, 3).toUpperCase()}-${Date.now()}`,
+      };
+
+      const res = await createCabang(payload);
+
+      const newCabang = {
+        id: res.data.id,
+        name: res.data.nama,
+        branchId: res.data.kode,
+        city: res.data.kota,
+        address: res.data.alamat,
+        jamBuka: "",
+        jamTutup: "",
+      };
+
+      setCabangs((prev) => [...prev, newCabang]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleEdit = async (data) => {
+    try {
+      const res = await updateCabang(editItem.id, data);
+
+      setCabangs((prev) =>
+        prev.map((c) =>
+          c.id === editItem.id
+            ? {
+                ...c,
+                name: res.data.nama,
+                city: res.data.kota,
+                address: res.data.alamat,
+              }
+            : c,
+        ),
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await deleteCabang(deleteId);
+
+      setCabangs((prev) => prev.filter((c) => c.id !== deleteId));
+      setDeleteId(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const STAT_CARDS = [
-    { label: "Total Cabang", value: cabangs.length, icon: <Building2 size={18} color={NAVY} />, bg: "#e6eef6" },
-    { label: "Kota", value: cities.length, icon: <MapPin size={18} color={NAVY} />, bg: "#e6eef6" },
-    { label: "Ditampilkan", value: cabangs.length, icon: <Activity size={18} color={NAVY} />, bg: "#e6eef6" },
+    {
+      label: "Total Cabang",
+      value: cabangs.length,
+      icon: <Building2 size={18} color={NAVY} />,
+      bg: "#e6eef6",
+    },
+    {
+      label: "Kota",
+      value: cities.length,
+      icon: <MapPin size={18} color={NAVY} />,
+      bg: "#e6eef6",
+    },
+    {
+      label: "Ditampilkan",
+      value: cabangs.length,
+      icon: <Activity size={18} color={NAVY} />,
+      bg: "#e6eef6",
+    },
   ];
 
   return (
     <div className="cabang-admin">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col justify-between gap-4 mb-8 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-[22px] font-extrabold m-0 tracking-tight" style={{ color: NAVY }}>
+          <h1
+            className="text-[22px] font-extrabold m-0 tracking-tight"
+            style={{ color: NAVY }}
+          >
             Manajemen Cabang
           </h1>
-          <p className="text-[12.5px] text-gray-400 m-0 mt-0.5">Kelola semua cabang toko aktif dan informasinya</p>
+          <p className="text-[12.5px] text-gray-400 m-0 mt-0.5">
+            Kelola semua cabang toko aktif dan informasinya
+          </p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90 hover:-translate-y-px shrink-0"
-          style={{ background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}
+          style={{
+            background: NAVY,
+            boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
+          }}
         >
           <Plus size={15} /> Tambah Cabang
         </button>
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-7">
         {STAT_CARDS.map(({ label, value, icon, bg }) => (
-          <div key={label} className="stat-card bg-white rounded-2xl border border-gray-100 flex items-center gap-4 px-6 py-5 shadow-sm">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: bg }}>
+          <div
+            key={label}
+            className="flex items-center gap-4 px-6 py-5 bg-white border border-gray-100 shadow-sm stat-card rounded-2xl"
+          >
+            <div
+              className="flex items-center justify-center w-11 h-11 rounded-xl shrink-0"
+              style={{ background: bg }}
+            >
               {icon}
             </div>
             <div>
-              <p className="text-[26px] font-extrabold m-0 leading-none" style={{ color: NAVY }}>{value}</p>
-              <p className="text-[12px] font-semibold text-gray-400 mt-1 m-0">{label}</p>
+              <p
+                className="text-[26px] font-extrabold m-0 leading-none"
+                style={{ color: NAVY }}
+              >
+                {value}
+              </p>
+              <p className="text-[12px] font-semibold text-gray-400 mt-1 m-0">
+                {label}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background: "#FDFDFD" }}>
+      <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
+        <div
+          className="flex items-center justify-between px-6 py-4 border-b border-gray-100"
+          style={{ background: "#FDFDFD" }}
+        >
           <div className="flex items-center gap-2">
             <Building2 size={14} color={NAVY} />
-            <span className="text-[12.5px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Daftar Cabang</span>
+            <span
+              className="text-[12.5px] font-bold uppercase tracking-wider"
+              style={{ color: NAVY }}
+            >
+              Daftar Cabang
+            </span>
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse min-w-[640px]">
+          <table className="w-full border-collapse min-w-160">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
-                {["Ikon", "Nama Cabang", "Kota & Jam", "Alamat", "Aksi"].map((h) => (
-                  <th key={h} className={`text-[11px] font-bold text-gray-400 tracking-widest uppercase px-5 py-4 ${h === "Aksi" ? "text-right" : "text-left"}`}>
-                    {h}
-                  </th>
-                ))}
+              <tr className="border-b border-gray-100 bg-gray-50">
+                {["Ikon", "Nama Cabang", "Kota & Jam", "Alamat", "Aksi"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className={`text-[11px] font-bold text-gray-400 tracking-widest uppercase px-5 py-4 ${h === "Aksi" ? "text-right" : "text-left"}`}
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody>
               {paginated.map((item, i) => (
-                <tr key={item.id} className={`row-item ${i < paginated.length - 1 ? "border-b border-gray-50" : ""}`}>
+                <tr
+                  key={item.id}
+                  className={`row-item ${i < paginated.length - 1 ? "border-b border-gray-50" : ""}`}
+                >
                   <td className="px-5 py-4">
                     <BranchChip city={item.city} />
                   </td>
                   <td className="px-5 py-4">
-                    <p className="text-[13.5px] font-bold m-0 mb-0.5" style={{ color: NAVY }}>{item.name}</p>
-                    <p className="text-[11.5px] text-gray-400 m-0">{item.branchId}</p>
+                    <p
+                      className="text-[13.5px] font-bold m-0 mb-0.5"
+                      style={{ color: NAVY }}
+                    >
+                      {item.name}
+                    </p>
+                    <p className="text-[11.5px] text-gray-400 m-0">
+                      {item.branchId}
+                    </p>
                   </td>
                   <td className="px-5 py-4">
-                    <p className="text-[13px] font-semibold m-0 mb-0.5" style={{ color: NAVY }}>{item.city}</p>
+                    <p
+                      className="text-[13px] font-semibold m-0 mb-0.5"
+                      style={{ color: NAVY }}
+                    >
+                      {item.city}
+                    </p>
                     {item.jamBuka && item.jamTutup && (
                       <div className="flex items-center gap-1">
                         <Clock size={11} className="text-gray-300" />
-                        <span className="text-[11.5px] text-gray-400">{item.jamBuka} – {item.jamTutup}</span>
+                        <span className="text-[11.5px] text-gray-400">
+                          {item.jamBuka} – {item.jamTutup}
+                        </span>
                       </div>
                     )}
                   </td>
                   <td className="px-5 py-4">
-                    <span className="text-[12.5px] text-gray-600">{item.address}</span>
+                    <span className="text-[12.5px] text-gray-600">
+                      {item.address}
+                    </span>
                   </td>
                   <td className="px-5 py-4 text-right">
                     <div className="flex gap-1.5 justify-end">
-                      <button onClick={() => setViewItem(item)} className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center">
+                      <button
+                        onClick={() => setViewItem(item)}
+                        className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer action-btn"
+                      >
                         <Eye size={13} />
                       </button>
-                      <button onClick={() => setEditItem(item)} className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-amber-600">
+                      <button
+                        onClick={() => setEditItem(item)}
+                        className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer action-btn text-amber-600"
+                      >
                         <Pencil size={13} />
                       </button>
-                      <button onClick={() => setDeleteId(item.id)} className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-red-500">
+                      <button
+                        onClick={() => setDeleteId(item.id)}
+                        className="flex items-center justify-center w-8 h-8 text-red-500 border-none rounded-lg cursor-pointer action-btn"
+                      >
                         <Trash2 size={13} />
                       </button>
                     </div>
@@ -452,25 +722,50 @@ export default function CabangPage() {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <div className="flex flex-col justify-between gap-3 px-6 py-4 border-t border-gray-100 sm:flex-row sm:items-center bg-gray-50">
           <p className="text-[12.5px] text-gray-400 m-0">
-            Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, cabangs.length)} dari {cabangs.length} cabang
+            Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
+            {Math.min(currentPage * ITEMS_PER_PAGE, cabangs.length)} dari{" "}
+            {cabangs.length} cabang
           </p>
           <div className="flex gap-1.5">
-            <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} className="w-8 h-8 rounded-lg border border-gray-200 bg-white cursor-pointer text-[13px] text-gray-600 disabled:opacity-40 hover:border-gray-300 transition-colors">‹</button>
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="w-8 h-8 rounded-lg border border-gray-200 bg-white cursor-pointer text-[13px] text-gray-600 disabled:opacity-40 hover:border-gray-300 transition-colors"
+            >
+              ‹
+            </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
                 className="w-8 h-8 rounded-lg cursor-pointer text-[12.5px] font-bold border transition-all"
-                style={currentPage === page
-                  ? { background: NAVY, color: "#fff", borderColor: NAVY, boxShadow: `0 4px 10px rgba(7,43,80,0.25)` }
-                  : { background: "#fff", color: "#6b7280", borderColor: "#e5e7eb" }}
+                style={
+                  currentPage === page
+                    ? {
+                        background: NAVY,
+                        color: "#fff",
+                        borderColor: NAVY,
+                        boxShadow: `0 4px 10px rgba(7,43,80,0.25)`,
+                      }
+                    : {
+                        background: "#fff",
+                        color: "#6b7280",
+                        borderColor: "#e5e7eb",
+                      }
+                }
               >
                 {page}
               </button>
             ))}
-            <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="w-8 h-8 rounded-lg border border-gray-200 bg-white cursor-pointer text-[13px] text-gray-600 disabled:opacity-40 hover:border-gray-300 transition-colors">›</button>
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="w-8 h-8 rounded-lg border border-gray-200 bg-white cursor-pointer text-[13px] text-gray-600 disabled:opacity-40 hover:border-gray-300 transition-colors"
+            >
+              ›
+            </button>
           </div>
         </div>
       </div>
@@ -480,34 +775,62 @@ export default function CabangPage() {
         <ViewModal
           cabang={viewItem}
           onClose={() => setViewItem(null)}
-          onEdit={() => { setEditItem(viewItem); setViewItem(null); }}
+          onEdit={() => {
+            setEditItem(viewItem);
+            setViewItem(null);
+          }}
         />
       )}
-      {showAdd && <CabangFormModal onClose={() => setShowAdd(false)} onSave={(data) => { handleAdd(data); setShowAdd(false); }} />}
+      {showAdd && (
+        <CabangFormModal
+          onClose={() => setShowAdd(false)}
+          onSave={(data) => {
+            handleAdd(data);
+            setShowAdd(false);
+          }}
+        />
+      )}
       {editItem && (
         <CabangFormModal
           initial={editItem}
           onClose={() => setEditItem(null)}
-          onSave={(data) => { handleEdit(data); setEditItem(null); }}
+          onSave={(data) => {
+            handleEdit(data);
+            setEditItem(null);
+          }}
         />
       )}
 
       {/* Delete Modal */}
       {deleteId !== null && (
         <Overlay onClose={() => setDeleteId(null)}>
-          <div className="modal-wrap bg-white rounded-2xl w-[360px] overflow-hidden shadow-2xl">
-            <div className="py-8 px-7 text-center bg-gradient-to-br from-red-500 to-red-600">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
+          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-90">
+            <div className="py-8 text-center px-7 bg-linear-to-br from-red-500 to-red-600">
+              <div className="flex items-center justify-center mx-auto mb-4 w-14 h-14 rounded-2xl bg-white/20">
                 <AlertTriangle size={26} color="#fff" />
               </div>
-              <h3 className="text-[18px] font-extrabold text-white mb-2 m-0">Hapus Cabang?</h3>
+              <h3 className="text-[18px] font-extrabold text-white mb-2 m-0">
+                Hapus Cabang?
+              </h3>
               <p className="text-[12.5px] text-white/80 m-0 leading-relaxed">
-                Tindakan ini tidak dapat dibatalkan.<br />Cabang akan dihapus permanen.
+                Tindakan ini tidak dapat dibatalkan.
+                <br />
+                Cabang akan dihapus permanen.
               </p>
             </div>
             <div className="px-6 py-5 flex gap-2.5">
-              <button onClick={() => setDeleteId(null)} className="flex-1 py-3 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Batal</button>
-              <button onClick={handleDelete} className="flex-1 py-3 rounded-xl border-none bg-gradient-to-br from-red-500 to-red-600 text-white cursor-pointer text-[13.5px] font-bold">Ya, Hapus</button>
+              <button
+                onClick={() => setDeleteId(null)}
+                className="flex-1 py-3 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 py-3 rounded-xl border-none bg-linear-to-br from-red-500 to-red-600 text-white cursor-pointer text-[13.5px] font-bold"
+              >
+                Ya, Hapus
+              </button>
             </div>
           </div>
         </Overlay>

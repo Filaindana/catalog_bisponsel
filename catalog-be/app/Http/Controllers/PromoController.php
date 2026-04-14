@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Promo;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 
 class PromoController
 {
@@ -16,7 +17,30 @@ class PromoController
             $query->where('status', $request->status);
         }
 
-        $promo = $query->orderBy('dibuat_pada', 'desc')->get();
+        $promo = $query->orderBy('dibuat_pada', 'desc')->get()
+            ->map(function ($item) {
+
+                // AUTO STATUS (biar ga tergantung DB doang)
+                $now = Carbon::now();
+                if ($item->tanggal_mulai > $now) {
+                    $status = 'segera';
+                } elseif ($item->tanggal_selesai < $now) {
+                    $status = 'berakhir';
+                } else {
+                    $status = 'aktif';
+                }
+
+                return [
+                    'id' => $item->id,
+                    'nama' => $item->nama,
+                    'deskripsi' => $item->deskripsi,
+                    'tanggal_mulai' => $item->tanggal_mulai?->format('Y-m-d'),
+                    'tanggal_selesai' => $item->tanggal_selesai?->format('Y-m-d'),
+                    'status' => $status,
+                    'banner' => $item->banner,
+                    'produk' => $item->produk,
+                ];
+            });
 
         return response()->json([
             'status' => true,
@@ -26,25 +50,32 @@ class PromoController
 
     public function show(int $id): JsonResponse
     {
-        $promo = Promo::with('produk.gambar')->findOrFail($id);
+        $promo = Promo::with('produk')->findOrFail($id);
 
         return response()->json([
             'status' => true,
-            'data'   => $promo,
+            'data'   => [
+                'id' => $promo->id,
+                'nama' => $promo->nama,
+                'deskripsi' => $promo->deskripsi,
+                'tanggal_mulai' => $promo->tanggal_mulai?->format('Y-m-d'),
+                'tanggal_selesai' => $promo->tanggal_selesai?->format('Y-m-d'),
+                'status' => $promo->status,
+                'banner' => $promo->banner,
+                'produk' => $promo->produk,
+            ],
         ]);
     }
 
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'nama'            => 'required|string|max:255',
-            'deskripsi'       => 'nullable|string',
-            'tanggal_mulai'   => 'required|date',
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'status'          => 'required|in:aktif,segera,berakhir',
-            'banner'          => 'nullable|string',
-            'produk_ids'      => 'nullable|array',
-            'produk_ids.*'    => 'exists:produk,id',
+            'banner' => 'nullable|string',
+            'produk_ids' => 'nullable|array',
         ]);
 
         $promo = Promo::create($validated);
@@ -54,9 +85,9 @@ class PromoController
         }
 
         return response()->json([
-            'status'  => true,
-            'message' => 'Promo berhasil dibuat.',
-            'data'    => $promo->load('produk'),
+            'status' => true,
+            'message' => 'Promo berhasil dibuat',
+            'data' => $promo->load('produk'),
         ], 201);
     }
 
@@ -65,14 +96,12 @@ class PromoController
         $promo = Promo::findOrFail($id);
 
         $validated = $request->validate([
-            'nama'            => 'sometimes|string|max:255',
-            'deskripsi'       => 'nullable|string',
-            'tanggal_mulai'   => 'sometimes|date',
-            'tanggal_selesai' => 'sometimes|date|after_or_equal:tanggal_mulai',
-            'status'          => 'sometimes|in:aktif,segera,berakhir',
-            'banner'          => 'nullable|string',
-            'produk_ids'      => 'nullable|array',
-            'produk_ids.*'    => 'exists:produk,id',
+            'nama' => 'sometimes|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'tanggal_mulai' => 'sometimes|date',
+            'tanggal_selesai' => 'sometimes|date',
+            'banner' => 'nullable|string',
+            'produk_ids' => 'nullable|array',
         ]);
 
         $promo->update($validated);
@@ -82,9 +111,9 @@ class PromoController
         }
 
         return response()->json([
-            'status'  => true,
-            'message' => 'Promo berhasil diperbarui.',
-            'data'    => $promo->load('produk'),
+            'status' => true,
+            'message' => 'Promo berhasil diupdate',
+            'data' => $promo->load('produk'),
         ]);
     }
 
@@ -95,8 +124,8 @@ class PromoController
         $promo->delete();
 
         return response()->json([
-            'status'  => true,
-            'message' => 'Promo berhasil dihapus.',
+            'status' => true,
+            'message' => 'Promo berhasil dihapus',
         ]);
     }
 }

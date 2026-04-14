@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getTotalProduk,
+  getPromoAktif,
+  getTotalCabang,
+} from "../../utils/services/dashboardService";
 import {
   Package,
   Tag,
@@ -29,35 +34,35 @@ const topProducts = [
   { rank: "03", name: "Xiaomi 14 Pro", sold: 25, change: "-2%", up: false },
 ];
 
-const stats = [
-  {
-    label: "Total Produk",
-    value: "120",
-    badge: "↑ 12% dari bulan lalu",
-    badgeColor: "text-emerald-600 bg-emerald-50",
-    icon: Package,
-    accentBg: "bg-blue-50", // ← berubah
-    accentText: "text-[#1e3a5f]",
-  },
-  {
-    label: "Promo Aktif",
-    value: "8",
-    badge: "Sama seperti bulan lalu",
-    badgeColor: "text-slate-500 bg-slate-100",
-    icon: Tag,
-    accentBg: "bg-blue-50", // ← berubah dari bg-violet-50
-    accentText: "text-[#1e3a5f]",
-  },
-  {
-    label: "Total Cabang",
-    value: "7",
-    badge: "↑ 1 cabang baru",
-    badgeColor: "text-amber-600 bg-amber-50",
-    icon: Building2,
-    accentBg: "bg-blue-50", // ← berubah dari bg-amber-50
-    accentText: "text-[#1e3a5f]",
-  },
-];
+// const stats = [
+//   {
+//     label: "Total Produk",
+//     value: "120",
+//     badge: "↑ 12% dari bulan lalu",
+//     badgeColor: "text-emerald-600 bg-emerald-50",
+//     icon: Package,
+//     accentBg: "bg-blue-50", // ← berubah
+//     accentText: "text-[#1e3a5f]",
+//   },
+//   {
+//     label: "Promo Aktif",
+//     value: "8",
+//     badge: "Sama seperti bulan lalu",
+//     badgeColor: "text-slate-500 bg-slate-100",
+//     icon: Tag,
+//     accentBg: "bg-blue-50", // ← berubah dari bg-violet-50
+//     accentText: "text-[#1e3a5f]",
+//   },
+//   {
+//     label: "Total Cabang",
+//     value: "7",
+//     badge: "↑ 1 cabang baru",
+//     badgeColor: "text-amber-600 bg-amber-50",
+//     icon: Building2,
+//     accentBg: "bg-blue-50", // ← berubah dari bg-amber-50
+//     accentText: "text-[#1e3a5f]",
+//   },
+// ];
 
 /* ─── PREDIKSI DATA ─── */
 const prediksiData = [
@@ -93,11 +98,11 @@ function PrediksiModal({ onClose }) {
       onClick={onClose}
     >
       <div
-        className="w-[700px] bg-white rounded-2xl max-h-[88vh] flex flex-col overflow-hidden border border-slate-200 shadow-2xl"
+        className="w-175 bg-white rounded-2xl max-h-[88vh] flex flex-col overflow-hidden border border-slate-200 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-[#072B50] px-6 py-5 flex items-start justify-between flex-shrink-0">
+        <div className="bg-[#072B50] px-6 py-5 flex items-start justify-between shrink-0">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Sparkles size={14} className="text-blue-300" />
@@ -120,7 +125,7 @@ function PrediksiModal({ onClose }) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+        <div className="flex-1 px-6 py-6 space-y-6 overflow-y-auto">
           {/* Summary cards */}
           <div className="grid grid-cols-3 gap-3">
             {[
@@ -167,11 +172,11 @@ function PrediksiModal({ onClose }) {
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">
               Grafik Prediksi Detail
             </p>
-            <div className="relative h-52 bg-slate-50 rounded-xl px-4 pt-4 pb-8">
+            <div className="relative px-4 pt-4 pb-8 h-52 bg-slate-50 rounded-xl">
               {[25, 50, 75].map((y) => (
                 <div
                   key={y}
-                  className="absolute left-4 right-4 border-t border-slate-200/80"
+                  className="absolute border-t left-4 right-4 border-slate-200/80"
                   style={{ top: `${y}%` }}
                 />
               ))}
@@ -183,13 +188,13 @@ function PrediksiModal({ onClose }) {
                   return (
                     <div
                       key={i}
-                      className="flex-1 flex flex-col justify-end items-center gap-1 h-full group relative"
+                      className="relative flex flex-col items-center justify-end flex-1 h-full gap-1 group"
                     >
                       <div className="absolute bottom-full mb-1.5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                         <div className="bg-slate-900 text-white text-[10px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap">
                           {val} unit
                           {isPred && (
-                            <span className="text-blue-300 ml-1">
+                            <span className="ml-1 text-blue-300">
                               (prediksi)
                             </span>
                           )}
@@ -240,10 +245,10 @@ function PrediksiModal({ onClose }) {
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
               Rincian Mingguan
             </p>
-            <div className="rounded-xl border border-slate-100 overflow-hidden">
+            <div className="overflow-hidden border rounded-xl border-slate-100">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
+                  <tr className="border-b bg-slate-50 border-slate-100">
                     {[
                       "Periode",
                       "Prediksi Penjualan",
@@ -294,12 +299,12 @@ function PrediksiModal({ onClose }) {
                   ].map((row, i) => (
                     <tr
                       key={i}
-                      className="border-t border-slate-100 hover:bg-slate-50 transition-colors"
+                      className="transition-colors border-t border-slate-100 hover:bg-slate-50"
                     >
                       <td className="px-4 py-3 text-sm font-semibold text-slate-700">
                         {row.period}
                       </td>
-                      <td className="px-4 py-3 text-sm text-right tabular-nums text-slate-900 font-semibold">
+                      <td className="px-4 py-3 text-sm font-semibold text-right tabular-nums text-slate-900">
                         {row.val} unit
                       </td>
                       <td className="px-4 py-3 text-right">
@@ -330,9 +335,9 @@ function PrediksiModal({ onClose }) {
           </div>
 
           {/* Catatan */}
-          <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100">
-            <Info size={14} className="text-blue-400 mt-0.5 flex-shrink-0" />
-            <p className="text-xs text-blue-600 leading-relaxed">
+          <div className="flex items-start gap-3 px-4 py-3 border border-blue-100 rounded-xl bg-blue-50">
+            <Info size={14} className="text-blue-400 mt-0.5 shrink-0" />
+            <p className="text-xs leading-relaxed text-blue-600">
               Prediksi dihasilkan berdasarkan tren historis 6 minggu terakhir.
               Tingkat kepercayaan menurun seiring jauhnya proyeksi. Data ini
               bersifat indikatif dan belum mencerminkan faktor eksternal seperti
@@ -341,7 +346,7 @@ function PrediksiModal({ onClose }) {
           </div>
         </div>
 
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex justify-end flex-shrink-0">
+        <div className="flex justify-end px-6 py-4 border-t border-slate-100 bg-slate-50/50 shrink-0">
           <button
             onClick={onClose}
             className="px-5 py-2.5 rounded-xl bg-[#072B50] text-white text-sm font-semibold hover:bg-[#0e3d6e] cursor-pointer transition-colors border-0 font-[inherit]"
@@ -360,15 +365,91 @@ export default function Dashboard() {
   const [predHovered, setPredHovered] = useState(null);
   const [showPrediksi, setShowPrediksi] = useState(false);
 
+  const [stats, setStats] = useState([
+    {
+      label: "Total Produk",
+      value: "...",
+      badge: "Loading...",
+      badgeColor: "text-slate-500 bg-slate-100",
+      icon: Package,
+      accentBg: "bg-blue-50",
+      accentText: "text-[#1e3a5f]",
+    },
+    {
+      label: "Promo Aktif",
+      value: "...",
+      badge: "Loading...",
+      badgeColor: "text-slate-500 bg-slate-100",
+      icon: Tag,
+      accentBg: "bg-blue-50",
+      accentText: "text-[#1e3a5f]",
+    },
+    {
+      label: "Total Cabang",
+      value: "...",
+      badge: "Loading...",
+      badgeColor: "text-slate-500 bg-slate-100",
+      icon: Building2,
+      accentBg: "bg-blue-50",
+      accentText: "text-[#1e3a5f]",
+    },
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [produk, promo, cabang] = await Promise.all([
+          getTotalProduk(),
+          getPromoAktif(),
+          getTotalCabang(),
+        ]);
+
+        setStats([
+          {
+            label: "Total Produk",
+            value: produk,
+            badge: "Data realtime",
+            badgeColor: "text-emerald-600 bg-emerald-50",
+            icon: Package,
+            accentBg: "bg-blue-50",
+            accentText: "text-[#1e3a5f]",
+          },
+          {
+            label: "Promo Aktif",
+            value: promo,
+            badge: "Sedang berjalan",
+            badgeColor: "text-slate-500 bg-slate-100",
+            icon: Tag,
+            accentBg: "bg-blue-50",
+            accentText: "text-[#1e3a5f]",
+          },
+          {
+            label: "Total Cabang",
+            value: cabang,
+            badge: "Seluruh cabang",
+            badgeColor: "text-amber-600 bg-amber-50",
+            icon: Building2,
+            accentBg: "bg-blue-50",
+            accentText: "text-[#1e3a5f]",
+          },
+        ]);
+      } catch (error) {
+        console.error("Gagal fetch dashboard:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="font-sans">
       {/* PAGE HEADER */}
       <div className="flex items-end justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 leading-tight">
+          <h1 className="text-2xl font-bold leading-tight text-slate-900">
             Ringkasan Dashboard
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="mt-1 text-sm text-slate-400">
             Selamat datang kembali — berikut perkembangan di toko Anda.
           </p>
         </div>
@@ -387,9 +468,9 @@ export default function Dashboard() {
           return (
             <div
               key={i}
-              className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition-shadow"
+              className="p-5 transition-shadow bg-white border shadow-sm rounded-2xl border-slate-100 hover:shadow-md"
             >
-              <div className="flex justify-between items-start mb-5">
+              <div className="flex items-start justify-between mb-5">
                 <div
                   className={`w-10 h-10 rounded-xl ${s.accentBg} flex items-center justify-center`}
                 >
@@ -400,7 +481,7 @@ export default function Dashboard() {
               <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                 {s.label}
               </p>
-              <h2 className="text-4xl font-bold text-slate-900 mb-4 tabular-nums">
+              <h2 className="mb-4 text-4xl font-bold text-slate-900 tabular-nums">
                 {s.value}
               </h2>
               <span
@@ -416,9 +497,9 @@ export default function Dashboard() {
       {/* DUA CHART SEJAJAR: Prediksi (kiri) + Analitik Katalog (kanan) */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         {/* KIRI — Prediksi Penjualan */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+        <div className="p-6 bg-white border shadow-sm rounded-2xl border-slate-100">
           <div className="flex items-start justify-between mb-5">
-            <div className="min-h-[52px]">
+            <div className="min-h-13">
               <div className="flex items-center gap-2 mb-0.5">
                 <Sparkles size={13} className="text-violet-400" />
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
@@ -442,8 +523,8 @@ export default function Dashboard() {
           </div>
 
           {/* Mini bar chart prediksi */}
-          <div className="relative bg-slate-50 rounded-xl px-3 pt-3">
-            <div className="relative h-36 flex items-end gap-1">
+          <div className="relative px-3 pt-3 bg-slate-50 rounded-xl">
+            <div className="relative flex items-end gap-1 h-36">
               {[33, 66].map((y) => (
                 <div
                   key={y}
@@ -459,7 +540,7 @@ export default function Dashboard() {
                 return (
                   <div
                     key={i}
-                    className="flex-1 flex flex-col justify-end items-center h-full relative cursor-pointer"
+                    className="relative flex flex-col items-center justify-end flex-1 h-full cursor-pointer"
                     onMouseEnter={() => setPredHovered(i)}
                     onMouseLeave={() => setPredHovered(null)}
                   >
@@ -489,7 +570,7 @@ export default function Dashboard() {
             </div>
 
             {/* Label — di luar area bar */}
-            <div className="flex gap-1 mt-1 pb-2">
+            <div className="flex gap-1 pb-2 mt-1">
               {prediksiData.map((d, i) => (
                 <div key={i} className="flex-1 text-center">
                   <span
@@ -512,7 +593,7 @@ export default function Dashboard() {
                 <span className="text-[11px] text-slate-400">Aktual</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-2 bg-blue-300/70 border border-dashed border-blue-400 rounded-sm" />
+                <div className="w-6 h-2 border border-blue-400 border-dashed rounded-sm bg-blue-300/70" />
                 <span className="text-[11px] text-slate-400">Prediksi</span>
               </div>
             </div>
@@ -526,9 +607,9 @@ export default function Dashboard() {
         </div>
 
         {/* KANAN — Analitik Katalog */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
-          <div className="flex justify-between items-center mb-5">
-            <div className="min-h-[52px]">
+        <div className="p-6 bg-white border shadow-sm rounded-2xl border-slate-100">
+          <div className="flex items-center justify-between mb-5">
+            <div className="min-h-13">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">
                 Performa
               </p>
@@ -548,7 +629,7 @@ export default function Dashboard() {
           </div>
 
           {/* Area bar */}
-          <div className="relative bg-slate-50 rounded-xl px-3 pt-3">
+          <div className="relative px-3 pt-3 bg-slate-50 rounded-xl">
             <div className="relative h-36 flex items-end gap-2.5">
               {[33, 66].map((y) => (
                 <div
@@ -565,7 +646,7 @@ export default function Dashboard() {
                 return (
                   <div
                     key={i}
-                    className="flex-1 flex flex-col justify-end items-center relative h-full cursor-pointer"
+                    className="relative flex flex-col items-center justify-end flex-1 h-full cursor-pointer"
                     onMouseEnter={() => setHovered(i)}
                     onMouseLeave={() => setHovered(null)}
                   >
@@ -638,8 +719,8 @@ export default function Dashboard() {
               key={i}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl transition-colors ${
                 i === 0
-                  ? "bg-white/[0.13]"
-                  : "bg-white/[0.06] hover:bg-white/[0.09]"
+                  ? "bg-white/13"
+                  : "bg-white/6 hover:bg-white/9"
               }`}
             >
               <span

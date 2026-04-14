@@ -1,4 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getPromos,
+  createPromo,
+  updatePromo,
+  deletePromo,
+} from "../../utils/services/promoService";
 import {
   Eye,
   Pencil,
@@ -42,82 +48,6 @@ if (
   document.head.appendChild(s);
 }
 
-/* ── DATA & CONSTANTS ── */
-const initialPromos = [
-  {
-    id: 1,
-    name: "Diskon Akhir Tahun",
-    desc: "Potongan harga hingga 50%",
-    startDate: "2024-01-01",
-    endDate: "2024-01-31",
-    status: "Aktif",
-    bannerColor: "#3b82f6",
-  },
-  {
-    id: 2,
-    name: "Promo Gajian",
-    desc: "Cashback khusus pengguna setia",
-    startDate: "2024-02-25",
-    endDate: "2024-02-28",
-    status: "Segera",
-    bannerColor: "#f59e0b",
-  },
-  {
-    id: 3,
-    name: "Flash Sale 12.12",
-    desc: "Penawaran kilat hanya 24 jam",
-    startDate: "2023-12-12",
-    endDate: "2023-12-12",
-    status: "Berakhir",
-    bannerColor: "#ef4444",
-  },
-  {
-    id: 4,
-    name: "Cashback Spesial",
-    desc: "Extra saldo untuk Top Up",
-    startDate: "2024-03-01",
-    endDate: "2024-03-15",
-    status: "Segera",
-    bannerColor: "#0d9488",
-  },
-  {
-    id: 5,
-    name: "Mega Sale Harbolnas",
-    desc: "Diskon besar-besaran se-Indonesia",
-    startDate: "2024-04-01",
-    endDate: "2024-04-07",
-    status: "Aktif",
-    bannerColor: "#8b5cf6",
-  },
-  {
-    id: 6,
-    name: "Promo Lebaran",
-    desc: "Spesial Hari Raya Idul Fitri",
-    startDate: "2024-04-10",
-    endDate: "2024-04-20",
-    status: "Segera",
-    bannerColor: "#ec4899",
-  },
-  {
-    id: 7,
-    name: "Double Cashback",
-    desc: "2x cashback untuk semua transaksi",
-    startDate: "2024-05-01",
-    endDate: "2024-05-05",
-    status: "Segera",
-    bannerColor: "#f97316",
-  },
-  {
-    id: 8,
-    name: "Flash Sale Weekend",
-    desc: "Hanya Sabtu & Minggu",
-    startDate: "2024-03-16",
-    endDate: "2024-03-17",
-    status: "Berakhir",
-    bannerColor: "#06b6d4",
-  },
-];
-
 const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
 const produkOptions = [
@@ -150,12 +80,19 @@ const statusConfig = {
   Berakhir: { bg: "#fee2e2", color: "#dc2626", dot: "#ef4444" },
 };
 
-const fmt = (d) =>
-  new Date(d).toLocaleDateString("id-ID", {
+// const fmt = (d) =>
+//   new Date(d).toLocaleDateString("id-ID", {
+//     day: "2-digit",
+//     month: "short",
+//     year: "numeric",
+//   });
+const fmt = (date) => {
+  if (!date) return "-";
+  return new Date(date).toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "short",
-    year: "numeric",
   });
+};
 
 const inputCls =
   "input-field w-full px-3.5 py-3 rounded-xl border border-gray-200 text-[13.5px] outline-none text-gray-800 bg-gray-50 transition-all";
@@ -170,9 +107,9 @@ const Field = ({ label, children }) => (
 );
 
 const ModalSection = ({ icon, title }) => (
-  <div className="flex items-center gap-2 mb-4 mt-1">
+  <div className="flex items-center gap-2 mt-1 mb-4">
     <div
-      className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+      className="flex items-center justify-center w-6 h-6 rounded-lg shrink-0"
       style={{ background: "rgba(7,43,80,0.08)" }}
     >
       {icon}
@@ -183,13 +120,13 @@ const ModalSection = ({ icon, title }) => (
     >
       {title}
     </span>
-    <div className="flex-1 h-px bg-gray-100 ml-1" />
+    <div className="flex-1 h-px ml-1 bg-gray-100" />
   </div>
 );
 
 const Overlay = ({ onClose, children }) => (
   <div
-    className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+    className="fixed inset-0 flex items-center justify-center p-4 z-1000"
     style={{ background: "rgba(5,12,30,0.6)", backdropFilter: "blur(10px)" }}
     onClick={onClose}
   >
@@ -218,13 +155,13 @@ function StatusBadge({ status }) {
 function BannerChip({ color }) {
   return (
     <div
-      className="w-[86px] h-[52px] rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
+      className="w-21.5 h-13 rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
       style={{
         background: `linear-gradient(135deg,${color}dd,${color}88)`,
         boxShadow: `0 4px 12px ${color}44`,
       }}
     >
-      <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white/15" />
+      <div className="absolute w-8 h-8 rounded-full -top-2 -right-2 bg-white/15" />
       <Tag size={16} color="#fff" />
     </div>
   );
@@ -240,7 +177,7 @@ function ColorPicker({ value, onChange }) {
           <button
             key={c}
             onClick={() => onChange(c)}
-            className="w-6 h-6 rounded-full border-2 transition-all duration-150 cursor-pointer"
+            className="w-6 h-6 transition-all duration-150 border-2 rounded-full cursor-pointer"
             style={{
               backgroundColor: c,
               borderColor: value === c ? "#fff" : c,
@@ -256,17 +193,17 @@ function ColorPicker({ value, onChange }) {
 function ViewModal({ promo, onClose }) {
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-[#FDFDFD] rounded-2xl w-[440px] overflow-hidden shadow-2xl">
+      <div className="bg-[#FDFDFD] rounded-2xl w-110 overflow-hidden shadow-2xl">
         <div className="relative px-7 py-7 bg-[#072B50]">
-          <div className="absolute -top-8 -right-8 w-36 h-36 rounded-full bg-white/5 pointer-events-none" />
-          <div className="absolute -bottom-4 left-4 w-16 h-16 rounded-full bg-white/5 pointer-events-none" />
+          <div className="absolute rounded-full pointer-events-none -top-8 -right-8 w-36 h-36 bg-white/5" />
+          <div className="absolute w-16 h-16 rounded-full pointer-events-none -bottom-4 left-4 bg-white/5" />
           <h2 className="text-[18px] font-extrabold text-white m-0 mb-1">
             {promo.name}
           </h2>
           <p className="text-[12.5px] text-white/60 m-0">{promo.desc}</p>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-white bg-white/10 hover:bg-white/20 transition-colors"
+            className="absolute flex items-center justify-center w-8 h-8 text-white transition-colors border-none rounded-lg cursor-pointer top-4 right-4 bg-white/10 hover:bg-white/20"
           >
             <X size={14} />
           </button>
@@ -349,12 +286,12 @@ function AddModal({ onClose, onSave }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[540px] bg-white rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="w-135 bg-white rounded-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-7 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between py-5 border-b border-gray-100 px-7">
           <div className="flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              className="flex items-center justify-center w-10 h-10 rounded-xl"
               style={{ background: "rgba(7,43,80,0.08)" }}
             >
               <Zap size={18} style={{ color: NAVY }} />
@@ -373,14 +310,14 @@ function AddModal({ onClose, onSave }) {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 cursor-pointer flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+            className="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors border border-gray-200 rounded-lg cursor-pointer bg-gray-50 hover:text-gray-700"
           >
             <X size={14} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-7 py-6 flex flex-col gap-6">
+        <div className="flex flex-col flex-1 gap-6 py-6 overflow-y-auto px-7">
           {/* Info */}
           <div>
             <ModalSection
@@ -401,7 +338,7 @@ function AddModal({ onClose, onSave }) {
                   value={form.desc}
                   onChange={(e) => setForm({ ...form, desc: e.target.value })}
                   placeholder="Jelaskan detail penawaran promo..."
-                  className={`${inputCls} h-[80px] resize-none`}
+                  className={`${inputCls} h-20 resize-none`}
                 />
               </Field>
             </div>
@@ -455,11 +392,11 @@ function AddModal({ onClose, onSave }) {
                 </div>
                 <div
                   onClick={() => setForm({ ...form, isAktif: !form.isAktif })}
-                  className="relative w-11 h-6 rounded-full cursor-pointer shrink-0 transition-colors duration-200"
+                  className="relative h-6 transition-colors duration-200 rounded-full cursor-pointer w-11 shrink-0"
                   style={{ background: form.isAktif ? NAVY : "#e2e8f0" }}
                 >
                   <div
-                    className="absolute top-[3px] w-[18px] h-[18px] rounded-full bg-white shadow-md transition-all duration-200"
+                    className="absolute top-0.75 w-4.5 h-4.5 rounded-full bg-white shadow-md transition-all duration-200"
                     style={{ left: form.isAktif ? "22px" : "3px" }}
                   />
                 </div>
@@ -484,7 +421,7 @@ function AddModal({ onClose, onSave }) {
                   e.preventDefault();
                   setDragOver(false);
                 }}
-                className="rounded-xl p-5 flex flex-col items-center gap-2 cursor-pointer transition-all duration-200 border-2 border-dashed"
+                className="flex flex-col items-center gap-2 p-5 transition-all duration-200 border-2 border-dashed cursor-pointer rounded-xl"
                 style={{
                   borderColor: dragOver ? NAVY : "#e2e8f0",
                   background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
@@ -536,7 +473,7 @@ function AddModal({ onClose, onSave }) {
                     className={`${inputCls} pl-9`}
                   />
                   {produkSearch && filteredProduk.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 bg-white border border-gray-100 rounded-xl shadow-xl z-10 mt-1 overflow-hidden">
+                    <div className="absolute left-0 right-0 z-10 mt-1 overflow-hidden bg-white border border-gray-100 shadow-xl top-full rounded-xl">
                       {filteredProduk.map((p, i) => (
                         <div
                           key={p}
@@ -571,7 +508,7 @@ function AddModal({ onClose, onSave }) {
                       {p}
                       <button
                         onClick={() => removeProduk(p)}
-                        className="w-4 h-4 rounded flex items-center justify-center border-none cursor-pointer"
+                        className="flex items-center justify-center w-4 h-4 border-none rounded cursor-pointer"
                         style={{
                           background: "rgba(7,43,80,0.12)",
                           color: NAVY,
@@ -625,7 +562,7 @@ function AddModal({ onClose, onSave }) {
    MAIN PAGE
 ══════════════════════════ */
 export default function Promo() {
-  const [promos, setPromos] = useState(initialPromos);
+  const [promos, setPromos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewPromo, setViewPromo] = useState(null);
@@ -641,13 +578,10 @@ export default function Promo() {
   });
 
   const totalPages = Math.ceil(promos.length / ITEMS_PER_PAGE);
-  const paginated = promos.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
-  );
-  const aktifCount = promos.filter((p) => p.status === "Aktif").length;
-  const segeraCount = promos.filter((p) => p.status === "Segera").length;
-  const berakhirCount = promos.filter((p) => p.status === "Berakhir").length;
+  const paginated = promos;
+  const aktifCount = promos.filter((p) => p.status === "aktif").length;
+  const segeraCount = promos.filter((p) => p.status === "segera").length;
+  const berakhirCount = promos.filter((p) => p.status === "berakhir").length;
 
   const openEdit = (p) => {
     setEditPromo(p);
@@ -660,18 +594,27 @@ export default function Promo() {
       bannerColor: p.bannerColor,
     });
   };
-  const handleSaveEdit = () => {
+
+  const handleSaveEdit = async () => {
+    const updated = await updatePromo(editPromo.id, editForm);
+
     setPromos((prev) =>
-      prev.map((p) => (p.id === editPromo.id ? { ...p, ...editForm } : p)),
+      prev.map((p) => (editPromo && p.id === editPromo.id ? updated : p)),
     );
+
     setEditPromo(null);
   };
-  const handleDelete = () => {
+
+  const handleDelete = async () => {
+    await deletePromo(deleteId);
     setPromos((prev) => prev.filter((p) => p.id !== deleteId));
     setDeleteId(null);
   };
-  const handleAddSave = (data) =>
-    setPromos((prev) => [...prev, { id: Date.now(), ...data }]);
+
+  const handleAddSave = async (data) => {
+    const newPromo = await createPromo(data);
+    setPromos((prev) => [newPromo, ...prev]);
+  };
 
   const STAT_CARDS = [
     {
@@ -694,10 +637,23 @@ export default function Promo() {
     },
   ];
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getPromos();
+        setPromos(data); // ⬅️ ini penting
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="promo-admin">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col justify-between gap-4 mb-8 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3.5">
           <div>
             <h1
@@ -724,14 +680,14 @@ export default function Promo() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-7">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-7">
         {STAT_CARDS.map(({ label, value, icon, bg }) => (
           <div
             key={label}
-            className="stat-card bg-white rounded-2xl border border-gray-100 flex items-center gap-4 px-6 py-5 shadow-sm"
+            className="flex items-center gap-4 px-6 py-5 bg-white border border-gray-100 shadow-sm stat-card rounded-2xl"
           >
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+              className="flex items-center justify-center w-11 h-11 rounded-xl shrink-0"
               style={{ background: bg }}
             >
               {icon}
@@ -752,7 +708,7 @@ export default function Promo() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
         <div
           className="flex items-center justify-between px-6 py-4 border-b border-gray-100"
           style={{ background: "#FDFDFD" }}
@@ -768,9 +724,9 @@ export default function Promo() {
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse min-w-[640px]">
+          <table className="w-full border-collapse min-w-160">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-100">
+              <tr className="border-b border-gray-100 bg-gray-50">
                 {["Banner", "Nama Promo", "Periode", "Status", "Aksi"].map(
                   (h) => (
                     <th
@@ -784,65 +740,70 @@ export default function Promo() {
               </tr>
             </thead>
             <tbody>
-              {paginated.map((promo, i) => (
-                <tr
-                  key={promo.id}
-                  className={`row-item ${i < paginated.length - 1 ? "border-b border-gray-50" : ""}`}
-                >
-                  <td className="px-5 py-4">
-                    <BannerChip color={promo.bannerColor} />
-                  </td>
-                  <td className="px-5 py-4">
-                    <p
-                      className="text-[13.5px] font-bold m-0 mb-0.5"
-                      style={{ color: NAVY }}
-                    >
-                      {promo.name}
-                    </p>
-                    <p className="text-[11.5px] text-gray-400 m-0">
-                      {promo.desc}
-                    </p>
-                  </td>
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-1.5">
-                      <Calendar size={12} className="text-gray-300 shrink-0" />
-                      <span className="text-[12.5px] text-gray-600 font-medium">
-                        {fmt(promo.startDate)} – {fmt(promo.endDate)}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <StatusBadge status={promo.status} />
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <div className="flex gap-1.5 justify-end">
-                      <button
-                        onClick={() => setViewPromo(promo)}
-                        className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center">
-                        <Eye size={13} />
-                      </button>
-                      <button
-                        onClick={() => openEdit(promo)}
-                        className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-amber-600"
+              {Array.isArray(paginated) &&
+                paginated.map((promo, i) => (
+                  <tr
+                    key={promo.id}
+                    className={`row-item ${i < paginated.length - 1 ? "border-b border-gray-50" : ""}`}
+                  >
+                    <td className="px-5 py-4">
+                      <BannerChip color={promo.bannerColor} />
+                    </td>
+                    <td className="px-5 py-4">
+                      <p
+                        className="text-[13.5px] font-bold m-0 mb-0.5"
+                        style={{ color: NAVY }}
                       >
-                        <Pencil size={13} />
-                      </button>
-                      <button
-                        onClick={() => setDeleteId(promo.id)}
-                        className="action-btn w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center text-red-500"
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {promo.name}
+                      </p>
+                      <p className="text-[11.5px] text-gray-400 m-0">
+                        {promo.desc}
+                      </p>
+                    </td>
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar
+                          size={12}
+                          className="text-gray-300 shrink-0"
+                        />
+                        <span className="text-[12.5px] text-gray-600 font-medium">
+                          {fmt(promo.startDate)} – {fmt(promo.endDate)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-5 py-4">
+                      <StatusBadge status={promo.status} />
+                    </td>
+                    <td className="px-5 py-4 text-right">
+                      <div className="flex gap-1.5 justify-end">
+                        <button
+                          onClick={() => setViewPromo(promo)}
+                          className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer action-btn"
+                        >
+                          <Eye size={13} />
+                        </button>
+                        <button
+                          onClick={() => openEdit(promo)}
+                          className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer action-btn text-amber-600"
+                        >
+                          <Pencil size={13} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteId(promo.id)}
+                          className="flex items-center justify-center w-8 h-8 text-red-500 border-none rounded-lg cursor-pointer action-btn"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-t border-gray-100 bg-gray-50">
+        <div className="flex flex-col justify-between gap-3 px-6 py-4 border-t border-gray-100 sm:flex-row sm:items-center bg-gray-50">
           <p className="text-[12.5px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
             {Math.min(currentPage * ITEMS_PER_PAGE, promos.length)} dari{" "}
@@ -904,13 +865,13 @@ export default function Promo() {
       {/* Edit Modal */}
       {editPromo && (
         <Overlay onClose={() => setEditPromo(null)}>
-          <div className="modal-wrap bg-white rounded-2xl w-[460px] overflow-hidden shadow-2xl">
+          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-115">
             <div
               className="flex items-center gap-3 px-6 py-5"
               style={{ background: NAVY }}
             >
               <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center"
+                className="flex items-center justify-center w-9 h-9 rounded-xl"
                 style={{ background: "rgba(255,255,255,0.15)" }}
               >
                 <Pencil size={16} color="#fff" />
@@ -925,14 +886,14 @@ export default function Promo() {
               </div>
               <button
                 onClick={() => setEditPromo(null)}
-                className="w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center"
+                className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer"
                 style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}
               >
                 <X size={14} />
               </button>
             </div>
 
-            <div className="p-6 flex flex-col gap-4">
+            <div className="flex flex-col gap-4 p-6">
               {[
                 { label: "Nama Promo", key: "name" },
                 { label: "Deskripsi", key: "desc" },
@@ -1011,7 +972,7 @@ export default function Promo() {
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="flex-[2] py-3 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
+                  className="flex-2 py-3 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
                   style={{
                     background: NAVY,
                     boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
@@ -1028,9 +989,9 @@ export default function Promo() {
       {/* Delete Modal */}
       {deleteId !== null && (
         <Overlay onClose={() => setDeleteId(null)}>
-          <div className="modal-wrap bg-white rounded-2xl w-[360px] overflow-hidden shadow-2xl">
-            <div className="py-8 px-7 text-center bg-gradient-to-br from-red-500 to-red-600">
-              <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
+          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-90">
+            <div className="py-8 text-center px-7 bg-linear-to-br from-red-500 to-red-600">
+              <div className="flex items-center justify-center mx-auto mb-4 w-14 h-14 rounded-2xl bg-white/20">
                 <AlertTriangle size={26} color="#fff" />
               </div>
               <h3 className="text-[18px] font-extrabold text-white mb-2 m-0">
@@ -1051,7 +1012,7 @@ export default function Promo() {
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 py-3 rounded-xl border-none bg-gradient-to-br from-red-500 to-red-600 text-white cursor-pointer text-[13.5px] font-bold"
+                className="flex-1 py-3 rounded-xl border-none bg-linear-to-br from-red-500 to-red-600 text-white cursor-pointer text-[13.5px] font-bold"
               >
                 Ya, Hapus
               </button>

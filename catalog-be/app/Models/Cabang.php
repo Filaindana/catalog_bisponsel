@@ -18,6 +18,14 @@ class Cabang extends Model
         'kota',
         'alamat',
         'telepon',
+        'jam_buka',
+        'jam_tutup',
+        'maps_link',
+    ];
+
+    protected $casts = [
+        'jam_buka'  => 'string',
+        'jam_tutup' => 'string',
     ];
 
     public function aktivitas(): HasMany

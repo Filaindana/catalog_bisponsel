@@ -14,10 +14,10 @@ return new class extends Migration
             $table->text('deskripsi')->nullable();
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
-            $table->enum('status', ['aktif', 'segera', 'berakhir'])->default('segera');
             $table->string('banner')->nullable();
+
             $table->timestamp('dibuat_pada')->useCurrent();
-            $table->timestamp('diperbarui_pada')->useCurrentOnUpdate()->nullable();
+            $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

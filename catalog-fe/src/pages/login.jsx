@@ -30,8 +30,8 @@ const labelStyle = {
 
 const features = [
   "Akses ke ribuan produk elektronik",
-  "Notifikasi promo & flash sale eksklusif",
-  "Riwayat pembelian tersimpan aman",
+  "Filter & cari produk dengan mudah",
+  "Simpan produk favorit & kelola profilmu",
 ];
 
 export default function Login() {
@@ -178,8 +178,7 @@ export default function Login() {
               maxWidth: 340,
             }}
           >
-            Masuk dan lanjutkan pengalaman berbelanja produk teknologi terbaik
-            bersama kami.
+            Masuk untuk menggunakan fitur simpan produk dan mengakses profilmu.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {features.map((text, i) => (

@@ -30,14 +30,13 @@ const labelStyle = {
 
 const features = [
   "Akses ke ribuan produk elektronik",
-  "Notifikasi promo & flash sale eksklusif",
-  "Riwayat pembelian tersimpan aman",
+  "Filter & cari produk dengan mudah",
+  "Simpan produk favorit & kelola profilmu",
 ];
 
 export default function Register() {
   const navigate = useNavigate();
 
-  // ✅ semua state HARUS di dalam component
   const [nama, setNama] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -47,7 +46,6 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  // ✅ function juga di dalam component
   const handleRegister = async () => {
     if (password !== confirmPassword) {
       return alert("Password tidak sama");
@@ -60,7 +58,7 @@ export default function Register() {
         phone,
         password,
         password_confirmation: confirmPassword,
-        peran: "user", // ⚠️ sesuai backend kamu
+        peran: "user",
       });
 
       alert("Register berhasil!");
@@ -169,9 +167,9 @@ export default function Register() {
               letterSpacing: "-0.5px",
             }}
           >
-            Bergabung bersama
+            Temukan produk 
             <br />
-            ribuan pelanggan kami
+            yang kamu cari!
           </h2>
           <p
             style={{
@@ -182,8 +180,7 @@ export default function Register() {
               maxWidth: 340,
             }}
           >
-            Temukan produk teknologi terbaik dengan harga kompetitif dan layanan
-            terpercaya.
+            Buat akun untuk mengakses katalog lengkap dan menyimpan produk favoritmu.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {features.map((text, i) => (
@@ -259,7 +256,7 @@ export default function Register() {
           Buat Akun
         </h1>
         <p style={{ fontSize: 14, color: "#6b7280", margin: "0 0 28px 0" }}>
-          Daftar dan nikmati kemudahan berbelanja di BizPonsel
+          Daftar dan simpan produk favoritmu di BizPonsel
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

@@ -232,7 +232,6 @@ function HeroCard({ p }) {
             src={p.image} alt={p.title}
             onError={e => { e.currentTarget.style.display="none"; }}
           />
-          <div className="absolute inset-0 pointer-events-none" style={{ background:"linear-gradient(to right,transparent 60%,rgba(255,255,255,0.06) 100%)" }} />
           <div className="absolute top-5 left-5 bg-[#072B50] text-white text-[13px] font-black rounded-lg px-3.5 py-2">
             -{p.discount} OFF
           </div>
@@ -351,27 +350,7 @@ function BannerCard({ b, delay="" }) {
             ? "linear-gradient(to left,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%)"
             : "linear-gradient(to right,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.6) 100%)" }} />
 
-        <div className={`relative z-10 flex flex-col justify-between p-8 md:p-9 min-h-[220px] ${isRight?"items-end text-right":"items-start text-left"}`}>
-          <div>
-            <div className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 mb-4 border border-white/20 bg-white/10">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ background:b.accent }} />
-              <span className="text-[9px] font-bold text-white/70 tracking-[2px] uppercase">{b.label}</span>
-            </div>
-            <h3 className="text-2xl md:text-[26px] font-black text-white tracking-tight leading-snug mb-2.5 whitespace-pre-line">{b.title}</h3>
-            <p className="text-xs text-white/60 leading-relaxed max-w-[290px] mb-6" style={{ marginLeft:isRight?"auto":0 }}>{b.desc}</p>
-          </div>
-          <div className={`flex gap-3 flex-wrap ${isRight?"justify-end":"justify-start"}`}>
-            <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white text-[#072B50] text-[13px] font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg">
-              {b.btnText}
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-              </svg>
-            </button>
-            <button className="px-5 py-2.5 rounded-lg text-[13px] font-semibold text-white/80 border border-white/30 bg-transparent hover:bg-white/10 hover:border-white transition-all">
-              Pelajari Lebih
-            </button>
-          </div>
-        </div>
+      
       </div>
     </div>
   );
@@ -451,18 +430,7 @@ export default function PromoPage() {
           </div>
         )}
 
-        {/* ── BANNER SECTION ── */}
-        <div className="mb-10">
-          <div className="flex items-center gap-4 mb-7">
-            <div className="w-[5px] h-8 rounded-[3px] bg-[#072B50] shrink-0" />
-            <span className="text-[22px] font-extrabold text-[#072B50] tracking-tight">Promo Spesial Hari Ini</span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {BANNERS.map((b,i) => (
-              <BannerCard key={b.id} b={b} delay={delays[i]} />
-            ))}
-          </div>
-        </div>
+      
 
         {/* Empty state */}
         {filtered.length === 0 && (

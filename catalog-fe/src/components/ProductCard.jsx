@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ProductCard({
   product,
@@ -7,11 +8,28 @@ export default function ProductCard({
   variant = "default",
   compact = false,
   onCategoryClick,
+  onClick,
 }) {
+  const navigate = useNavigate();
+  const [hoverSave, setHoverSave] = useState(false);
   const imgHeight = compact ? "h-[150px]" : "h-[210px]";
+
+  const handleSave = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const isLoggedIn = !!localStorage.getItem("token");
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      onToggleSave?.();
+    }
+  };
+
+  const saveIsFilled = saved || hoverSave;
 
   return (
     <div
+      onClick={onClick}
       className={`pc-gradient-hover rounded-[16px] cursor-pointer p-[2px] bg-gray-200 ${
         compact ? "min-w-[200px]" : "min-w-[220px]"
       }`}
@@ -45,7 +63,7 @@ export default function ProductCard({
 
         {/* IMAGE */}
         <div className="relative bg-gray-50 overflow-hidden mt-2.5 group">
-          
+
           {product.badge && (
             <span className="absolute top-3 left-3 bg-red-500 text-white text-[12px] font-bold px-2 py-1 rounded-lg z-10">
               {product.badge}
@@ -59,28 +77,30 @@ export default function ProductCard({
           )}
 
           {/* SAVE BUTTON */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleSave?.();
-            }}
-            className={`absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-lg flex items-center justify-center shadow-md transition ${
-              saved
-                ? "bg-[#072B50] text-white"
-                : "bg-white text-[#072B50]"
-            }`}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill={saved ? "white" : "none"}
-              stroke={saved ? "none" : "#072B50"}
+          {variant !== "promo" && (
+            <button
+              onClick={handleSave}
+              onMouseEnter={(e) => { e.stopPropagation(); setHoverSave(true); }}
+              onMouseLeave={(e) => { e.stopPropagation(); setHoverSave(false); }}
+              className={`absolute top-2.5 right-2.5 z-10 w-9 h-9 rounded-lg flex items-center justify-center shadow-md transition-all duration-200 active:scale-95 ${
+                saveIsFilled
+                  ? "bg-[#072B50]"
+                  : "bg-white"
+              }`}
             >
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-            </svg>
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill={saveIsFilled ? "white" : "none"}
+                stroke={saveIsFilled ? "none" : "#072B50"}
+                strokeWidth="2"
+              >
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+            </button>
+          )}
 
           <img
             src={product.image}

@@ -10,7 +10,6 @@ import {
   Upload,
   Trash2,
   Check,
-  Settings,
   Building2,
 } from "lucide-react";
 
@@ -49,16 +48,6 @@ const Field = ({ label, children, hint }) => (
   </div>
 );
 
-const ModalSection = ({ icon, title }) => (
-  <div className="flex items-center gap-2 mb-4 mt-1">
-    <div className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0" style={{ background: "rgba(7,43,80,0.08)" }}>
-      {icon}
-    </div>
-    <span className="text-[11px] font-extrabold uppercase tracking-widest" style={{ color: NAVY }}>{title}</span>
-    <div className="flex-1 h-px bg-gray-100 ml-1" />
-  </div>
-);
-
 export default function Pengaturan() {
   const [showPassword, setShowPassword] = useState(false);
   const [savedProfile, setSavedProfile] = useState(false);
@@ -73,7 +62,8 @@ export default function Pengaturan() {
   const [kontak, setKontak] = useState({
     whatsapp: "+62 81234567890",
     email: "support@bizponsel.com",
-    alamat: "Jl. Sudirman No. 123, Gedung Bizponsel Lantai 15, Jakarta Pusat, 10220",
+    alamat:
+      "Jl. Sudirman No. 123, Gedung Bizponsel Lantai 15, Jakarta Pusat, 10220",
   });
 
   const handleSaveProfile = () => {
@@ -86,47 +76,65 @@ export default function Pengaturan() {
     setTimeout(() => setSavedKontak(false), 2000);
   };
 
-  const STAT_CARDS = [
-    { label: "Profil Admin", value: "1", icon: <User size={18} color={NAVY} />, bg: "#e6eef6" },
-    { label: "Kontak Aktif", value: "3", icon: <Phone size={18} color={NAVY} />, bg: "#e6eef6" },
-    { label: "Pengaturan", value: "2", icon: <Settings size={18} color={NAVY} />, bg: "#e6eef6" },
-  ];
-
   return (
     <div className="pengaturan-admin">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-[22px] font-extrabold m-0 tracking-tight" style={{ color: NAVY }}>
+          <h1
+            className="text-[22px] font-extrabold m-0 tracking-tight"
+            style={{ color: NAVY }}
+          >
             Pengaturan
           </h1>
-          <p className="text-[12.5px] text-gray-400 m-0 mt-0.5">Kelola profil admin dan informasi kontak website</p>
+          <p className="text-[12.5px] text-gray-400 m-0 mt-0.5">
+            Kelola profil admin dan informasi kontak website
+          </p>
         </div>
       </div>
-
-     
 
       <div className="flex flex-col gap-6">
         {/* ── PROFIL ADMIN ── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          {/* Section Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background: "#FDFDFD" }}>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <User size={14} color={NAVY} />
-              <span className="text-[12.5px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Profil Admin</span>
+              <span
+                className="text-[12.5px] font-bold uppercase tracking-wider"
+                style={{ color: NAVY }}
+              >
+                Profil Admin
+              </span>
             </div>
-            <span className="text-[11px] text-gray-400">Informasi akun dan keamanan login</span>
+            <span className="text-[11px] text-gray-400">
+              Informasi akun dan keamanan login
+            </span>
           </div>
+
+          {/* ISI TETAP SAMA (tidak diubah) */}
 
           <div className="p-6 flex flex-col gap-6">
             {/* Avatar */}
             <div className="flex items-center gap-5 p-5 rounded-xl bg-gray-50 border border-gray-100">
-              <div className="w-16 h-16 rounded-2xl border-2 flex items-center justify-center text-3xl shrink-0" style={{ background: "rgba(7,43,80,0.08)", borderColor: "rgba(7,43,80,0.15)" }}>
+              <div
+                className="w-16 h-16 rounded-2xl border-2 flex items-center justify-center text-3xl shrink-0"
+                style={{
+                  background: "rgba(7,43,80,0.08)",
+                  borderColor: "rgba(7,43,80,0.15)",
+                }}
+              >
                 👨
               </div>
               <div className="flex-1">
-                <p className="text-[13.5px] font-bold m-0 mb-0.5" style={{ color: NAVY }}>Foto Profil</p>
-                <p className="text-[11.5px] text-gray-400 m-0 mb-3">JPG, PNG atau GIF · Maks. 2MB</p>
+                <p
+                  className="text-[13.5px] font-bold m-0 mb-0.5"
+                  style={{ color: NAVY }}
+                >
+                  Foto Profil
+                </p>
+                <p className="text-[11.5px] text-gray-400 m-0 mb-3">
+                  JPG, PNG atau GIF · Maks. 2MB
+                </p>
                 <div className="flex gap-2">
                   <button
                     className="flex items-center gap-1.5 text-white text-[12px] px-4 py-2 rounded-lg cursor-pointer border-none font-bold transition-all hover:opacity-90"
@@ -145,22 +153,32 @@ export default function Pengaturan() {
             <div className="grid grid-cols-2 gap-4">
               <Field label="Nama Lengkap">
                 <div className="relative">
-                  <User size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <User
+                    size={13}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  />
                   <input
                     type="text"
                     value={profile.nama}
-                    onChange={(e) => setProfile({ ...profile, nama: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, nama: e.target.value })
+                    }
                     className={`${inputCls} pl-9`}
                   />
                 </div>
               </Field>
               <Field label="Email Admin">
                 <div className="relative">
-                  <Mail size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <Mail
+                    size={13}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  />
                   <input
                     type="email"
                     value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    onChange={(e) =>
+                      setProfile({ ...profile, email: e.target.value })
+                    }
                     className={`${inputCls} pl-9`}
                   />
                 </div>
@@ -168,14 +186,22 @@ export default function Pengaturan() {
             </div>
 
             {/* Password */}
-            <Field label="Password Baru" hint="Kosongkan jika tidak ingin mengubah password">
+            <Field
+              label="Password Baru"
+              hint="Kosongkan jika tidak ingin mengubah password"
+            >
               <div className="relative">
-                <Lock size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <Lock
+                  size={13}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                />
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Masukkan password baru"
                   value={profile.password}
-                  onChange={(e) => setProfile({ ...profile, password: e.target.value })}
+                  onChange={(e) =>
+                    setProfile({ ...profile, password: e.target.value })
+                  }
                   className={`${inputCls} pl-9 pr-10`}
                 />
                 <button
@@ -192,11 +218,25 @@ export default function Pengaturan() {
               <button
                 onClick={handleSaveProfile}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90"
-                style={savedProfile
-                  ? { background: "#10b981", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }
-                  : { background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}
+                style={
+                  savedProfile
+                    ? {
+                        background: "#10b981",
+                        boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
+                      }
+                    : {
+                        background: NAVY,
+                        boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
+                      }
+                }
               >
-                {savedProfile ? <><Check size={14} /> Tersimpan!</> : "Simpan Perubahan"}
+                {savedProfile ? (
+                  <>
+                    <Check size={14} /> Tersimpan!
+                  </>
+                ) : (
+                  "Simpan Perubahan"
+                )}
               </button>
             </div>
           </div>
@@ -205,34 +245,54 @@ export default function Pengaturan() {
         {/* ── KONTAK WEBSITE ── */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           {/* Section Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background: "#FDFDFD" }}>
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b border-gray-100"
+            style={{ background: "#FDFDFD" }}
+          >
             <div className="flex items-center gap-2">
               <Building2 size={14} color={NAVY} />
-              <span className="text-[12.5px] font-bold uppercase tracking-wider" style={{ color: NAVY }}>Kontak Website</span>
+              <span
+                className="text-[12.5px] font-bold uppercase tracking-wider"
+                style={{ color: NAVY }}
+              >
+                Kontak Website
+              </span>
             </div>
-            <span className="text-[11px] text-gray-400">Ditampilkan di footer dan halaman kontak</span>
+            <span className="text-[11px] text-gray-400">
+              Ditampilkan di footer dan halaman kontak
+            </span>
           </div>
 
           <div className="p-6 flex flex-col gap-5">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Nomor WhatsApp">
                 <div className="relative">
-                  <Phone size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <Phone
+                    size={13}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  />
                   <input
                     type="text"
                     value={kontak.whatsapp}
-                    onChange={(e) => setKontak({ ...kontak, whatsapp: e.target.value })}
+                    onChange={(e) =>
+                      setKontak({ ...kontak, whatsapp: e.target.value })
+                    }
                     className={`${inputCls} pl-9`}
                   />
                 </div>
               </Field>
               <Field label="Email Perusahaan">
                 <div className="relative">
-                  <Mail size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                  <Mail
+                    size={13}
+                    className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+                  />
                   <input
                     type="email"
                     value={kontak.email}
-                    onChange={(e) => setKontak({ ...kontak, email: e.target.value })}
+                    onChange={(e) =>
+                      setKontak({ ...kontak, email: e.target.value })
+                    }
                     className={`${inputCls} pl-9`}
                   />
                 </div>
@@ -241,11 +301,16 @@ export default function Pengaturan() {
 
             <Field label="Alamat Kantor">
               <div className="relative">
-                <MapPin size={13} className="absolute left-3.5 top-3.5 text-gray-400 pointer-events-none" />
+                <MapPin
+                  size={13}
+                  className="absolute left-3.5 top-3.5 text-gray-400 pointer-events-none"
+                />
                 <textarea
                   rows={3}
                   value={kontak.alamat}
-                  onChange={(e) => setKontak({ ...kontak, alamat: e.target.value })}
+                  onChange={(e) =>
+                    setKontak({ ...kontak, alamat: e.target.value })
+                  }
                   className={`${inputCls} pl-9 resize-none leading-relaxed`}
                 />
               </div>
@@ -256,15 +321,29 @@ export default function Pengaturan() {
               <button
                 onClick={handleSaveKontak}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90"
-                style={savedKontak
-                  ? { background: "#10b981", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }
-                  : { background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}
+                style={
+                  savedKontak
+                    ? {
+                        background: "#10b981",
+                        boxShadow: "0 4px 14px rgba(16,185,129,0.3)",
+                      }
+                    : {
+                        background: NAVY,
+                        boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
+                      }
+                }
               >
-                {savedKontak ? <><Check size={14} /> Tersimpan!</> : "Simpan Pengaturan"}
+                {savedKontak ? (
+                  <>
+                    <Check size={14} /> Tersimpan!
+                  </>
+                ) : (
+                  "Simpan Pengaturan"
+                )}
               </button>
             </div>
           </div>
-        </div>
+        </div>  
       </div>
     </div>
   );

@@ -183,7 +183,7 @@ const BANNERS = [
 /* ─── Digit countdown box ─── */
 function Digit({ val, label }) {
   return (
-    <div className="countdown-box flex flex-col items-center bg-[#f0f4f9] border border-[#dde6f0] rounded-lg px-3 py-2 min-w-[44px]">
+    <div className="countdown-box flex flex-col items-center bg-[#f0f4f9] border border-[#dde6f0] rounded-lg px-3 py-2 min-w-11">
       <span className="text-xl font-black text-[#072B50] leading-none">{val}</span>
       <span className="text-[8px] font-semibold text-[#8a9bb0] tracking-widest uppercase mt-1">{label}</span>
     </div>
@@ -223,12 +223,12 @@ function HeroCard({ p }) {
   const t   = useCountdown(p.endTime);
   const ref = useReveal();
   return (
-    <div ref={ref} className="reveal mb-6">
+    <div ref={ref} className="mb-6 reveal">
       <div className="promo-card flex flex-col md:flex-row bg-white rounded-2xl border border-[#e8edf4] overflow-hidden shadow-sm hover:shadow-xl">
         {/* Gambar */}
-        <div className="relative w-full md:w-[42%] shrink-0 overflow-hidden bg-[#f0f4f9] min-h-[240px] md:min-h-[380px]">
+        <div className="relative w-full md:w-[42%] shrink-0 overflow-hidden bg-[#f0f4f9] min-h-60 md:min-h-95">
           <img
-            className="promo-img w-full h-full object-cover absolute inset-0"
+            className="absolute inset-0 object-cover w-full h-full promo-img"
             src={p.image} alt={p.title}
             onError={e => { e.currentTarget.style.display="none"; }}
           />
@@ -238,7 +238,7 @@ function HeroCard({ p }) {
         </div>
 
         {/* Konten */}
-        <div className="flex-1 flex flex-col justify-between p-7 md:p-10">
+        <div className="flex flex-col justify-between flex-1 p-7 md:p-10">
           <div>
             <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-bold tracking-widest uppercase mb-6"
               style={{ background:p.tagBg, color:p.tagColor }}>
@@ -251,7 +251,7 @@ function HeroCard({ p }) {
             {/* Countdown */}
             <div className="mb-7">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-[5px] h-[5px] rounded-full bg-[#e03131]" style={{ animation:"pulse 1.5s infinite" }} />
+                <div className="w-1.25 h-1.25 rounded-full bg-[#e03131]" style={{ animation:"pulse 1.5s infinite" }} />
                 <span className="text-[10px] font-bold text-[#e03131] tracking-widest uppercase">Berakhir Dalam</span>
               </div>
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -266,7 +266,7 @@ function HeroCard({ p }) {
 
           <div>
             <div className="h-px bg-[#dde6f0] mb-6" />
-            <div className="flex items-end justify-between gap-4 flex-wrap">
+            <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <div className="text-xs text-[#aab4c0] line-through mb-1.5">{p.originalPrice}</div>
                 <div className="text-2xl md:text-[30px] font-black text-[#072B50] tracking-tight leading-none">{p.salePrice}</div>
@@ -293,9 +293,9 @@ function SmallCard({ p, delay = "" }) {
     <div ref={ref} className={`reveal ${delay}`}>
       <div className="promo-card flex flex-col bg-white rounded-2xl border border-[#e8edf4] overflow-hidden shadow-sm hover:shadow-xl h-full">
         {/* Gambar */}
-        <div className="relative h-[175px] overflow-hidden bg-[#f0f4f9] shrink-0">
+        <div className="relative h-43.75 overflow-hidden bg-[#f0f4f9] shrink-0">
           <img
-            className="promo-img w-full h-full object-cover absolute inset-0"
+            className="absolute inset-0 object-cover w-full h-full promo-img"
             src={p.image} alt={p.title}
             onError={e => { e.currentTarget.style.display="none"; }}
           />
@@ -339,10 +339,10 @@ function BannerCard({ b, delay="" }) {
   const isRight = b.textAlign === "right";
   return (
     <div ref={ref} className={`reveal ${delay}`}>
-      <div className="banner-card relative rounded-2xl overflow-hidden min-h-[220px] cursor-pointer shadow-lg">
+      <div className="relative overflow-hidden shadow-lg cursor-pointer banner-card rounded-2xl min-h-55">
         <div className="absolute inset-0" style={{ background:b.bg }} />
         <img src={b.image} alt={b.title}
-          className="absolute inset-0 w-full h-full object-cover opacity-25 transition-opacity duration-300 hover:opacity-35"
+          className="absolute inset-0 object-cover w-full h-full transition-opacity duration-300 opacity-25 hover:opacity-35"
           onError={e => { e.currentTarget.style.display="none"; }}
         />
         <div className="absolute inset-0 pointer-events-none"
@@ -384,7 +384,7 @@ export default function PromoPage() {
 
       {/* ── PAGE HEADER ── */}
       <div ref={headerRef} className="reveal bg-[#072B50] px-5 md:px-12 py-10 md:py-12">
-        <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
+        <div className="flex flex-col items-start justify-between gap-6 mx-auto max-w-350 sm:flex-row sm:items-end">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="w-5 h-0.5 rounded-full bg-white/35" />
@@ -399,7 +399,7 @@ export default function PromoPage() {
       </div>
 
       {/* ── CONTENT ── */}
-      <div className="max-w-[1400px] mx-auto px-5 md:px-12 py-8 pb-16">
+      <div className="px-5 py-8 pb-16 mx-auto max-w-350 md:px-12">
 
         {/* Tabs */}
         <div className="flex flex-wrap items-center gap-2 mb-8">
@@ -423,7 +423,7 @@ export default function PromoPage() {
 
         {/* Small cards grid */}
         {smalls.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-10">
+          <div className="grid grid-cols-1 gap-5 mb-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {smalls.map((p, i) => (
               <SmallCard key={p.id} p={p} delay={delays[i % delays.length]} />
             ))}
@@ -434,8 +434,8 @@ export default function PromoPage() {
 
         {/* Empty state */}
         {filtered.length === 0 && (
-          <div className="text-center py-24">
-            <div className="text-6xl mb-4">🔍</div>
+          <div className="py-24 text-center">
+            <div className="mb-4 text-6xl">🔍</div>
             <p className="text-[15px] font-semibold text-[#072B50] mb-1">Tidak ada promo untuk kategori ini</p>
             <p className="text-[13px] text-[#9aa5b4]">Coba pilih kategori lain atau kembali ke Semua</p>
           </div>

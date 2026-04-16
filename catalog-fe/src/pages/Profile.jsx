@@ -101,12 +101,12 @@ function Overlay({ open, onClose, children }) {
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-content-center p-4"
+      className="fixed inset-0 z-50 flex items-center p-4 justify-content-center"
       style={{ background: "rgba(7,43,80,0.42)", backdropFilter: "blur(5px)", display: open ? "flex" : "none", alignItems: "center", justifyContent: "center" }}
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl p-7 w-full shadow-2xl"
+        className="w-full bg-white shadow-2xl rounded-2xl p-7"
         style={{ maxWidth: 360, animation: "pop .22s cubic-bezier(.34,1.3,.64,1) both" }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -140,7 +140,7 @@ function EditFieldModal({ field, targetValue, onClose, onSave }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-base font-extrabold" style={{ color: NAVY }}>Edit {field}</h3>
-        <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 border-0 cursor-pointer transition-colors">
+        <button onClick={onClose} className="flex items-center justify-center w-8 h-8 transition-colors border-0 rounded-lg cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-500">
           <IconX />
         </button>
       </div>
@@ -216,7 +216,7 @@ function PasswordModal({ onClose }) {
       <Overlay open onClose={onClose}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-extrabold" style={{ color: NAVY }}>Lupa Password</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 border-0 cursor-pointer transition-colors"><IconX /></button>
+          <button onClick={onClose} className="flex items-center justify-center w-8 h-8 transition-colors border-0 rounded-lg cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-500"><IconX /></button>
         </div>
         {!forgotSent ? (
           <>
@@ -238,9 +238,9 @@ function PasswordModal({ onClose }) {
             </div>
           </>
         ) : (
-          <div className="text-center py-3">
-            <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3"><IconCheckCircle /></div>
-            <p className="text-sm font-bold text-green-600 mb-2">Email terkirim!</p>
+          <div className="py-3 text-center">
+            <div className="flex items-center justify-center mx-auto mb-3 rounded-full w-14 h-14 bg-green-50"><IconCheckCircle /></div>
+            <p className="mb-2 text-sm font-bold text-green-600">Email terkirim!</p>
             <p className="text-[12.5px] text-slate-500 leading-relaxed mb-4">Link reset password telah dikirim.<br />Cek inbox atau folder spam Anda.</p>
             <button onClick={onClose} className="w-full py-2.5 rounded-xl text-sm font-bold text-white border-0 cursor-pointer" style={{ background: NAVY }}>Oke, Mengerti</button>
           </div>
@@ -253,12 +253,12 @@ function PasswordModal({ onClose }) {
     <Overlay open onClose={onClose}>
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-base font-extrabold" style={{ color: NAVY }}>Ubah Password</h3>
-        <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 border-0 cursor-pointer transition-colors"><IconX /></button>
+        <button onClick={onClose} className="flex items-center justify-center w-8 h-8 transition-colors border-0 rounded-lg cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-500"><IconX /></button>
       </div>
 
       {success ? (
-        <div className="text-center py-4">
-          <div className="w-14 h-14 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3"><IconCheckCircle /></div>
+        <div className="py-4 text-center">
+          <div className="flex items-center justify-center mx-auto mb-3 rounded-full w-14 h-14 bg-green-50"><IconCheckCircle /></div>
           <p className="text-sm font-bold text-green-600">Password berhasil diperbarui!</p>
         </div>
       ) : (
@@ -274,14 +274,14 @@ function PasswordModal({ onClose }) {
                 placeholder="Masukkan password lama"
                 className={`w-full px-4 py-2.5 pr-11 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${oldErr ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"}`}
               />
-              <button type="button" onClick={() => setShowOld((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 border-0 bg-transparent cursor-pointer flex p-0">
+              <button type="button" onClick={() => setShowOld((v) => !v)} className="absolute flex p-0 -translate-y-1/2 bg-transparent border-0 cursor-pointer right-3 top-1/2 text-slate-400 hover:text-slate-600">
                 <IconEye off={showOld} />
               </button>
             </div>
             {oldErr && <div className="flex items-center gap-1.5 mt-1.5"><IconAlert /><span className="text-xs text-red-500">{oldErr}</span></div>}
           </div>
 
-          <hr className="border-0 border-t border-slate-100 my-4" />
+          <hr className="my-4 border-0 border-t border-slate-100" />
 
           {/* New password */}
           <div className="mb-1">
@@ -296,7 +296,7 @@ function PasswordModal({ onClose }) {
                 className={`w-full px-4 py-2.5 pr-11 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${newErr ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"} ${!oldCorrect && oldPw.length > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
               />
               {(oldCorrect || oldPw.length === 0) && (
-                <button type="button" onClick={() => setShowNew((v) => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 border-0 bg-transparent cursor-pointer flex p-0">
+                <button type="button" onClick={() => setShowNew((v) => !v)} className="absolute flex p-0 -translate-y-1/2 bg-transparent border-0 cursor-pointer right-3 top-1/2 text-slate-400 hover:text-slate-600">
                   <IconEye off={showNew} />
                 </button>
               )}
@@ -305,7 +305,7 @@ function PasswordModal({ onClose }) {
           </div>
 
           <div className="flex justify-end mt-2 mb-4">
-            <button onClick={() => setForgotMode(true)} className="text-xs font-semibold border-0 bg-transparent cursor-pointer p-0 hover:underline" style={{ color: NAVY }}>
+            <button onClick={() => setForgotMode(true)} className="p-0 text-xs font-semibold bg-transparent border-0 cursor-pointer hover:underline" style={{ color: NAVY }}>
               Lupa password?
             </button>
           </div>
@@ -326,13 +326,13 @@ function PasswordModal({ onClose }) {
 function InfoRow({ icon, label, value, valueClass = "", onEdit, editLabel = "Edit" }) {
   return (
     <div className="flex items-center gap-3.5 px-5 py-4 border-b border-slate-100 last:border-b-0 hover:bg-slate-50/60 transition-colors">
-      <div className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center flex-shrink-0">{icon}</div>
+      <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-100 shrink-0">{icon}</div>
       <div className="flex-1 min-w-0">
         <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">{label}</p>
         <p className={`text-sm font-semibold text-slate-800 truncate ${valueClass}`}>{value}</p>
       </div>
       {onEdit && (
-        <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-500 hover:bg-blue-50 hover:text-[#072B50] hover:border-blue-200 cursor-pointer transition-all flex-shrink-0">
+        <button onClick={onEdit} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-500 hover:bg-blue-50 hover:text-[#072B50] hover:border-blue-200 cursor-pointer transition-all shrink-0">
           <IconEdit /> {editLabel}
         </button>
       )}
@@ -343,9 +343,9 @@ function InfoRow({ icon, label, value, valueClass = "", onEdit, editLabel = "Edi
 /* ── Saved Card ── */
 function SavedCard({ item, onRemove }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-xl shadow-sm">
+    <div className="overflow-hidden transition-all duration-200 bg-white border shadow-sm cursor-pointer rounded-2xl border-slate-200 hover:-translate-y-1 hover:shadow-xl">
       <div className="relative">
-        <img src={item.image} alt={item.name} className="w-full h-40 object-cover block bg-slate-100" onError={(e) => { e.target.style.background = "#f0f4fb"; }} />
+        <img src={item.image} alt={item.name} className="block object-cover w-full h-40 bg-slate-100" onError={(e) => { e.target.style.background = "#f0f4fb"; }} />
         <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
           className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center border-0 cursor-pointer hover:scale-110 transition-transform"
           style={{ background: NAVY }}>
@@ -382,14 +382,14 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-[#f4f6fb]">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-3xl px-4 py-10 mx-auto sm:px-6">
 
         {/* Title */}
         <h1 className="text-[26px] font-extrabold tracking-tight mb-7" style={{ color: NAVY }}>Profil Saya</h1>
 
         {/* Top bar */}
         <div className="flex items-center justify-between mb-7">
-          <div className="flex gap-1 bg-slate-200 rounded-xl p-1">
+          <div className="flex gap-1 p-1 bg-slate-200 rounded-xl">
             {[{ key: "userdata", label: "User Data" }, { key: "saved", label: "Saved" }].map((t) => (
               <button key={t.key} onClick={() => setTab(t.key)}
                 className="px-5 py-2 rounded-[9px] text-[13px] font-semibold border-0 cursor-pointer transition-all duration-200"
@@ -413,12 +413,12 @@ export default function Profile() {
         {tab === "userdata" && (
           <div>
             {/* Hero card */}
-            <div className="rounded-2xl p-7 mb-5 flex items-center gap-5 shadow-lg" style={{ background: NAVY }}>
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-extrabold text-white flex-shrink-0 border-2 border-white/25" style={{ background: "rgba(255,255,255,0.15)" }}>
+            <div className="flex items-center gap-5 mb-5 shadow-lg rounded-2xl p-7" style={{ background: NAVY }}>
+              <div className="flex items-center justify-center w-16 h-16 text-2xl font-extrabold text-white border-2 rounded-full shrink-0 border-white/25" style={{ background: "rgba(255,255,255,0.15)" }}>
                 {initials}
               </div>
               <div>
-                <p className="text-lg font-extrabold text-white mb-1">{nama}</p>
+                <p className="mb-1 text-lg font-extrabold text-white">{nama}</p>
                 <p className="text-sm text-white/65">{email}</p>
                 <div className="mt-2 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold text-white/85 border border-white/20" style={{ background: "rgba(255,255,255,0.12)" }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" /> Online
@@ -427,9 +427,9 @@ export default function Profile() {
             </div>
 
             {/* Informasi Pribadi */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden mb-5 shadow-sm">
+            <div className="mb-5 overflow-hidden bg-white border shadow-sm rounded-2xl border-slate-200">
               <div className="flex items-center gap-2.5 px-5 py-3.5 bg-slate-50 border-b border-slate-200">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center"><IconUser /></div>
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50"><IconUser /></div>
                 <h2 className="text-[13.5px] font-bold" style={{ color: NAVY }}>Informasi Pribadi</h2>
               </div>
               <InfoRow icon={<IconUser />} label="Nama Lengkap" value={nama} onEdit={() => setEditField("Nama")} />
@@ -438,9 +438,9 @@ export default function Profile() {
             </div>
 
             {/* Keamanan */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="overflow-hidden bg-white border shadow-sm rounded-2xl border-slate-200">
               <div className="flex items-center gap-2.5 px-5 py-3.5 bg-slate-50 border-b border-slate-200">
-                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center"><IconLock /></div>
+                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50"><IconLock /></div>
                 <h2 className="text-[13.5px] font-bold" style={{ color: NAVY }}>Keamanan Akun</h2>
               </div>
               <InfoRow icon={<IconLock />} label="Password" value="••••••••••" valueClass="tracking-widest text-slate-400" onEdit={() => setPwModal(true)} editLabel="Ubah" />
@@ -451,25 +451,25 @@ export default function Profile() {
         {/* SAVED TAB */}
         {tab === "saved" && (
           <div>
-            <div className="text-center pt-6 pb-5">
-              <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto mb-3">
+            <div className="pt-6 pb-5 text-center">
+              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 border rounded-2xl bg-slate-100 border-slate-200">
                 <IconBookmark />
               </div>
-              <h2 className="text-lg font-extrabold mb-1" style={{ color: NAVY }}>Koleksi Saya</h2>
+              <h2 className="mb-1 text-lg font-extrabold" style={{ color: NAVY }}>Koleksi Saya</h2>
               <p className="text-sm text-slate-400">Item yang Anda simpan akan muncul di sini</p>
             </div>
 
             {saved.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-5xl mb-3">🔖</div>
+              <div className="py-16 text-center">
+                <div className="mb-3 text-5xl">🔖</div>
                 <h3 className="text-sm font-bold mb-1.5" style={{ color: NAVY }}>Belum ada item tersimpan</h3>
-                <p className="text-sm text-slate-400 mb-5">Simpan produk favorit kamu dari halaman produk</p>
+                <p className="mb-5 text-sm text-slate-400">Simpan produk favorit kamu dari halaman produk</p>
                 <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity" style={{ background: NAVY }}>
                   Jelajahi Produk
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {saved.map((item) => (
                   <SavedCard key={item.id} item={item} onRemove={(id) => setSaved((p) => p.filter((x) => x.id !== id))} />
                 ))}

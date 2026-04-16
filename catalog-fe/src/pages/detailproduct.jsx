@@ -168,7 +168,7 @@ export default function DetailProduct() {
   return (
     <div className="detail-root bg-[#f5f7fa] min-h-screen">
       {/* tighter max-width + reduced horizontal padding */}
-      <div className="max-w-[1200px] mx-auto px-3 sm:px-5 py-5">
+      <div className="px-3 py-5 mx-auto max-w-300 sm:px-5">
 
         {/* ── BACK ── */}
         <button
@@ -180,13 +180,13 @@ export default function DetailProduct() {
 
         {/* ══ TOP SECTION ══ */}
         <div className="bg-white rounded-2xl shadow-sm border border-[#e8edf4] mb-4 overflow-visible">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+          <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
 
             {/* ── LEFT: MAIN IMAGE + THUMBNAILS BOTTOM ── */}
             <div className="flex flex-col border-b md:border-b-0 md:border-r border-[#f0f4f9]">
 
               {/* Main image area with zoom */}
-              <div className="relative flex-1 flex items-center justify-center bg-[#fafbfc] rounded-tl-2xl rounded-tr-2xl md:rounded-tr-none min-h-[300px] sm:min-h-[360px] p-5">
+              <div className="relative flex-1 flex items-center justify-center bg-[#fafbfc] rounded-tl-2xl rounded-tr-2xl md:rounded-tr-none min-h-75 sm:min-h-90 p-5">
 
                 {/* ── ZOOM WRAP ── */}
                 <div
@@ -202,7 +202,7 @@ export default function DetailProduct() {
                     key={activeImage}
                     src={product.images[activeImage]}
                     alt={product.name}
-                    className="max-h-[300px] w-full object-contain relative z-0"
+                    className="relative z-0 object-contain w-full max-h-75"
                     style={{ animation:"scaleIn .28s ease both" }}
                   />
 
@@ -249,7 +249,7 @@ export default function DetailProduct() {
                   <div
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`thumb-item shrink-0 w-[58px] h-[58px] rounded-xl overflow-hidden cursor-pointer bg-[#f8fafc] flex items-center justify-center border-2 ${
+                    className={`thumb-item shrink-0 w-14.5 h-14.5 rounded-xl overflow-hidden cursor-pointer bg-[#f8fafc] flex items-center justify-center border-2 ${
                       activeImage === i
                         ? "border-[#072B50] shadow-md"
                         : "border-[#e8edf4] hover:border-[#a8b8cc]"
@@ -265,7 +265,7 @@ export default function DetailProduct() {
             <div className="flex flex-col gap-3.5 p-5 sm:p-6">
 
               {/* Category + badge */}
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-[#8a9bb0]">{product.category}</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100">In Stock</span>
               </div>
@@ -306,7 +306,7 @@ export default function DetailProduct() {
                 <div className="flex gap-2.5">
                   {product.colors.map((color,i)=>(
                     <div key={i} onClick={()=>setSelectedColor(i)} title={product.colorLabels[i]}
-                      className="w-7 h-7 rounded-full cursor-pointer transition-all duration-200"
+                      className="transition-all duration-200 rounded-full cursor-pointer w-7 h-7"
                       style={{
                         backgroundColor:color,
                         outline: selectedColor===i ? `3px solid ${NAVY}` : "3px solid transparent",
@@ -351,7 +351,7 @@ export default function DetailProduct() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-4">
           {GUARANTEES.map((g,i)=>(
             <div key={i} className="badge-g flex items-center gap-2.5 bg-white rounded-xl border border-[#e8edf4] px-3.5 py-3 cursor-default">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{background:"#f0f4f9",color:NAVY}}>
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0" style={{background:"#f0f4f9",color:NAVY}}>
                 {g.icon}
               </div>
               <div>
@@ -410,7 +410,7 @@ export default function DetailProduct() {
           </div>
           <div className="flex items-center gap-2.5">
             <button onClick={()=>swiperRef.current?.slidePrev()}
-              className="arrow-btn w-9 h-9 min-w-[36px] rounded-full bg-white border border-[#e8edf4] shadow-sm cursor-pointer flex items-center justify-center text-lg text-gray-600">‹</button>
+              className="arrow-btn w-9 h-9 min-w-9 rounded-full bg-white border border-[#e8edf4] shadow-sm cursor-pointer flex items-center justify-center text-lg text-gray-600">‹</button>
             <div className="flex-1 min-w-0">
               <Swiper onSwiper={s=>(swiperRef.current=s)} spaceBetween={12} slidesPerView={5}
                 breakpoints={{
@@ -431,7 +431,7 @@ export default function DetailProduct() {
               </Swiper>
             </div>
             <button onClick={()=>swiperRef.current?.slideNext()}
-              className="arrow-btn w-9 h-9 min-w-[36px] rounded-full bg-white border border-[#e8edf4] shadow-sm cursor-pointer flex items-center justify-center text-lg text-gray-600">›</button>
+              className="arrow-btn w-9 h-9 min-w-9 rounded-full bg-white border border-[#e8edf4] shadow-sm cursor-pointer flex items-center justify-center text-lg text-gray-600">›</button>
           </div>
         </div>
 

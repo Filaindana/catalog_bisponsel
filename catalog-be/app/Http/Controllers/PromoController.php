@@ -17,34 +17,35 @@ class PromoController
             $query->where('status', $request->status);
         }
 
-        $promo = $query->orderBy('dibuat_pada', 'desc')->get()
-            ->map(function ($item) {
+        $promo = $query->orderBy('dibuat_pada', 'desc')
+            ->paginate($request->get('per_page', 10));
 
-                // AUTO STATUS (biar ga tergantung DB doang)
-                $now = Carbon::now();
-                if ($item->tanggal_mulai > $now) {
-                    $status = 'segera';
-                } elseif ($item->tanggal_selesai < $now) {
-                    $status = 'berakhir';
-                } else {
-                    $status = 'aktif';
-                }
+        $promo->getCollection()->transform(function ($item) {
+            $now = \Carbon\Carbon::now();
 
-                return [
-                    'id' => $item->id,
-                    'nama' => $item->nama,
-                    'deskripsi' => $item->deskripsi,
-                    'tanggal_mulai' => $item->tanggal_mulai?->format('Y-m-d'),
-                    'tanggal_selesai' => $item->tanggal_selesai?->format('Y-m-d'),
-                    'status' => $status,
-                    'banner' => $item->banner,
-                    'produk' => $item->produk,
-                ];
-            });
+            if ($item->tanggal_mulai > $now) {
+                $status = 'segera';
+            } elseif ($item->tanggal_selesai < $now) {
+                $status = 'berakhir';
+            } else {
+                $status = 'aktif';
+            }
+
+            return [
+                'id' => $item->id,
+                'nama' => $item->nama,
+                'deskripsi' => $item->deskripsi,
+                'tanggal_mulai' => $item->tanggal_mulai?->format('Y-m-d'),
+                'tanggal_selesai' => $item->tanggal_selesai?->format('Y-m-d'),
+                'status' => $status,
+                'banner' => $item->banner,
+                'produk' => $item->produk,
+            ];
+        });
 
         return response()->json([
             'status' => true,
-            'data'   => $promo,
+            'data'   => $promo
         ]);
     }
 

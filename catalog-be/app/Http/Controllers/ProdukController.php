@@ -26,11 +26,26 @@ class ProdukController
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        $produk = $query->orderBy('dibuat_pada', 'desc')->paginate($request->get('per_page', 12));
+        // PAGINATION (buat table)
+        // $produk = $query->orderBy('dibuat_pada', 'desc')
+        //     ->paginate($request->get('per_page', 12));
+        $produk = $query->orderBy('dibuat_pada', 'desc')
+            ->paginate($request->get('per_page', 12))
+            ->appends($request->query());
+
+        // 🔥 GLOBAL COUNT (BUKAN PER PAGE)
+        $totalProduk = Produk::count();
+        $promoCount = Produk::where('adalah_promo', true)->count();
+        $lowStockCount = Produk::where('stok', '<', 10)->count();
 
         return response()->json([
             'status' => true,
             'data'   => $produk,
+            'meta'   => [
+                'total'           => $totalProduk,
+                'promo_count'     => $promoCount,
+                'low_stock_count' => $lowStockCount,
+            ]
         ]);
     }
 

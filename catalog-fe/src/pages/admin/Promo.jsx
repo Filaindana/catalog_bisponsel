@@ -75,9 +75,9 @@ const presetColors = [
 ];
 
 const statusConfig = {
-  Aktif: { bg: "#dcfce7", color: "#16a34a", dot: "#22c55e" },
-  Segera: { bg: "#fef9c3", color: "#ca8a04", dot: "#eab308" },
-  Berakhir: { bg: "#fee2e2", color: "#dc2626", dot: "#ef4444" },
+  aktif: { bg: "#dcfce7", color: "#16a34a", dot: "#22c55e" },
+  segera: { bg: "#fef9c3", color: "#ca8a04", dot: "#eab308" },
+  berakhir: { bg: "#fee2e2", color: "#dc2626", dot: "#ef4444" },
 };
 
 // const fmt = (d) =>
@@ -564,6 +564,7 @@ function AddModal({ onClose, onSave }) {
 export default function Promo() {
   const [promos, setPromos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewPromo, setViewPromo] = useState(null);
   const [editPromo, setEditPromo] = useState(null);
@@ -577,7 +578,7 @@ export default function Promo() {
     bannerColor: NAVY,
   });
 
-  const totalPages = Math.ceil(promos.length / ITEMS_PER_PAGE);
+  // const totalPages = Math.ceil(promos.length / ITEMS_PER_PAGE);
   const paginated = promos;
   const aktifCount = promos.filter((p) => p.status === "aktif").length;
   const segeraCount = promos.filter((p) => p.status === "segera").length;
@@ -638,17 +639,22 @@ export default function Promo() {
   ];
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPromos = async () => {
       try {
-        const data = await getPromos();
-        setPromos(data); // ⬅️ ini penting
+        const res = await getPromos({
+          page: currentPage,
+          limit: 10,
+        });
+
+        setPromos(res.data);
+        setTotalPages(res.last_page);
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchPromos();
+  }, [currentPage]);
 
   return (
     <div className="promo-admin">

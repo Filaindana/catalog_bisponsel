@@ -418,12 +418,12 @@ function AddProductModal({ onClose, onSave }) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="w-[540px] bg-white rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div className="w-135 bg-white rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-7 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between py-5 border-b border-gray-100 px-7">
           <div className="flex items-center gap-3">
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              className="flex items-center justify-center w-10 h-10 rounded-xl"
               style={{ background: "rgba(7,43,80,0.08)" }}
             >
               <Sparkles size={18} style={{ color: NAVY }} />
@@ -442,14 +442,14 @@ function AddProductModal({ onClose, onSave }) {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg border border-gray-200 bg-gray-50 cursor-pointer flex items-center justify-center text-gray-400 hover:text-gray-700 transition-colors"
+            className="flex items-center justify-center w-8 h-8 text-gray-400 transition-colors border border-gray-200 rounded-lg cursor-pointer bg-gray-50 hover:text-gray-700"
           >
             <X size={14} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="flex-1 py-6 overflow-y-auto px-7 flex flex-col gap-6">
+        <div className="flex flex-col flex-1 gap-6 py-6 overflow-y-auto px-7">
           {/* SECTION 1 */}
           <div>
             <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100 mb-4">
@@ -856,17 +856,32 @@ export default function Produk() {
     stock: "",
     promo: false,
   });
+
   const [products, setProducts] = useState([]);
+  const [meta, setMeta] = useState({
+    promo_count: 0,
+    low_stock_count: 0,
+  });
+
   const [totalPages, setTotalPages] = useState(1);
   const paginated = products;
-  const promoCount = products.filter((p) => p.promo).length;
-  const lowStockCount = products.filter((p) => p.stock < 10).length;
+  const promoCount = meta.promo_count;
+  const lowStockCount = meta.low_stock_count;
 
   useEffect(() => {
     const fetchProduk = async () => {
       try {
-        const res = await getProduk(currentPage);
-        const mapped = res.data.map((item) => ({
+        const res = await getProduk({
+          page: currentPage,
+          limit: 12,
+        });
+
+        console.log("FULL RES:", res);
+
+        // ✅ sekarang langsung array
+        const raw = res.data || [];
+
+        const mapped = raw.map((item) => ({
           id: item.id,
           name: item.nama,
           category: item.kategori?.nama || "-",
@@ -875,12 +890,21 @@ export default function Produk() {
           promo: item.adalah_promo,
           image: "📦",
         }));
+
         setProducts(mapped);
-        setTotalPages(res.last_page);
+
+        // ✅ pagination
+        setTotalPages(res.last_page || 1);
+
+        setMeta({
+          promo_count: mapped.filter((p) => p.promo).length,
+          low_stock_count: mapped.filter((p) => p.stock < 10).length,
+        });
       } catch (err) {
         console.error("Gagal ambil produk:", err);
       }
     };
+
     fetchProduk();
   }, [currentPage]);
 

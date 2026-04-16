@@ -6,10 +6,10 @@ export const getTotalProduk = async () => {
   return res.data.total; // dari paginate Laravel
 };
 
-// PROMO AKTIF
 export const getPromoAktif = async () => {
   const res = await api("/promo?status=aktif");
-  return res.data.length;
+
+  return res.data.data.length; // ✅ ambil array-nya
 };
 
 // TOTAL CABANG

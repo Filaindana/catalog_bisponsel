@@ -26,25 +26,30 @@ const getBannerColor = (status) => {
   }
 };
 
-export const getPromos = async (status = null) => {
+export const getPromos = async ({ page = 1, limit = 10 } = {}) => {
   try {
-    const endpoint = status ? `/promo?status=${status}` : `/promo`;
-    const res = await api(endpoint);
+    const res = await api(`/promo?page=${page}&per_page=${limit}`);
 
-    return res.data.map((item) => ({
-      id: item.id,
-      name: item.nama,
-      desc: item.deskripsi,
-      startDate: item.tanggal_mulai,
-      endDate: item.tanggal_selesai,
-      status: item.status,
-      banner: item.banner,
+    console.log("RAW RES:", res.data);
 
-      // optional UI tambahan
-      bannerColor: getBannerColor(item.status),
-    }));
+    const paginator = res.data; // ✅ langsung ini
+
+    return {
+      data: paginator.data.map((item) => ({
+        id: item.id,
+        name: item.nama,
+        desc: item.deskripsi,
+        startDate: item.tanggal_mulai,
+        endDate: item.tanggal_selesai,
+        status: item.status,
+        banner: item.banner,
+        bannerColor: getBannerColor(item.status),
+      })),
+      current_page: paginator.current_page,
+      last_page: paginator.last_page,
+    };
   } catch (err) {
-    console.error("Error getPromos:", err.message);
+    console.error("Error getPromos:", err);
     throw err;
   }
 };

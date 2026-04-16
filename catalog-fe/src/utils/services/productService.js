@@ -31,7 +31,7 @@ const buildParams = (filters) => {
   }
 
   params.page = filters.page || 1;
-  params.limit = filters.limit || 15;
+  params.per_page = filters.limit || 12;
 
   return params;
 };

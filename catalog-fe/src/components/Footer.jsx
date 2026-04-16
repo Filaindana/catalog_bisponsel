@@ -32,14 +32,14 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#072B50] pt-[50px]">
-      <div className="max-w-[1200px] mx-auto px-10">
+    <footer className="bg-[#072B50] pt-12.5">
+      <div className="px-10 mx-auto max-w-300">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1.6fr_1.6fr] gap-10 pb-10">
 
           {/* KOLOM 1 - BRAND */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <img src={logoImg} alt="Logo" className="h-9 object-contain" />
+              <img src={logoImg} alt="Logo" className="object-contain h-9" />
               <span className="text-lg font-bold text-white">BizPonsel</span>
             </div>
             <p className="text-[13px] text-[#d7d7d7] leading-[1.8] m-0">
@@ -70,7 +70,7 @@ export default function Footer() {
             <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Contact Us</h4>
             <div className="flex flex-col gap-3.5">
               {contacts.map((item, i) => (
-                <div key={i} className="flex gap-3 items-start">
+                <div key={i} className="flex items-start gap-3">
                   <span className="text-[#d7d7d7] mt-0.5 shrink-0">{item.icon}</span>
                   <span className="text-[13px] text-[#d7d7d7] leading-[1.6]">{item.text}</span>
                 </div>
@@ -103,8 +103,8 @@ export default function Footer() {
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="bg-[#061e38] py-[18px] px-10 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-[#1e4d7b]">
-        <p className="text-xs text-white m-0">© 2026 BismarCatalog. All rights reserved.</p>
+      <div className="bg-[#061e38] py-4.5 px-10 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-[#1e4d7b]">
+        <p className="m-0 text-xs text-white">© 2026 BismarCatalog. All rights reserved.</p>
         <div className="flex gap-4">
           {["Privacy Policy", "Terms of Service"].map((item) => (
             <a

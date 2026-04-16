@@ -41,7 +41,7 @@ function AdminLayout() {
     <div className="min-h-screen bg-gray-50">
       <AdminNavbar />
       <AdminSidebar />
-      <main className="ml-[200px] pt-16 p-8">
+      <main className="p-8 pt-16 ml-50">
         <Outlet />
       </main>
     </div>
@@ -62,8 +62,8 @@ function App() {
           <Route index element={<Home />} />
           <Route path="promo" element={<Promo />} />
           <Route path="product" element={<Product />} />
-          {/* <Route path="product/:id" element={<DetailProduct />} /> */}
-          <Route path="product/detail" element={<DetailProduct />} />
+          <Route path="product/:id" element={<DetailProduct />} />
+          {/* <Route path="product/detail" element={<DetailProduct />} /> */}
           <Route path="contact" element={<Contact />} />
           <Route path="profile" element={<Profile />} />
         </Route>

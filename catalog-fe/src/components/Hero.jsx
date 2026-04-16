@@ -65,12 +65,12 @@ export default function Hero() {
   const s = slides[idx];
 
   return (
-    <section className="relative h-[570px] overflow-hidden bg-[#06122a]">
+    <section className="relative h-142.5 overflow-hidden bg-[#06122a]">
 
       {/* BG IMAGE */}
       <div
         key={`bg-${idx}`}
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-center bg-cover"
         style={{
           backgroundImage: `url(${s.image})`,
           animation: "hKB 5.5s ease forwards",
@@ -90,19 +90,19 @@ export default function Hero() {
         key={`c-${key}`}
         className="absolute inset-0 flex items-center pb-12"
       >
-        <div className="max-w-[1400px] w-full mx-auto px-10">
-          <div className="max-w-[520px]">
+        <div className="w-full px-10 mx-auto max-w-350">
+          <div className="max-w-130">
 
             {/* Tag */}
-            <div className="h-tag inline-flex items-center gap-[7px] border border-white/[0.22] rounded-[30px] px-[13px] py-[5px] mb-5 bg-white/[0.07]">
-              <span className="w-[5px] h-[5px] rounded-full bg-blue-400 shrink-0" style={{ boxShadow: "0 0 6px #60a5fa" }} />
+            <div className="h-tag inline-flex items-center gap-1.5 border border-white/22 rounded-[30px] px-3 py-1.25 mb-5 bg-white/[0.07]">
+              <span className="w-1.25 h-1.25 rounded-full bg-blue-400 shrink-0" style={{ boxShadow: "0 0 6px #60a5fa" }} />
               <span className="text-[11px] font-bold text-white/85 tracking-[1.2px] uppercase">
                 {s.tag}
               </span>
             </div>
 
             {/* H1 */}
-            <h1 className="h-h1 text-[44px] font-extrabold leading-[1.2] text-white m-0 mb-[18px] tracking-[-0.4px]">
+            <h1 className="h-h1 text-[44px] font-extrabold leading-[1.2] text-white m-0 mb-4.5 tracking-[-0.4px]">
               {s.title}<br />
               <span
                 style={{
@@ -118,7 +118,7 @@ export default function Hero() {
             </h1>
 
             {/* Desc */}
-            <p className="h-desc text-sm text-white/[0.68] leading-[1.85] m-0 mb-8 max-w-[420px]">
+            <p className="h-desc text-sm text-white/68 leading-[1.85] m-0 mb-8 max-w-105">
               {s.desc}
             </p>
 

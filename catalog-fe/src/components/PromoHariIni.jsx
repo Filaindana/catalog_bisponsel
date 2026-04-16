@@ -51,24 +51,24 @@ export default function PromoHariIni() {
   };
 
   return (
-    <section className="py-[50px] bg-white">
-      <div className="max-w-[1400px] mx-auto px-[40px]">
+    <section className="py-12.5 bg-white">
+      <div className="px-10 mx-auto max-w-350">
 
         {/* HEADER */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-7 gap-3">
-          <h2 className="section-title m-0 border-l-[5px] border-[#072B50] pl-[14px]">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between mb-7">
+          <h2 className="section-title m-0 border-l-[5px] border-[#072B50] pl-3.5">
             Promo Spesial Hari Ini
           </h2>
 
-          <div className="flex items-center gap-4 justify-between md:justify-end w-full md:w-auto">
+          <div className="flex items-center justify-between w-full gap-4 md:justify-end md:w-auto">
 
             {/* COUNTDOWN */}
-            <div className="flex items-center gap-[6px]">
+            <div className="flex items-center gap-1.5">
               <span className="text-[14px] font-semibold text-gray-500">End in</span>
               <div className="ph-countdown-box">{hours}</div>
-              <span className="text-[20px] font-extrabold text-gray-900 mx-[2px]">:</span>
+              <span className="text-[20px] font-extrabold text-gray-900 mx-0.5">:</span>
               <div className="ph-countdown-box">{minutes}</div>
-              <span className="text-[20px] font-extrabold text-gray-900 mx-[2px]">:</span>
+              <span className="text-[20px] font-extrabold text-gray-900 mx-0.5">:</span>
               <div className="ph-countdown-box">{secs}</div>
             </div>
 
@@ -89,17 +89,17 @@ export default function PromoHariIni() {
         </div>
 
         {/* SCROLL TRACK */}
-        <div className="mb-[-8px] pb-[8px] overflow-hidden">
+        <div className="pb-2 -mb-2 overflow-hidden">
           <div
             ref={scrollRef}
-            className="flex gap-5 overflow-x-auto overflow-y-visible no-scrollbar cursor-default px-[4px] pt-[8px] pb-[16px] scroll-smooth"
+            className="flex gap-5 px-1 pt-2 pb-4 overflow-x-auto overflow-y-visible cursor-default no-scrollbar scroll-smooth"
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
             {products.map((product, index) => (
-              <div key={index} className="flex-[0_0_220px] min-w-[220px]">
+              <div key={index} className="flex-[0_0_220px] min-w-55">
                 <ProductCard
                   product={{ ...product, id: index + 1, badge: undefined }}
                   saved={saved[index]}

@@ -34,36 +34,6 @@ const topProducts = [
   { rank: "03", name: "Xiaomi 14 Pro", sold: 25, change: "-2%", up: false },
 ];
 
-// const stats = [
-//   {
-//     label: "Total Produk",
-//     value: "120",
-//     badge: "↑ 12% dari bulan lalu",
-//     badgeColor: "text-emerald-600 bg-emerald-50",
-//     icon: Package,
-//     accentBg: "bg-blue-50", // ← berubah
-//     accentText: "text-[#1e3a5f]",
-//   },
-//   {
-//     label: "Promo Aktif",
-//     value: "8",
-//     badge: "Sama seperti bulan lalu",
-//     badgeColor: "text-slate-500 bg-slate-100",
-//     icon: Tag,
-//     accentBg: "bg-blue-50", // ← berubah dari bg-violet-50
-//     accentText: "text-[#1e3a5f]",
-//   },
-//   {
-//     label: "Total Cabang",
-//     value: "7",
-//     badge: "↑ 1 cabang baru",
-//     badgeColor: "text-amber-600 bg-amber-50",
-//     icon: Building2,
-//     accentBg: "bg-blue-50", // ← berubah dari bg-amber-50
-//     accentText: "text-[#1e3a5f]",
-//   },
-// ];
-
 /* ─── PREDIKSI DATA ─── */
 const prediksiData = [
   { label: "6 mgg lalu", actual: 310, predicted: null },

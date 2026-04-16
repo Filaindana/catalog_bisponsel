@@ -48,32 +48,22 @@ const brands = [
 
 export default function BrandSection() {
   return (
-    <section className="py-10 md:py-[50px] bg-white">
+    <section className="py-10 md:py-12.5 bg-white">
       
-      <h2 className="section-title text-center mb-6 md:mb-8">
+      <h2 className="mb-6 text-center section-title md:mb-8">
         Brand Tersedia
       </h2>
 
-      <div className="
-        max-w-[1000px] mx-auto px-4
-        grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8
-        gap-y-6 gap-x-4 sm:gap-x-6
-      ">
+      <div className="grid grid-cols-3 px-4 mx-auto  max-w-250 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-y-6 gap-x-4 sm:gap-x-6">
         {brands.map((brand, index) => (
           <div
             key={index}
-            className="
-              flex items-center justify-center cursor-pointer
-              opacity-90
-              hover:opacity-100 hover:scale-110
-              active:scale-95
-              transition-all duration-300
-            "
+            className="flex items-center justify-center transition-all duration-300 cursor-pointer  opacity-90 hover:opacity-100 hover:scale-110 active:scale-95"
           >
             <img
               src={brand.image}
               alt={brand.name}
-              className="h-7 sm:h-8 md:h-9 object-contain max-w-[90px]"
+              className="h-7 sm:h-8 md:h-9 object-contain max-w-22.5"
             />
           </div>
         ))}

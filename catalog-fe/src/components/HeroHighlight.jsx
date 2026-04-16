@@ -9,18 +9,18 @@ export default function HeroHighlight() {
   ];
 
   return (
-    <div className="w-full -mt-[50px] relative z-10">
+    <div className="w-full -mt-12.5 relative z-10">
       <div
-        className="py-7 text-white"
+        className="text-white py-7"
         style={{
           background: "linear-gradient(to right, #072B50, #1e40af, #7c3aed)",
           boxShadow: "0 12px 30px rgba(0,0,0,0.25)",
         }}
       >
-        <div className="max-w-[1400px] mx-auto px-10 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 gap-6 px-10 mx-auto max-w-350 md:grid-cols-4">
           {items.map((item, i) => (
-            <div key={i} className="flex items-center gap-[18px] justify-center">
-              <div className="w-[60px] h-[60px] shrink-0 rounded-full bg-white flex items-center justify-center text-[#072B50]"
+            <div key={i} className="flex items-center gap-4.5 justify-center">
+              <div className="w-15 h-15 shrink-0 rounded-full bg-white flex items-center justify-center text-[#072B50]"
                 style={{ boxShadow: "0 4px 10px rgba(0,0,0,0.15)" }}
               >
                 {item.icon}

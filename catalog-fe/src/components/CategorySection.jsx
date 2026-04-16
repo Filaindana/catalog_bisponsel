@@ -19,10 +19,10 @@ function CategoryItem({ item, onClick }) {
   return (
     <div
       onClick={onClick}
-      className="flex flex-col items-center gap-2 cursor-pointer py-3 w-full"
+      className="flex flex-col items-center w-full gap-2 py-3 cursor-pointer"
     >
       <div
-        className="w-[80px] h-[80px] sm:w-[90px] sm:h-[90px] md:w-[100px] md:h-[100px] 
+        className="w-20 h-20 sm:w-22.5 sm:h-22.5 md:w-25 md:h-25 
         rounded-full bg-gray-100 flex items-center justify-center overflow-hidden 
         border-2 border-transparent hover:border-[#072B50] hover:scale-105 
         transition-all duration-200 shadow-md"
@@ -65,12 +65,12 @@ export default function CategorySection() {
   };
 
   return (
-    <section className="py-10 md:py-[60px] bg-white">
-      <h2 className="section-title text-center mb-6 md:mb-9">
+    <section className="py-10 bg-white md:py-15">
+      <h2 className="mb-6 text-center section-title md:mb-9">
         Product Category
       </h2>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 md:px-[72px] relative">
+      <div className="relative px-4 mx-auto max-w-350 sm:px-6 md:px-18">
 
         {/* LEFT BUTTON */}
         {!isBeginning && (

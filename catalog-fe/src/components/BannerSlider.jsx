@@ -13,11 +13,11 @@ export default function BannerSlider() {
       pagination={{ clickable: true }}
       autoplay={{ delay: 3000, disableOnInteraction: false }}
       loop
-      className="h-[160px] sm:h-[220px] md:h-[280px] lg:h-[320px] rounded-2xl overflow-hidden"
+      className="h-40 overflow-hidden sm:h-55 md:h-70 lg:h-80 rounded-2xl"
     >
       {banners.map((_, i) => (
         <SwiperSlide key={i}>
-          <div className="h-full bg-slate-300 flex items-center justify-center text-lg font-semibold text-gray-700">
+          <div className="flex items-center justify-center h-full text-lg font-semibold text-gray-700 bg-slate-300">
             Banner {i + 1}
           </div>
         </SwiperSlide>

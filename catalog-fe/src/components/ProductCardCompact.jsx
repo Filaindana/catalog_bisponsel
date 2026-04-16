@@ -8,11 +8,11 @@ export default function ProductCardCompact({
   onCategoryClick,
 }) {
   return (
-    <div className="pc-gradient-hover min-w-[200px] rounded-[16px] cursor-pointer p-[2px] bg-gray-200">
+    <div className="pc-gradient-hover min-w-50 rounded-2xl cursor-pointer p-0.5 bg-gray-200">
       <div className="bg-white rounded-[13px] overflow-hidden font-[Inter]">
 
         {/* INFO */}
-        <div className="px-[14px] pt-[14px] cursor-default">
+        <div className="px-3.5 pt-3.5 cursor-default">
           <p
             onClick={(e) => {
               e.stopPropagation();
@@ -64,13 +64,13 @@ export default function ProductCardCompact({
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-[150px] object-contain block p-[14px] transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-37.5 object-contain block p-3.5 transition-transform duration-300 group-hover:scale-105"
           />
         </div>
 
         {/* PRICE */}
-        <div className="px-[14px] pb-[14px] pt-3 cursor-default">
-          <div className="flex justify-between items-end border-t border-gray-100 pt-3">
+        <div className="px-3.5 pb-3.5 pt-3 cursor-default">
+          <div className="flex items-end justify-between pt-3 border-t border-gray-100">
             <div>
               <p className="text-[12px] text-gray-400 mb-1">Harga</p>
               <p className="text-[14px] font-bold text-red-500">
@@ -88,7 +88,7 @@ export default function ProductCardCompact({
 
           {variant === "promo" && typeof product.discount === "number" && (
             <div className="pt-2.5">
-              <div className="h-[6px] bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#072B50] rounded-full"
                   style={{ width: `${Math.min(100, product.stock ?? 0)}%` }}

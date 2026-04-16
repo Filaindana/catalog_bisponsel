@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { sendKontak } from "../utils/services/contactService";
+import { getCabangs } from "../utils/services/cabangService";
 import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ExternalLink } from "lucide-react";
 import ceoImg from "../assets/ceo.jpg";
 
@@ -54,7 +56,7 @@ function SocialIcon({ sl, size = 44, iconSize = 22 }) {
       <button
         onClick={() => setOpen(v => !v)}
         title={sl.label}
-        className="flex items-center justify-center rounded-[10px] border-none cursor-pointer p-0 flex-shrink-0 transition-transform duration-150"
+        className="flex items-center justify-center rounded-[10px] border-none cursor-pointer p-0 shrink-0 transition-transform duration-150"
         style={{ width:`${size}px`, height:`${size}px`, background:sl.bg, boxShadow:"0 4px 12px rgba(0,0,0,0.25)", outline:open?"2.5px solid rgba(255,255,255,0.55)":"none", outlineOffset:"2px" }}
         onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.boxShadow="0 8px 20px rgba(0,0,0,0.35)"; }}
         onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,0.25)"; }}
@@ -62,13 +64,13 @@ function SocialIcon({ sl, size = 44, iconSize = 22 }) {
         {sl.icon(iconSize)}
       </button>
       {open && (
-        <div className="social-popup absolute z-[99] bg-white rounded-2xl p-4 border border-[#dce6f0] w-[200px]"
+        <div className="social-popup absolute z-99 bg-white rounded-2xl p-4 border border-[#dce6f0] w-50"
           style={{ bottom:"calc(100% + 10px)", left:"50%", transform:"translateX(-50%)", boxShadow:"0 16px 48px rgba(7,43,80,0.18)" }}>
           {/* tail */}
           <div className="absolute w-3 h-3 bg-white border border-[#dce6f0] border-t-0 border-l-0"
             style={{ bottom:"-6px", left:"50%", transform:"translateX(-50%) rotate(45deg)" }} />
           <div className="flex items-center gap-2 mb-2.5">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background:sl.bg }}>
+            <div className="flex items-center justify-center rounded-lg shrink-0 w-7 h-7" style={{ background:sl.bg }}>
               {sl.icon(13)}
             </div>
             <span className="text-[13px] font-bold text-gray-900">{sl.label}</span>
@@ -90,14 +92,14 @@ function SocialIcon({ sl, size = 44, iconSize = 22 }) {
 const TEMP_ADDRESS = "Jl. Bendul Merisi Selatan XI No. 59-61, Kecamatan Wonocolo, Kota Surabaya.";
 const TEMP_MAPS = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.096!2d112.7452!3d-7.3118!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fb0b5c5e5e5f%3A0x1234567890abcdef!2sJl.%20Bendul%20Merisi%20Selatan%20XI%2C%20Bendul%20Merisi%2C%20Kec.%20Wonocolo%2C%20Kota%20SBY%2C%20Jawa%20Timur%2060239!5e0!3m2!1sid!2sid!4v1";
 
-const branches = [
-  { name:"Cabang Surabaya Pusat", address:TEMP_ADDRESS, phone:"+62 812-3456-7890", hours:"Senin–Sabtu, 08.00–17.00", email:"surabayapusat@bismarcatalog.com", city:"Surabaya", image:null, maps:TEMP_MAPS },
-  { name:"Cabang Surabaya Timur", address:TEMP_ADDRESS, phone:"+62 812-3456-7891", hours:"Senin–Sabtu, 08.00–17.00", email:"surabayatimur@bismarcatalog.com", city:"Surabaya", image:null, maps:TEMP_MAPS },
-  { name:"Cabang Surabaya Barat", address:TEMP_ADDRESS, phone:"+62 812-3456-7892", hours:"Senin–Sabtu, 08.00–17.00", email:"surabayabarat@bismarcatalog.com", city:"Surabaya", image:null, maps:TEMP_MAPS },
-  { name:"Cabang Sidoarjo",       address:TEMP_ADDRESS, phone:"+62 812-3456-7893", hours:"Senin–Sabtu, 08.00–17.00", email:"sidoarjo@bismarcatalog.com",        city:"Sidoarjo", image:null, maps:TEMP_MAPS },
-  { name:"Cabang Gresik",         address:TEMP_ADDRESS, phone:"+62 812-3456-7894", hours:"Senin–Sabtu, 08.00–17.00", email:"gresik@bismarcatalog.com",          city:"Gresik",  image:null, maps:TEMP_MAPS },
-  { name:"Cabang Malang",         address:TEMP_ADDRESS, phone:"+62 812-3456-7895", hours:"Senin–Sabtu, 08.00–17.00", email:"malang@bismarcatalog.com",          city:"Malang",  image:null, maps:TEMP_MAPS },
-];
+// const branches = [
+//   { name:"Cabang Surabaya Pusat", address:TEMP_ADDRESS, phone:"+62 812-3456-7890", hours:"Senin–Sabtu, 08.00–17.00", email:"surabayapusat@bismarcatalog.com", city:"Surabaya", image:null, maps:TEMP_MAPS },
+//   { name:"Cabang Surabaya Timur", address:TEMP_ADDRESS, phone:"+62 812-3456-7891", hours:"Senin–Sabtu, 08.00–17.00", email:"surabayatimur@bismarcatalog.com", city:"Surabaya", image:null, maps:TEMP_MAPS },
+//   { name:"Cabang Surabaya Barat", address:TEMP_ADDRESS, phone:"+62 812-3456-7892", hours:"Senin–Sabtu, 08.00–17.00", email:"surabayabarat@bismarcatalog.com", city:"Surabaya", image:null, maps:TEMP_MAPS },
+//   { name:"Cabang Sidoarjo",       address:TEMP_ADDRESS, phone:"+62 812-3456-7893", hours:"Senin–Sabtu, 08.00–17.00", email:"sidoarjo@bismarcatalog.com",        city:"Sidoarjo", image:null, maps:TEMP_MAPS },
+//   { name:"Cabang Gresik",         address:TEMP_ADDRESS, phone:"+62 812-3456-7894", hours:"Senin–Sabtu, 08.00–17.00", email:"gresik@bismarcatalog.com",          city:"Gresik",  image:null, maps:TEMP_MAPS },
+//   { name:"Cabang Malang",         address:TEMP_ADDRESS, phone:"+62 812-3456-7895", hours:"Senin–Sabtu, 08.00–17.00", email:"malang@bismarcatalog.com",          city:"Malang",  image:null, maps:TEMP_MAPS },
+// ];
 
 const schedule = [
   { day:"Senin",  open:"08:30", close:"17:00", isOpen:true  },
@@ -120,23 +122,23 @@ function BranchCard({ branch, index, onClick }) {
       style={{ border:"1px solid #dce6f0", boxShadow:"0 2px 12px rgba(7,43,80,.07)" }}
       onClick={onClick}>
       {/* Image area */}
-      <div className="relative h-[180px] overflow-hidden flex-shrink-0">
+      <div className="relative overflow-hidden shrink-0 h-45">
         {hasImg ? (
           <img src={branch.image} alt={branch.name} onError={()=>setImgErr(true)}
-            className="bcard-img w-full h-full object-cover block"
+            className="block object-cover w-full h-full bcard-img"
             style={{ transition:"transform .55s cubic-bezier(.25,.46,.45,.94)" }} />
         ) : (
-          <div className="w-full h-full relative overflow-hidden"
+          <div className="relative w-full h-full overflow-hidden"
             style={{ background:`linear-gradient(145deg, #072B50 0%, ${accent} 100%)` }}>
             <svg className="absolute inset-0 w-full h-full opacity-[0.12]" xmlns="http://www.w3.org/2000/svg">
               <defs><pattern id={`dot${index}`} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="white"/></pattern></defs>
               <rect width="100%" height="100%" fill={`url(#dot${index})`}/>
             </svg>
-            <span className="absolute right-[-8px] bottom-[-16px] text-[100px] font-black leading-none select-none" style={{ color:"rgba(255,255,255,0.06)" }}>
+            <span className="absolute -right-2 -bottom-4 text-[100px] font-black leading-none select-none" style={{ color:"rgba(255,255,255,0.06)" }}>
               {String(index+1).padStart(2,"0")}
             </span>
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5">
-              <div className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center"
+              <div className="w-13 h-13 rounded-[14px] flex items-center justify-center"
                 style={{ border:"1.5px solid rgba(255,255,255,0.2)", background:"rgba(255,255,255,0.08)" }}>
                 <Building2 size={24} style={{ color:"rgba(255,255,255,0.55)" }} />
               </div>
@@ -156,7 +158,7 @@ function BranchCard({ branch, index, onClick }) {
       </div>
 
       {/* Body */}
-      <div className="flex flex-col flex-1 p-5 pb-[22px]">
+      <div className="flex flex-col flex-1 p-5 pb-5.5">
         <p className="bcard-name text-[17px] font-bold mb-3.5 leading-snug" style={{ color:"#072B50" }}>
           {branch.name.replace("Cabang ","")}
         </p>
@@ -170,7 +172,7 @@ function BranchCard({ branch, index, onClick }) {
             { icon:<Clock  size={11}/>,  value:branch.hours   },
           ].map((row,j) => (
             <div key={j} className="flex gap-2.5 items-start">
-              <span className="flex-shrink-0 mt-0.5" style={{ color:accent }}>{row.icon}</span>
+              <span className="shrink-0 mt-0.5" style={{ color:accent }}>{row.icon}</span>
               <span className="text-xs leading-[1.55]" style={{ color:"#5a6882" }}>{row.value}</span>
             </div>
           ))}
@@ -190,8 +192,42 @@ function BranchCard({ branch, index, onClick }) {
 /* ── Main ── */
 export default function Contact() {
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [cabangList, setCabangList] = useState([]);
+  const [loadingCabang, setLoadingCabang] = useState(true);
   const [now, setNow] = useState(new Date());
   const [jamOpen, setJamOpen] = useState(false);
+
+  const [form, setForm] = useState({
+    nama: "",
+    email: "",
+    telepon: "",
+    pesan: "",
+  });
+
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const res = await sendKontak(form);
+      alert("Pesan berhasil dikirim!");
+
+      setForm({
+        nama: "",
+        email: "",
+        telepon: "",
+        pesan: "",
+      });
+      console.log(res);
+    } catch (err) {
+      console.error(err);
+      alert("Gagal kirim pesan");
+    }
+  };
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -208,6 +244,41 @@ export default function Contact() {
     return h*60+m >= oh*60+om && h*60+m < ch*60+cm;
   })();
 
+  useEffect(() => {
+    const fetchCabang = async () => {
+      try {
+        const res = await getCabangs();
+        console.log("CABANG RES:", res);
+
+        // const data = res.data?.data || [];
+        const data = Array.isArray(res) ? res : [];
+
+        const mapped = data.map((item) => ({
+          id: item.id,
+          name: item.nama,
+          city: item.kota,
+          address: item.alamat,
+          phone: item.telepon || "-",
+          hours:
+            item.jam_buka && item.jam_tutup
+              ? `${item.jam_buka} - ${item.jam_tutup}`
+              : "Jam belum tersedia",
+          email: "-",
+          maps: item.maps_link || null,
+          image: null,
+        }));
+
+        setCabangList(mapped);
+      } catch (err) {
+        console.error("Error fetch cabang:", err);
+      } finally {
+        setLoadingCabang(false); // 🔥 WAJIB ADA
+      }
+    };
+
+    fetchCabang();
+  }, []);
+
   const inp = "w-full px-3 py-2.5 rounded-lg text-[13px] text-gray-900 outline-none transition-all duration-200 focus:ring-2 focus:ring-[#072B50]/10 focus:border-[#072B50]";
   const inpStyle = { border:"1px solid #dce6f0" };
 
@@ -215,20 +286,20 @@ export default function Contact() {
     <div className="min-h-screen bg-[#f4f7fb]">
 
       {/* HERO */}
-      <div className="bg-white text-center px-5 md:px-10 py-14 md:py-16" style={{ borderBottom:"1px solid #dce6f0" }}>
+      <div className="px-5 text-center bg-white md:px-10 py-14 md:py-16" style={{ borderBottom:"1px solid #dce6f0" }}>
         <h1 className="text-2xl md:text-[32px] font-extrabold mb-3 tracking-tight" style={{ color:"#072B50" }}>Contact us</h1>
-        <p className="text-[15px] text-gray-500 mx-auto max-w-[440px] leading-[1.75]">
+        <p className="text-[15px] text-gray-500 mx-auto max-w-110 leading-[1.75]">
           Ada pertanyaan atau butuh bantuan? Kami siap membantu Anda.
         </p>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-4 md:px-10 py-7 pb-14">
+      <div className="px-4 mx-auto max-w-350 md:px-10 py-7 pb-14">
 
         {/* BAGIAN 1 — Info Kontak + CEO */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 mb-9">
 
           {/* Informasi Kontak */}
-          <div className="bg-white rounded-2xl p-6 md:p-8" style={{ border:"1px solid #dce6f0" }}>
+          <div className="p-6 bg-white rounded-2xl md:p-8" style={{ border:"1px solid #dce6f0" }}>
             <h2 className="text-xl font-bold mb-1.5" style={{ color:"#072B50" }}>Informasi Kontak</h2>
             <p className="text-[13px] text-gray-400 mb-7 leading-relaxed">Jangan ragu untuk menghubungi kami kapan saja.</p>
 
@@ -239,7 +310,7 @@ export default function Contact() {
                 { icon:<Mail   size={16}/>, label:"Email",   value:"info@bizponselcatalog.com" },
               ].map((item,i) => (
                 <div key={i} className="flex gap-3.5 items-start">
-                  <div className="w-[38px] h-[38px] rounded-[9px] flex items-center justify-center text-white flex-shrink-0 bg-[#072B50]">
+                  <div className="w-9.5 h-9.5 rounded-[9px] flex items-center justify-center text-white shrink-0 bg-[#072B50]">
                     {item.icon}
                   </div>
                   <div>
@@ -254,7 +325,7 @@ export default function Contact() {
             <div>
               <div
                 onClick={() => setJamOpen(!jamOpen)}
-                className="flex justify-between items-center cursor-pointer px-4 py-3 transition-all duration-200"
+                className="flex items-center justify-between px-4 py-3 transition-all duration-200 cursor-pointer"
                 style={{
                   background:"#f0f4f9",
                   borderRadius: jamOpen ? "10px 10px 0 0" : "10px",
@@ -266,7 +337,7 @@ export default function Contact() {
                   <div>
                     <p className="text-[11px] text-gray-500 font-semibold m-0">Jam Operasional</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="w-[5px] h-[5px] rounded-full" style={{ background:isOpen?"#22c55e":"#9ca3af", animation:isOpen?"pulse2 2s infinite":"none" }} />
+                      <div className="w-1.25 h-1.25 rounded-full" style={{ background:isOpen?"#22c55e":"#9ca3af", animation:isOpen?"pulse2 2s infinite":"none" }} />
                       <p className="text-[11px] font-semibold m-0" style={{ color:isOpen?"#15803d":"#9ca3af" }}>
                         {isOpen ? `Sedang Buka · Tutup ${schedule[dayIdx].close.replace(":",".")} WIB` : "Tutup"}
                       </p>
@@ -279,7 +350,7 @@ export default function Contact() {
               </div>
 
               {jamOpen && (
-                <div className="jam-accordion overflow-hidden" style={{ border:"1px solid #072B50", borderTop:"none", borderRadius:"0 0 10px 10px" }}>
+                <div className="overflow-hidden jam-accordion" style={{ border:"1px solid #072B50", borderTop:"none", borderRadius:"0 0 10px 10px" }}>
                   <div className="grid grid-cols-2">
                     {/* Jam Kerja Pusat */}
                     <div style={{ borderRight:"1px solid #dce6f0" }}>
@@ -322,8 +393,8 @@ export default function Contact() {
           </div>
 
           {/* CEO Photo */}
-          <div className="relative rounded-2xl overflow-hidden min-h-[320px] lg:min-h-[400px]" style={{ border:"1px solid #dce6f0" }}>
-            <img src={ceoImg} alt="CEO" className="w-full h-full object-contain object-top absolute inset-0" />
+          <div className="relative overflow-hidden rounded-2xl min-h-80 lg:min-h-100" style={{ border:"1px solid #dce6f0" }}>
+            <img src={ceoImg} alt="CEO" className="absolute inset-0 object-contain object-top w-full h-full" />
             <div className="absolute inset-0" style={{ background:"linear-gradient(to top, #072B50 38%, transparent 100%)" }} />
             <div className="absolute bottom-6 left-6 right-6">
               <p className="text-[13px] italic font-light leading-[1.8] mb-3.5" style={{ color:"rgba(255,255,255,0.8)" }}>
@@ -344,7 +415,7 @@ export default function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-7 mb-9">
 
           {/* Form */}
-          <div className="bg-white rounded-2xl p-6 md:p-8" style={{ border:"1px solid #dce6f0" }}>
+          <div className="p-6 bg-white rounded-2xl md:p-8" style={{ border:"1px solid #dce6f0" }}>
             <h2 className="text-xl font-bold mb-1.5" style={{ color:"#072B50" }}>Kirim Pesan</h2>
             <p className="text-[13px] text-gray-400 mb-6">Isi form di bawah dan kami akan segera menghubungi Anda.</p>
             <div className="flex flex-col gap-3.5">
@@ -352,25 +423,49 @@ export default function Contact() {
                 {[{ label:"Nama Lengkap", placeholder:"John Doe", type:"text" }, { label:"Email", placeholder:"john@email.com", type:"email" }].map(f => (
                   <div key={f.label}>
                     <label className="block text-xs font-semibold text-gray-700 mb-1.5">{f.label}</label>
-                    <input type={f.type} placeholder={f.placeholder} className={inp} style={inpStyle}
+                    <input
+                      type={f.type}
+                      name={f.label === "Nama Lengkap" ? "nama" : "email"}
+                      value={f.label === "Nama Lengkap" ? form.nama : form.email}
+                      onChange={handleChange}
+                      placeholder={f.placeholder}
+                      className={inp}
+                      style={inpStyle}
                       onFocus={e=>(e.currentTarget.style.border="1px solid #072B50")}
-                      onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")} />
+                      onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")}
+                    />
                   </div>
                 ))}
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1.5">No. Telepon</label>
-                <input type="tel" placeholder="+62 812-xxxx-xxxx" className={inp} style={inpStyle}
+                <input
+                  type="tel"
+                  name="telepon"
+                  value={form.telepon}
+                  onChange={handleChange}
+                  placeholder="+62 812-xxxx-xxxx"
+                  className={inp}
+                  style={inpStyle}
                   onFocus={e=>(e.currentTarget.style.border="1px solid #072B50")}
-                  onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")} />
+                  onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")}
+                />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1.5">Pesan</label>
-                <textarea placeholder="Tulis pesan Anda di sini..." rows={5} className={inp + " resize-y"} style={{ ...inpStyle, fontFamily:"inherit" }}
+                <textarea
+                  name="pesan"
+                  value={form.pesan}
+                  onChange={handleChange}
+                  placeholder="Tulis pesan Anda di sini..."
+                  rows={5}
+                  className={inp + " resize-y"}
+                  style={{ ...inpStyle, fontFamily:"inherit" }}
                   onFocus={e=>(e.currentTarget.style.border="1px solid #072B50")}
-                  onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")} />
+                  onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")}
+                />
               </div>
-              <button className="w-full py-3 rounded-[9px] text-white text-[13px] font-bold border-none cursor-pointer transition-colors duration-200 bg-[#072B50] hover:bg-[#0a3460]">
+              <button onClick={handleSubmit} className="w-full py-3 rounded-[9px] text-white text-[13px] font-bold border-none cursor-pointer transition-colors duration-200 bg-[#072B50] hover:bg-[#0a3460]">
                 Kirim Pesan
               </button>
             </div>
@@ -378,38 +473,52 @@ export default function Contact() {
 
           {/* Sosmed + Maps */}
           <div className="flex flex-col gap-4">
-            <div className="bg-white rounded-2xl px-6 py-5" style={{ border:"1px solid #dce6f0" }}>
-              <h3 className="text-xl font-bold mb-1" style={{ color:"#072B50" }}>Follow Us</h3>
+            <div className="px-6 py-5 bg-white rounded-2xl" style={{ border:"1px solid #dce6f0" }}>
+              <h3 className="mb-1 text-xl font-bold" style={{ color:"#072B50" }}>Follow Us</h3>
               <p className="text-xs text-gray-400 mb-3.5">Klik icon untuk melihat info akun</p>
               <div className="flex gap-2.5">
                 {socialLinks.map(sl => <SocialIcon key={sl.label} sl={sl} size={44} iconSize={22} />)}
               </div>
             </div>
-            <div className="rounded-2xl overflow-hidden flex-1" style={{ border:"1px solid #dce6f0" }}>
+            <div className="flex-1 overflow-hidden rounded-2xl" style={{ border:"1px solid #dce6f0" }}>
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.4!2d112.7!3d-7.25!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zN8KwMTUnMDAuMCJTIDExMsKwNDInMDAuMCJF!5e0!3m2!1sen!2sid!4v1"
-                width="100%" height="100%" className="block min-h-[260px]" style={{ border:0 }} allowFullScreen loading="lazy" />
+                width="100%" height="100%" className="block min-h-65" style={{ border:0 }} allowFullScreen loading="lazy" />
             </div>
           </div>
         </div>
 
         {/* BAGIAN 3 — Cabang */}
         <div className="mb-14">
-          <div className="flex justify-between items-end mb-7 flex-wrap gap-3">
+          <div className="flex flex-wrap items-end justify-between gap-3 mb-7">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider opacity-40 mb-1.5" style={{ color:"#072B50" }}>Jaringan Kami</p>
               <h2 className="text-[28px] font-extrabold tracking-tight m-0" style={{ color:"#072B50" }}>Cabang Kami</h2>
             </div>
             <div className="flex items-center gap-2 rounded-full px-4 py-1.5 bg-white" style={{ border:"1px solid #dce6f0" }}>
-              <div className="w-[7px] h-[7px] rounded-full bg-green-500" style={{ boxShadow:"0 0 0 3px rgba(34,197,94,.2)" }} />
-              <span className="text-xs font-semibold text-gray-700">{branches.length} Cabang Aktif</span>
+              <div className="w-1.75 h-1.75 rounded-full bg-green-500" style={{ boxShadow:"0 0 0 3px rgba(34,197,94,.2)" }} />
+              <span className="text-xs font-semibold text-gray-700">{cabangList.length} Cabang Aktif</span>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {branches.map((branch,i) => (
+          {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {cabangList.map((branch,i) => (
               <BranchCard key={i} branch={branch} index={i} onClick={() => setSelectedBranch(branch)} />
             ))}
-          </div>
+          </div> */}
+          {loadingCabang ? (
+            <p className="text-sm text-gray-500">Loading cabang...</p>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {cabangList.map((branch,i) => (
+                <BranchCard
+                  key={branch.id}
+                  branch={branch}
+                  index={i}
+                  onClick={() => setSelectedBranch(branch)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -417,7 +526,7 @@ export default function Contact() {
       {selectedBranch && (
         <div
           onClick={() => setSelectedBranch(null)}
-          className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+          className="fixed inset-0 flex items-center justify-center p-4 z-1000"
           style={{ background:"rgba(2,12,28,0.75)", backdropFilter:"blur(10px)" }}>
           <div
             onClick={e => e.stopPropagation()}
@@ -432,14 +541,14 @@ export default function Contact() {
               </svg>
               <div className="relative flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[11px] flex items-center justify-center flex-shrink-0"
+                  <div className="w-10 h-10 rounded-[11px] flex items-center justify-center shrink-0"
                     style={{ background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.18)" }}>
                     <Building2 size={19} style={{ color:"rgba(255,255,255,0.82)" }} />
                   </div>
                   <div className="flex items-center gap-3.5">
                     <div>
                       <div className="flex items-center gap-1.5 mb-0.5">
-                        <div className="w-[5px] h-[5px] rounded-full bg-green-400" style={{ boxShadow:"0 0 0 3px rgba(74,222,128,0.2)" }} />
+                        <div className="w-1.25 h-1.25 rounded-full bg-green-400" style={{ boxShadow:"0 0 0 3px rgba(74,222,128,0.2)" }} />
                         <span className="text-[9px] font-bold tracking-[2px] uppercase" style={{ color:"rgba(255,255,255,0.5)" }}>Detail Cabang</span>
                       </div>
                       <h3 className="text-[17px] font-extrabold text-white m-0 tracking-tight">{selectedBranch.name}</h3>
@@ -454,7 +563,7 @@ export default function Contact() {
                 {/* Close btn */}
                 <button
                   onClick={() => setSelectedBranch(null)}
-                  className="w-[26px] h-[26px] rounded-md flex items-center justify-center flex-shrink-0 cursor-pointer transition-all duration-150"
+                  className="w-6.5 h-6.5 rounded-md flex items-center justify-center shrink-0 cursor-pointer transition-all duration-150"
                   style={{ background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)" }}
                   onMouseEnter={e=>{ e.currentTarget.style.background="rgba(239,68,68,0.7)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.4)"; }}
                   onMouseLeave={e=>{ e.currentTarget.style.background="rgba(255,255,255,0.1)"; e.currentTarget.style.borderColor="rgba(255,255,255,0.2)"; }}>
@@ -477,11 +586,11 @@ export default function Contact() {
                   { icon:<Clock  size={13}/>, label:"Jam Operasional", value:selectedBranch.hours   },
                 ].map((item,i) => (
                   <div key={i} className="flex items-center gap-3 px-3.5 py-2.5 bg-white rounded-[11px]" style={{ border:"1px solid #eef1f6", boxShadow:"0 1px 3px rgba(7,43,80,0.04)" }}>
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-[#f0f4f9] text-[#072B50]">{item.icon}</div>
-                    <div className="w-px h-7 flex-shrink-0 bg-[#eef1f6]" />
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-[#f0f4f9] text-[#072B50]">{item.icon}</div>
+                    <div className="w-px h-7 shrink-0 bg-[#eef1f6]" />
                     <div className="min-w-0">
                       <p className="text-[9px] text-[#aab4c4] font-bold uppercase tracking-[0.8px] mb-0.5">{item.label}</p>
-                      <p className="text-[12.5px] text-[#1e293b] font-semibold leading-snug break-words m-0">{item.value}</p>
+                      <p className="text-[12.5px] text-[#1e293b] font-semibold leading-snug wrap-break-word m-0">{item.value}</p>
                     </div>
                   </div>
                 ))}
@@ -498,9 +607,9 @@ export default function Contact() {
               </div>
 
               {/* Maps kolom kanan */}
-              <div className="relative min-h-[320px] md:min-h-[380px]">
+              <div className="relative min-h-80 md:min-h-95">
                 <iframe src={selectedBranch.maps} width="100%" height="100%"
-                  className="absolute inset-0 block min-h-[380px]"
+                  className="absolute inset-0 block min-h-95"
                   style={{ border:0 }} allowFullScreen loading="lazy"
                   title={`Peta ${selectedBranch.name}`} referrerPolicy="no-referrer-when-downgrade" />
               </div>

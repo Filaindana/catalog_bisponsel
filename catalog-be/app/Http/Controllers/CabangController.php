@@ -16,21 +16,6 @@ class CabangController
             'status' => true,
             'data'   => $cabang,
         ]);
-        // return response()->json([
-        //     'status' => true,
-        //     'data' => $cabang->map(function ($item) {
-        //         return [
-        //             'id'        => $item->id,
-        //             'name'      => $item->nama,
-        //             'branchId'  => $item->kode,
-        //             'city'      => $item->kota,
-        //             'address'   => $item->alamat,
-        //             'jamBuka'   => $item->jam_buka,
-        //             'jamTutup'  => $item->jam_tutup,
-        //             'mapsLink'  => $item->maps_link,
-        //         ];
-        //     }),
-        // ]);
     }
 
     public function show(int $id): JsonResponse

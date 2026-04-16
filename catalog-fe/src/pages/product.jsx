@@ -1,28 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import laptopImg from "../assets/laptop.png";
-import mouseImg from "../assets/mouse.png";
-import keyboardImg from "../assets/keyboard.png";
-import soundImg from "../assets/sound.png";
-import kabelImg from "../assets/kabel.png";
-import monitorImg from "../assets/monitor.png";
 import { Search, ChevronDown } from "lucide-react";
 import ProductCard from "../components/ProductCardCompact.jsx";
-
-const allProducts = Array.from({ length: 24 }, (_, i) => ({
-  id: i + 1,
-  category: "Komputer (PC)",
-  name: "PC Gaming Pro Ryzen Edition",
-  spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB",
-  price: 17499000,
-  rating: 4.8,
-  badge: i % 3 === 0 ? "New" : i % 4 === 0 ? "Sale" : null,
-  brand: ["Asus", "MSI", "HP", "Lenovo", "Acer"][i % 5],
-  discount: i % 4 === 0 ? 15 : null,
-  image: [laptopImg, mouseImg, keyboardImg, soundImg, kabelImg, monitorImg][
-    i % 6
-  ],
-}));
+import { getProducts } from "../utils/services/productService.js";
 
 const categories = [
   "Keyboard",
@@ -84,7 +64,7 @@ export default function Product() {
   // ── baca query param ?category=xxx dari URL ──
   const [searchParams] = useSearchParams();
 
-  const [saved, setSaved] = useState(allProducts.map(() => false));
+  const [saved, setSaved] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -95,6 +75,53 @@ export default function Product() {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState(20000000);
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const res = await getProducts({
+        page: currentPage,
+        search: searchQuery,
+        sortBy: sortBy,
+      });
+
+      console.log("RES:", res);
+      console.log(
+        "IMAGE URL:",
+        `http://localhost:8000/storage/${res.products[0]?.gambar}`,
+      );    
+
+      // 🔥 FIX FLEXIBLE RESPONSE
+      const list = res?.products || res?.data || [];
+
+      setProducts(list);
+      setTotalPages(res?.totalPages || 1);
+
+    } catch (err) {
+      console.error(err);
+      setProducts([]); // safety fallback
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [
+    currentPage,
+    searchQuery,
+    sortBy,
+    selectedCategories,
+    selectedBrands,
+    selectedDiscounts,
+    selectedStatus,
+    priceRange,
+  ]);
 
   // ── auto-filter saat URL berubah ──
   useEffect(() => {
@@ -108,49 +135,6 @@ export default function Product() {
       }, 100);
     }
   }, [searchParams]);
-
-  const productsPerPage = 15;
-
-  const filteredProducts = allProducts
-    .filter((p) => {
-      if (
-        searchQuery &&
-        !p.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !p.category.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-        return false;
-      if (p.price > priceRange) return false;
-      if (
-        selectedCategories.length > 0 &&
-        !selectedCategories.includes(p.category)
-      )
-        return false;
-      if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand))
-        return false;
-      if (selectedDiscounts.length > 0) {
-        const hasDiskon =
-          selectedDiscounts.includes("Diskon") && p.discount !== null;
-        const hasBestSeller =
-          selectedDiscounts.includes("Best Seller") && p.rating >= 4.7;
-        const hasNewArrival =
-          selectedDiscounts.includes("New Arrival") && p.badge === "New";
-        if (!hasDiskon && !hasBestSeller && !hasNewArrival) return false;
-      }
-      if (selectedStatus.includes("Tidak Tersedia")) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortBy === "Harga Terendah") return a.price - b.price;
-      if (sortBy === "Harga Tertinggi") return b.price - a.price;
-      if (sortBy === "Rating") return b.rating - a.rating;
-      return b.id - a.id;
-    });
-
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const currentProducts = filteredProducts.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage,
-  );
 
   const toggleItem = (list, setList, item) => {
     if (list.includes(item)) {
@@ -438,20 +422,9 @@ export default function Product() {
             <div>
               <p style={{ fontSize: "14px", color: "#374151", margin: "0 0 4px 0" }}>
                 Showing{" "}
-                {filteredProducts.length === 0 ? 0 : (currentPage - 1) * productsPerPage + 1}
-                –{Math.min(currentPage * productsPerPage, filteredProducts.length)}{" "}
-                of {filteredProducts.length} results
-                {searchQuery && (
-                  <span style={{ color: "#6b7280" }}>
-                    {" "}untuk &quot;<strong>{searchQuery}</strong>&quot;
-                  </span>
-                )}
-                {/* Tampilkan kategori aktif dari URL */}
-                {selectedCategories.length > 0 && (
-                  <span style={{ color: "#072B50", fontWeight: 600 }}>
-                    {" "}· {selectedCategories.join(", ")}
-                  </span>
-                )}
+                {(products?.length ?? 0) === 0 ? 0 : (currentPage - 1) * 15 + 1}
+                –{Math.min(currentPage * 15, products.length)}{" "}
+                of {products.length} results
               </p>
               {hasActiveFilters && (
                 <span
@@ -553,37 +526,44 @@ export default function Product() {
           </div>
 
           {/* GRID */}
-          {currentProducts.length === 0 ? (
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "60px 0" }}>
+              Loading produk...
+            </div>
+          ) : products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af", fontSize: "15px" }}>
               Produk tidak ditemukan.
             </div>
           ) : (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "14px" }}>
-              {currentProducts.map((product, index) => (
+              {products.map((product) => (
                 <ProductCard
-                  key={product.id}
-                  product={{
-                    id: product.id,
-                    category: product.category,
-                    name: product.name,
-                    spec: product.spec,
-                    price: formatPrice(product.price),
-                    rating: product.rating,
-                    image: product.image,
-                    badge: product.badge ?? undefined,
-                  }}
-                  saved={saved[index]}
-                  onCategoryClick={() => {
-                    toggleItem(selectedCategories, setSelectedCategories, product.category);
-                    setCurrentPage(1);
-                  }}
-                  compact
-                  onToggleSave={() =>
-                    setSaved((prev) => {
-                      const u = [...prev];
-                      u[index] = !u[index];
-                      return u;
-                    })
+                key={product.id}
+                product={{
+                  id: product.id,
+                  category: product.kategori?.nama || "-",
+                  name: product.nama,
+                  spec: product.deskripsi || "-",
+                  price: formatPrice(product.harga),
+                  rating: product.rating || 0,
+                  image: product.gambar
+                    ? `http://localhost:8000/storage/${product.gambar}`
+                    : "/fallback.jpg",
+                  badge: product.adalah_promo ? "Sale" : undefined,
+                }}
+                // saved={saved[index]}
+                saved={saved[product.id]}
+                compact
+                onToggleSave={() =>
+                    // setSaved((prev) => {
+                    //   const u = [...prev];
+                    //   u[index] = !u[index];
+                    //   return u;
+                    // })
+                    setSaved((prev) => ({
+                      ...prev,
+                      [product.id]: !prev[product.id],
+                    }))
                   }
                 />
               ))}

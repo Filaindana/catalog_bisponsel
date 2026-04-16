@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('stok')->default(0);
             $table->float('rating')->default(0);
             $table->boolean('adalah_promo')->default(false);
+            $table->string('gambar')->nullable();
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrentOnUpdate()->nullable();
         });

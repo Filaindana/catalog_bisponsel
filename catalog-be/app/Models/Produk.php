@@ -22,6 +22,7 @@ class Produk extends Model
         'stok',
         'rating',
         'adalah_promo',
+        'gambar',
     ];
 
     protected $casts = [
@@ -36,10 +37,15 @@ class Produk extends Model
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
-    public function gambar(): HasMany
-    {
-        return $this->hasMany(GambarProduk::class, 'produk_id');
-    }
+    // public function gambar(): HasMany
+    // {
+    //     return $this->hasMany(GambarProduk::class, 'produk_id');
+    // }
+
+    // public function gambarProduk()
+    // {
+    //     return $this->hasMany(GambarProduk::class, 'produk_id');
+    // }
 
     public function spesifikasi(): HasMany
     {

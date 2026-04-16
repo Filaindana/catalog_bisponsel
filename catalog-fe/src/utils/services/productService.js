@@ -1,6 +1,7 @@
-import API from "../api";
 
-// 🔥 helper query builder
+import api from "../api";
+
+// helper query builder (tetap sama)
 const buildParams = (filters) => {
   const params = {};
 
@@ -15,7 +16,6 @@ const buildParams = (filters) => {
     params["brand[]"] = filters.brands;
   }
 
-  // 🔄 sorting mapping
   switch (filters.sortBy) {
     case "Harga Terendah":
       params.sort = "price_asc";
@@ -31,21 +31,32 @@ const buildParams = (filters) => {
   }
 
   params.page = filters.page || 1;
-  params.per_page = filters.limit || 12;
+  params.per_page = filters.limit || 15;
 
   return params;
 };
 
-// ✅ GET PRODUCTS
+// 🔥 GET PRODUCTS (FIX INI)
 export const getProducts = async (filters = {}) => {
-  const res = await API.get("/products", {
-    params: buildParams(filters),
+  const query = new URLSearchParams(buildParams(filters)).toString();
+
+  const res = await api(`/produk?${query}`, {
+    method: "GET",
   });
-  return res.data;
+
+  return {
+    products: res.data.data,
+    currentPage: res.data.current_page,
+    totalPages: res.data.last_page,
+    meta: res.meta,
+  };
 };
 
-// ✅ DETAIL
+// 🔥 DETAIL
 export const getProductById = async (id) => {
-  const res = await API.get(`/products/${id}`);
-  return res.data;
+  const res = await api(`/produk/${id}`, {
+    method: "GET",
+  });
+
+  return res;
 };

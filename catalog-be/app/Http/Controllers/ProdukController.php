@@ -12,7 +12,7 @@ class ProdukController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Produk::with(['kategori', 'gambar', 'spesifikasi']);
+        $query = Produk::with(['kategori', 'spesifikasi']);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
@@ -51,7 +51,7 @@ class ProdukController
 
     public function show(int $id): JsonResponse
     {
-        $produk = Produk::with(['kategori', 'gambar', 'spesifikasi', 'promo'])->findOrFail($id);
+        $produk = Produk::with(['kategori', 'spesifikasi', 'promo'])->findOrFail($id);
 
         return response()->json([
             'status' => true,

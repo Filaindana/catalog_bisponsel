@@ -15,6 +15,9 @@ return new class extends Migration
             $table->string('kota');
             $table->text('alamat');
             $table->string('telepon')->nullable();
+            $table->text('maps_link')->nullable();
+            $table->string('jam_buka')->nullable();
+            $table->string('jam_tutup')->nullable();
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrentOnUpdate()->nullable();
         });

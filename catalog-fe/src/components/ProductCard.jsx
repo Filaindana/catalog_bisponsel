@@ -50,19 +50,20 @@ export default function ProductCard({
             {product.category}
           </p>
 
-          <p className="text-[16px] font-extrabold text-gray-900 mb-1 leading-tight">
+          <p className="text-[16px] font-extrabold text-gray-900 mb-1 leading-tight line-clamp-2 min-h-10">
             {product.name}
           </p>
 
           {product.spec && (
-            <p className="text-[13px] text-gray-400 leading-snug">
+            <p className="text-[13px] text-gray-400 leading-snug line-clamp-2 min-h-9">
               {product.spec}
             </p>
           )}
         </div>
 
         {/* IMAGE */}
-        <div className="relative bg-gray-50 overflow-hidden mt-2.5 group">
+        {/* <div className="relative bg-gray-50 overflow-hidden mt-2.5 group"> */}
+        <div className="relative bg-gray-50 overflow-hidden mt-2.5 group h-50 flex items-center justify-center">
 
           {product.badge && (
             <span className="absolute top-3 left-3 bg-red-500 text-white text-[12px] font-bold px-2 py-1 rounded-lg z-10">

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
-import ProductCard from "../components/ProductCardCompact.jsx";
+// import ProductCard from "../components/ProductCardCompact.jsx";
+import ProductCard from "../components/ProductCard.jsx";
 import { getProducts } from "../utils/services/productService.js";
 
 const categories = [

@@ -4,6 +4,7 @@ import { Search, ChevronDown } from "lucide-react";
 // import ProductCard from "../components/ProductCardCompact.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import { getProducts } from "../utils/services/productService.js";
+import { removeFavorit, addFavorit, getFavorit } from "../utils/services/favoritService.js";
 
 const categories = [
   "Keyboard",
@@ -65,7 +66,8 @@ export default function Product() {
   // ── baca query param ?category=xxx dari URL ──
   const [searchParams] = useSearchParams();
 
-  const [saved, setSaved] = useState({});
+  // const [saved, setSaved] = useState({});
+  const [savedMap, setSavedMap] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBrands, setSelectedBrands] = useState([]);
@@ -92,10 +94,6 @@ export default function Product() {
       });
 
       console.log("RES:", res);
-      console.log(
-        "IMAGE URL:",
-        `http://localhost:8000/storage/${res.products[0]?.gambar}`,
-      );    
 
       // 🔥 FIX FLEXIBLE RESPONSE
       const list = res?.products || res?.data || [];
@@ -113,6 +111,7 @@ export default function Product() {
 
   useEffect(() => {
     fetchData();
+    refreshFavorit(); // ⬅️ TAMBAH INI
   }, [
     currentPage,
     searchQuery,
@@ -231,6 +230,47 @@ export default function Product() {
       {label}
     </button>
   );
+
+  const normalizeFavorit = (res) => {
+    return res?.data || res || [];
+  };
+
+  const refreshFavorit = async () => {
+    try {
+      const res = await getFavorit();
+      const data = normalizeFavorit(res);
+
+      const map = {};
+      data.forEach((item) => {
+        map[item.produk.id] = true;
+      });
+
+      setSavedMap(map);
+    } catch (err) {
+      console.error("Gagal ambil favorit:", err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchFavorit = async () => {
+      try {
+        const res = await getFavorit();
+
+        const data = res?.data || res || [];
+
+        const map = {};
+        data.forEach((item) => {
+          map[item.produk.id] = true;
+        });
+
+        setSavedMap(map);
+      } catch (err) {
+        console.error("Gagal ambil favorit:", err);
+      }
+    };
+
+    fetchFavorit();
+  }, []);
 
   return (
     <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
@@ -552,21 +592,30 @@ export default function Product() {
                     : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}
-                // saved={saved[index]}
-                saved={saved[product.id]}
+                saved={savedMap[product.id]}
                 compact
-                onToggleSave={() =>
-                    // setSaved((prev) => {
-                    //   const u = [...prev];
-                    //   u[index] = !u[index];
-                    //   return u;
-                    // })
-                    setSaved((prev) => ({
+                onToggleSave={async () => {
+                  const isSaved = savedMap[product.id];
+                  setSavedMap((prev) => ({
+                    ...prev,
+                    [product.id]: !isSaved,
+                  }));
+
+                  try {
+                    if (isSaved) {
+                      await removeFavorit(product.id);
+                    } else {
+                      await addFavorit(product.id);
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    setSavedMap((prev) => ({
                       ...prev,
-                      [product.id]: !prev[product.id],
-                    }))
+                      [product.id]: isSaved,
+                    }));
                   }
-                />
+                }}
+                  />
               ))}
             </div>
           )}

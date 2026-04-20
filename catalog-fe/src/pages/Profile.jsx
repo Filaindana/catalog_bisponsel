@@ -1,16 +1,31 @@
 import { useState, useRef, useEffect } from "react";
+import { changePassword, getProfile, updateProfile } from "../utils/services/profileService";
+import { getFavorit, removeFavorit } from "../utils/services/favoritService";
+import ProductCard from "../components/ProductCard";
 
 const NAVY = "#072B50";
 const PC_IMG = "https://images.unsplash.com/photo-1593640408182-31c228f37e8e?w=400&q=80";
-const REAL_PW = "password123";
 
-const fmt = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
+// const categories = [
+//   "Keyboard",
+//   "Kabel Lan",
+//   "Laptop",
+//   "Speaker",
+//   "Mouse",
+//   "Handphone",
+//   "Komputer (PC)",
+// ];
 
-const initialSaved = [
-  { id: 1, category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB • SSD 1TB", price: 17499000, rating: 4.8, image: PC_IMG },
-  { id: 2, category: "Komputer (PC)", name: "PC Gaming Compact i5 Gen 13", spec: "Core i5 • RTX 3060 • 8GB • SSD 512GB", price: 12999000, rating: 4.6, image: PC_IMG },
-  { id: 3, category: "Komputer (PC)", name: "PC Workstation AMD Threadripper", spec: "Threadripper • RTX 4070 • 32GB • SSD 2TB", price: 29499000, rating: 4.9, image: PC_IMG },
-];
+const categories = {
+  1: "Laptop",
+  2: "Smartphone",
+  3: "Aksesoris",
+  4: "Audio & Headphone",
+  5: "Kamera & Fotografi",
+  6: "Rumah",
+  7: "Gaming",
+  8: "Networking",
+};
 
 /* ── Icons ── */
 const IconUser = () => (
@@ -78,16 +93,6 @@ const IconLogout = () => (
 const IconBookmark = () => (
   <svg width="20" height="20" fill="none" stroke={NAVY} strokeWidth="2" viewBox="0 0 24 24">
     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-  </svg>
-);
-const IconBookmarkFill = () => (
-  <svg width="13" height="13" fill="white" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
-    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-  </svg>
-);
-const IconStar = () => (
-  <svg width="12" height="12" fill="#f59e0b" stroke="#f59e0b" strokeWidth="1" viewBox="0 0 24 24">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
 const IconMailSend = () => (
@@ -192,21 +197,46 @@ function PasswordModal({ onClose }) {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
   const oldRef = useRef(null);
+
+  const isOldFilled = oldPw.trim().length > 0;
+
   useEffect(() => { oldRef.current?.focus(); }, []);
 
-  const oldCorrect = oldPw === REAL_PW;
+  const savePw = async () => {
+    setOldErr("");
+    setNewErr("");
 
-  const savePw = () => {
-    setOldErr(""); setNewErr("");
-    let ok = true;
-    if (!oldPw) { setOldErr("Password lama tidak boleh kosong"); ok = false; }
-    else if (!oldCorrect) { setOldErr("Password lama salah"); ok = false; }
-    if (!newPw && ok) { setNewErr("Password baru tidak boleh kosong"); ok = false; }
-    else if (newPw.length < 8 && newPw && ok) { setNewErr("Password baru minimal 8 karakter"); ok = false; }
-    else if (newPw === oldPw && newPw && ok) { setNewErr("Tidak boleh sama dengan password lama"); ok = false; }
-    if (!ok) return;
-    setSuccess(true);
-    setTimeout(() => onClose(), 1500);
+    if (!oldPw) {
+      setOldErr("Password lama tidak boleh kosong");
+      return;
+    }
+
+    if (!newPw) {
+      setNewErr("Password baru tidak boleh kosong");
+      return;
+    }
+
+    if (newPw.length < 8) {
+      setNewErr("Password minimal 8 karakter");
+      return;
+    }
+
+    try {
+      await changePassword({
+        old_password: oldPw,
+        new_password: newPw,
+      });
+
+      setSuccess(true);
+
+      // reset input biar bersih
+      setOldPw("");
+      setNewPw("");
+
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setOldErr(err.message || "Terjadi kesalahan");
+    }
   };
 
   const sendForgot = () => { if (!forgotEmail.includes("@")) return; setForgotSent(true); };
@@ -268,7 +298,8 @@ function PasswordModal({ onClose }) {
             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password Lama</label>
             <div className="relative">
               <input
-                ref={oldRef} type={showOld ? "text" : "password"} value={oldPw}
+                ref={oldRef} type={showOld ? "text" : "password"} 
+                value={oldPw}
                 onChange={(e) => { setOldPw(e.target.value); setOldErr(""); }}
                 onKeyDown={(e) => { if (e.key === "Enter") savePw(); }}
                 placeholder="Masukkan password lama"
@@ -288,18 +319,25 @@ function PasswordModal({ onClose }) {
             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Password Baru</label>
             <div className="relative">
               <input
-                type={showNew ? "text" : "password"} value={newPw}
+                type={showNew ? "text" : "password"} 
+                value={newPw}
                 onChange={(e) => { setNewPw(e.target.value); setNewErr(""); }}
                 onKeyDown={(e) => { if (e.key === "Enter") savePw(); }}
-                disabled={!oldCorrect && oldPw.length > 0}
-                placeholder={!oldCorrect && oldPw.length > 0 ? "Masukkan password lama yang benar dulu" : "Minimal 8 karakter"}
-                className={`w-full px-4 py-2.5 pr-11 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${newErr ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"} ${!oldCorrect && oldPw.length > 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-              />
-              {(oldCorrect || oldPw.length === 0) && (
-                <button type="button" onClick={() => setShowNew((v) => !v)} className="absolute flex p-0 -translate-y-1/2 bg-transparent border-0 cursor-pointer right-3 top-1/2 text-slate-400 hover:text-slate-600">
-                  <IconEye off={showNew} />
-                </button>
-              )}
+                disabled={!isOldFilled}
+                placeholder={
+                  !isOldFilled
+                    ? "Isi password lama dulu"
+                    : "Minimal 8 karakter"
+                }
+                className={`w-full px-4 py-2.5 pr-11 rounded-xl text-sm text-slate-800 outline-none transition-all border-[1.5px] bg-slate-50 focus:bg-white ${!isOldFilled
+      ? "bg-slate-100 text-slate-400 cursor-not-allowed border-slate-200" : newErr ? "border-red-400 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.1)]" : "border-slate-200 focus:border-[#072B50] focus:shadow-[0_0_0_3px_rgba(7,43,80,0.09)]"}`}
+              />    
+              <button 
+              type="button" 
+              onClick={() => setShowNew((v) => !v)} 
+              className="absolute flex p-0 -translate-y-1/2 bg-transparent border-0 cursor-pointer right-3 top-1/2 text-slate-400 hover:text-slate-600">
+                <IconEye off={showNew} />
+              </button>
             </div>
             {newErr && <div className="flex items-center gap-1.5 mt-1.5"><IconAlert /><span className="text-xs text-red-500">{newErr}</span></div>}
           </div>
@@ -340,45 +378,136 @@ function InfoRow({ icon, label, value, valueClass = "", onEdit, editLabel = "Edi
   );
 }
 
-/* ── Saved Card ── */
-function SavedCard({ item, onRemove }) {
-  return (
-    <div className="overflow-hidden transition-all duration-200 bg-white border shadow-sm cursor-pointer rounded-2xl border-slate-200 hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative">
-        <img src={item.image} alt={item.name} className="block object-cover w-full h-40 bg-slate-100" onError={(e) => { e.target.style.background = "#f0f4fb"; }} />
-        <button onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
-          className="absolute top-2.5 left-2.5 w-8 h-8 rounded-full flex items-center justify-center border-0 cursor-pointer hover:scale-110 transition-transform"
-          style={{ background: NAVY }}>
-          <IconBookmarkFill />
-        </button>
-      </div>
-      <div className="p-4">
-        <p className="text-[10.5px] font-bold uppercase tracking-widest text-slate-400 mb-1">{item.category}</p>
-        <h3 className="text-sm font-extrabold leading-snug mb-1.5" style={{ color: NAVY }}>{item.name}</h3>
-        <p className="text-[11.5px] text-slate-500 leading-relaxed mb-3">{item.spec}</p>
-        <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
-          <p className="text-sm font-extrabold text-red-600">{fmt(item.price)}</p>
-          <div className="flex items-center gap-1 text-amber-500 font-bold text-[12.5px]">
-            <IconStar />{item.rating}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ═══════════════════════════════
    MAIN — Profile Page
 ═══════════════════════════════ */
 export default function Profile() {
   const [tab, setTab] = useState("userdata");
-  const [saved, setSaved] = useState(initialSaved);
-  const [nama, setNama] = useState("Vena Novita");
-  const [email, setEmail] = useState("venanovita@gmail.com");
+  const [saved, setSaved] = useState([]);
+  const [user, setUser] = useState(null);
+  const nama = user?.nama || "";
+  const email = user?.email || "";
   const [editField, setEditField] = useState(null); // "Nama" | "Email" | null
   const [pwModal, setPwModal] = useState(false);
 
   const initials = nama.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await getProfile();
+        console.log("PROFILE RES:", res);
+        console.log(localStorage.getItem("token"));
+        console.log(res.data);
+        setUser(res); // ⬅️ penting!
+      } catch (err) {
+        console.error("FETCH PROFILE ERROR:", err.message);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleUpdateUser = async (field, value) => {
+    try {
+      const res = await updateProfile(user.id, {
+        [field]: value,
+      });
+
+      setUser(res); // ⬅️ update state dari backend
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const formatTanggal = (dateString) => {
+    if (!dateString) return "-";
+
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  useEffect(() => {
+    const fetchFavorit = async () => {
+      try {
+        const res = await getFavorit();
+
+        console.log("FAVORIT:", res);
+
+        // mapping dari backend ke format frontend
+        const mapped = res.map((item) => ({
+          id: item.produk.id,
+          category: item.produk.kategori?.nama || "-",
+          name: item.produk.nama,
+          spec: item.produk.deskripsi || "-",
+          price: item.produk.harga,
+          rating: item.produk.rating || 0,
+          image: item.produk.gambar?.[0]?.url || PC_IMG,
+        }));
+
+        setSaved(mapped);
+      } catch (err) {
+        console.error("ERROR FETCH FAVORIT:", err.message);
+      }
+    };
+
+    fetchFavorit();
+  }, []);
+
+  const formatPrice = (price) =>
+    "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
+
+  const fetchSaved = async () => {
+    try {
+      const res = await getFavorit();
+
+      const data = res?.data || res || [];
+
+      // 🔥 ubah jadi format product
+      // const products = data.map((item) => item.produk);
+      const products = data.map((item) => {
+        const p = item.produk;
+        console.log("DATA FAVORIT:", data);
+        data.forEach((item, i) => {
+          console.log("ITEM", i, item.produk);
+        });
+        console.log("KATEGORI:", item.produk.kategori);
+
+        return {
+          id: p.id,
+          // category: p.kategori?.nama || "-",
+          category: p.kategori?.nama || categories[p.kategori_id] || "-",
+          name: p.nama,
+          spec: p.deskripsi || "-",
+          price: formatPrice(p.harga),
+          rating: p.rating || 0,
+          image: p.gambar
+            ? `http://localhost:8000/storage/${p.gambar}`
+            : "/fallback.jpg",
+          badge: p.adalah_promo ? "Sale" : undefined,
+        };
+      });
+
+      setSaved(products);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    if (tab === "saved") {
+      const load = async () => {
+        await fetchSaved();
+      };
+
+      load();
+    }
+  }, [tab]);
 
   return (
     <div className="min-h-screen bg-[#f4f6fb]">
@@ -434,7 +563,7 @@ export default function Profile() {
               </div>
               <InfoRow icon={<IconUser />} label="Nama Lengkap" value={nama} onEdit={() => setEditField("Nama")} />
               <InfoRow icon={<IconMail />} label="Email" value={email} onEdit={() => setEditField("Email")} />
-              <InfoRow icon={<IconCal />} label="Tanggal Bergabung" value="27 Februari 2026" />
+              <InfoRow icon={<IconCal />} label="Tanggal Bergabung"   value={formatTanggal(user?.dibuat_pada)} />
             </div>
 
             {/* Keamanan */}
@@ -471,7 +600,21 @@ export default function Profile() {
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {saved.map((item) => (
-                  <SavedCard key={item.id} item={item} onRemove={(id) => setSaved((p) => p.filter((x) => x.id !== id))} />
+                  <ProductCard
+                    key={item.id}
+                    product={item}
+                    saved={true}
+                    onToggleSave={async () => {
+                      try {
+                        await removeFavorit(item.id);
+
+                        // langsung update UI (tanpa refresh)
+                        setSaved((prev) => prev.filter((x) => x.id !== item.id));
+                      } catch (err) {
+                        console.error("Gagal hapus favorit:", err.message);
+                      }
+                    }}
+                  />
                 ))}
               </div>
             )}
@@ -481,10 +624,10 @@ export default function Profile() {
 
       {/* Modals */}
       {editField === "Nama" && (
-        <EditFieldModal field="Nama" targetValue={nama} onClose={() => setEditField(null)} onSave={setNama} />
+        <EditFieldModal field="Nama" targetValue={nama} onClose={() => setEditField(null)} onSave={(val) => handleUpdateUser("nama", val)} />
       )}
       {editField === "Email" && (
-        <EditFieldModal field="Email" targetValue={email} onClose={() => setEditField(null)} onSave={setEmail} />
+        <EditFieldModal field="Email" targetValue={email} onClose={() => setEditField(null)} onSave={(val) => handleUpdateUser("email", val)} />
       )}
       {pwModal && <PasswordModal onClose={() => setPwModal(false)} />}
     </div>

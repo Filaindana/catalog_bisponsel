@@ -38,6 +38,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
     });
 });
 
@@ -81,7 +82,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('promo', PromoController::class)->except(['index', 'show']);
 
     // 🔗 Promo Produk
-    Route::apiResource('promo-produk', PromoProdukController::class);
+    // Route::apiResource('promo-produk', PromoProdukController::class);
 
     // 🏢 Cabang & Aktivitas
     Route::apiResource('cabang', CabangController::class)->except(['index', 'show']);
@@ -89,7 +90,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // ⭐ Favorit
     Route::get('/favorit', [FavoritController::class, 'index']);
-    Route::post('/favorit/{produk_id}', [FavoritController::class, 'store']);
+    // Route::post('/favorit/{produk_id}', [FavoritController::class, 'store']);
+    Route::post('/favorit', [FavoritController::class, 'store']);
     Route::delete('/favorit/{produk_id}', [FavoritController::class, 'destroy']);
 
     // 📊 Penjualan

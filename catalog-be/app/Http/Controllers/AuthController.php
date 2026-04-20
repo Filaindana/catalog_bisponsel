@@ -79,4 +79,30 @@ class AuthController
             'message' => 'Logout berhasil.',
         ]);
     }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => 'required|min:8',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Password lama salah'
+            ], 400);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password berhasil diubah'
+        ]);
+    }
 }

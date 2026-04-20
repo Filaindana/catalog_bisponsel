@@ -37,10 +37,10 @@ class Produk extends Model
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
-    // public function gambar(): HasMany
-    // {
-    //     return $this->hasMany(GambarProduk::class, 'produk_id');
-    // }
+    public function gambar(): HasMany
+    {
+        return $this->hasMany(GambarProduk::class, 'produk_id');
+    }
 
     // public function gambarProduk()
     // {

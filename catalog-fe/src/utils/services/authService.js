@@ -21,8 +21,11 @@ export const login = async (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 
-  if (res.token) {
-    setToken(res.token);
+  // if (res.token) {
+  //   setToken(res.token);
+  // }
+  if (res.data?.token) {
+    setToken(res.data.token);
   }
 
   return res;

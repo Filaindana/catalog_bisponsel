@@ -12,8 +12,12 @@ const buildParams = (filters) => {
     params["category[]"] = filters.categories;
   }
 
-  if (filters.brands?.length) {
-    params["brand[]"] = filters.brands;
+  if (filters.status?.length) {
+    params["status[]"] = filters.status;
+  }
+
+  if (filters.discounts?.length) {
+    params["discounts[]"] = filters.discounts;
   }
 
   switch (filters.sortBy) {
@@ -36,11 +40,18 @@ const buildParams = (filters) => {
   return params;
 };
 
-// 🔥 GET PRODUCTS (FIX INI)
 export const getProducts = async (filters = {}) => {
-  const query = new URLSearchParams(buildParams(filters)).toString();
+  const params = buildParams(filters);
+  const qs = new URLSearchParams();
+  for (const [key, val] of Object.entries(params)) {
+    if (Array.isArray(val)) {
+      val.forEach((v) => qs.append(key, v));
+    } else if (val !== undefined && val !== null) {
+      qs.append(key, val);
+    }
+  }
 
-  const res = await api(`/produk?${query}`, {
+  const res = await api(`/produk?${qs.toString()}`, {
     method: "GET",
   });
 

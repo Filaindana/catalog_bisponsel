@@ -18,19 +18,51 @@ class ProdukController
             $query->where('kategori_id', $request->kategori_id);
         }
 
+        if ($request->filled('category')) {
+            $categories = (array) $request->input('category');
+            $query->whereHas('kategori', fn($q) => $q->whereIn('nama', $categories));
+        }
+
         if ($request->filled('adalah_promo')) {
             $query->where('adalah_promo', filter_var($request->adalah_promo, FILTER_VALIDATE_BOOLEAN));
+        }
+
+        if ($request->filled('discounts')) {
+            $discounts = (array) $request->input('discounts');
+            if (in_array('Diskon', $discounts)) {
+                $query->where('adalah_promo', true);
+            }
         }
 
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        // PAGINATION (buat table)
-        // $produk = $query->orderBy('dibuat_pada', 'desc')
-        //     ->paginate($request->get('per_page', 12));
-        $produk = $query->orderBy('dibuat_pada', 'desc')
-            ->paginate($request->get('per_page', 12))
+        if ($request->filled('max_price')) {
+            $query->where('harga', '<=', (int) $request->max_price);
+        }
+
+        if ($request->filled('status')) {
+            $statusList = (array) $request->input('status');
+            $query->where(function ($q) use ($statusList) {
+                if (in_array('Tersedia', $statusList)) {
+                    $q->orWhere('stok', '>', 0);
+                }
+                if (in_array('Tidak Tersedia', $statusList)) {
+                    $q->orWhere('stok', '=', 0);
+                }
+            });
+        }
+
+        $sort = $request->input('sort', 'latest');
+        match ($sort) {
+            'price_asc'  => $query->orderBy('harga', 'asc'),
+            'price_desc' => $query->orderBy('harga', 'desc'),
+            'rating'     => $query->orderBy('rating', 'desc'),
+            default      => $query->orderBy('dibuat_pada', 'desc'),
+        };
+
+        $produk = $query->paginate($request->get('per_page', 12))
             ->appends($request->query());
 
         // 🔥 GLOBAL COUNT (BUKAN PER PAGE)

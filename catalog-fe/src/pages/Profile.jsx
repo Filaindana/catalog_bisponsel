@@ -487,7 +487,7 @@ export default function Profile() {
           price: formatPrice(p.harga),
           rating: p.rating || 0,
           image: p.gambar
-            ? `http://localhost:8000/storage/${p.gambar}`
+            ? `http://localhost:8000/images/${p.gambar}`
             : "/fallback.jpg",
           badge: p.adalah_promo ? "Sale" : undefined,
         };

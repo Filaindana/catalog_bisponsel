@@ -7,16 +7,16 @@ import { getProducts } from "../utils/services/productService.js";
 import { removeFavorit, addFavorit, getFavorit } from "../utils/services/favoritService.js";
 
 const categories = [
-  "Keyboard",
-  "Kabel Lan",
-  "Laptop",
-  "Speaker",
-  "Mouse",
-  "Handphone",
-  "Komputer (PC)",
+  "Laptop & Komputer",
+  "Smartphone & Tablet",
+  "Aksesoris Elektronik",
+  "Audio & Headphone",
+  "Kamera & Fotografi",
+  "Peralatan Rumah",
+  "Gaming",
+  "Networking",
 ];
-const brands = ["MSI", "Lenovo", "HP", "Asus", "Acer"];
-const discounts = ["Diskon", "Best Seller", "New Arrival"];
+const discounts = ["Diskon"];
 
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -70,17 +70,17 @@ export default function Product() {
   const [savedMap, setSavedMap] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedBrands, setSelectedBrands] = useState([]);
   const [selectedDiscounts, setSelectedDiscounts] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState([]);
   const [sortBy, setSortBy] = useState("Terbaru");
   const [sortOpen, setSortOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState(20000000);
+  const [priceRange, setPriceRange] = useState(50000000);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchData = async () => {
@@ -91,6 +91,10 @@ export default function Product() {
         page: currentPage,
         search: searchQuery,
         sortBy: sortBy,
+        categories: selectedCategories,
+        discounts: selectedDiscounts,
+        status: selectedStatus,
+        maxPrice: priceRange < 50000000 ? priceRange : undefined,
       });
 
       console.log("RES:", res);
@@ -106,18 +110,18 @@ export default function Product() {
       setProducts([]); // safety fallback
     } finally {
       setLoading(false);
+      setIsFirstLoad(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-    refreshFavorit(); // ⬅️ TAMBAH INI
+    refreshFavorit();
   }, [
     currentPage,
     searchQuery,
     sortBy,
     selectedCategories,
-    selectedBrands,
     selectedDiscounts,
     selectedStatus,
     priceRange,
@@ -156,10 +160,9 @@ export default function Product() {
   const hasActiveFilters = Boolean(
     searchQuery ||
     selectedCategories.length > 0 ||
-    selectedBrands.length > 0 ||
     selectedDiscounts.length > 0 ||
     selectedStatus.length > 0 ||
-    priceRange !== 20000000,
+    priceRange !== 50000000,
   );
 
   const checkboxLabel = (label, checked, onChange) => (
@@ -405,15 +408,6 @@ export default function Product() {
           </FilterSection>
           <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
 
-          <FilterSection title="Brand">
-            {brands.map((brand) =>
-              checkboxLabel(brand, selectedBrands.includes(brand), () =>
-                toggleItem(selectedBrands, setSelectedBrands, brand),
-              ),
-            )}
-          </FilterSection>
-          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
-
           <FilterSection title="Diskon">
             {discounts.map((d) =>
               checkboxLabel(d, selectedDiscounts.includes(d), () =>
@@ -425,12 +419,13 @@ export default function Product() {
 
           <FilterSection title="Harga">
             <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "8px" }}>
-              Rp 4.000.069 - {formatPrice(priceRange)}
+              Rp 0 – {formatPrice(priceRange)}
             </div>
             <input
               type="range"
-              min={4000069}
-              max={20000000}
+              min={0}
+              max={50000000}
+              step={500000}
               value={priceRange}
               onChange={(e) => {
                 setPriceRange(Number(e.target.value));
@@ -451,7 +446,7 @@ export default function Product() {
         </div>
 
         {/* PRODUK GRID */}
-        <div>
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "800px" }}>
           <div
             style={{
               display: "flex",
@@ -471,12 +466,11 @@ export default function Product() {
                 <span
                   onClick={() => {
                     setSelectedCategories([]);
-                    setSelectedBrands([]);
                     setSelectedDiscounts([]);
                     setSelectedStatus([]);
                     setSearchQuery("");
                     setSearchInput("");
-                    setPriceRange(20000000);
+                    setPriceRange(50000000);
                     setCurrentPage(1);
                   }}
                   style={{
@@ -567,16 +561,25 @@ export default function Product() {
           </div>
 
           {/* GRID */}
-          {loading ? (
-            <div style={{ textAlign: "center", padding: "60px 0" }}>
-              Loading produk...
+          {isFirstLoad && loading ? (
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af", fontSize: "15px" }}>
+              Memuat produk...
             </div>
-          ) : products.length === 0 ? (
+          ) : !loading && products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af", fontSize: "15px" }}>
               Produk tidak ditemukan.
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "14px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: "14px",
+                opacity: loading ? 0.4 : 1,
+                pointerEvents: loading ? "none" : "auto",
+                transition: "opacity 0.2s ease",
+              }}
+            >
               {products.map((product) => (
                 <ProductCard
                 key={product.id}
@@ -588,7 +591,7 @@ export default function Product() {
                   price: formatPrice(product.harga),
                   rating: product.rating || 0,
                   image: product.gambar
-                    ? `http://localhost:8000/storage/${product.gambar}`
+                    ? `http://localhost:8000/images/${product.gambar}`
                     : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}
@@ -621,7 +624,7 @@ export default function Product() {
           )}
 
           {/* PAGINATION */}
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "30px" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "auto", paddingTop: "30px" }}>
             {paginationBtn("‹", () => setCurrentPage((p) => Math.max(1, p - 1)), false, currentPage === 1)}
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <div key={page}>

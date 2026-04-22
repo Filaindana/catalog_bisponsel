@@ -174,6 +174,7 @@ export default function DetailProduct() {
     colorLabels: [],
     images: [],
     description: "",
+    detailDescription: "",
     specs: [],
   });
 
@@ -217,11 +218,21 @@ export default function DetailProduct() {
           colors: data.colors || [],
           colorLabels: data.color_labels || [],
 
-          description: data.deskripsi,
+          description: data.deskripsi_detail,
 
           // ✅ sementara pakai specs JSON
-          specs: data.specs?.length
-            ? data.specs
+          // specs: data.specs?.length
+          //   ? data.specs
+          //   : [
+          //       { attribute: "Nama", detail: data.nama },
+          //       { attribute: "Stok", detail: data.stok + " unit" },
+          //     ],
+          
+          specs: data.spesifikasi?.length
+            ? data.spesifikasi.map((item) => ({
+                attribute: item.atribut,
+                detail: item.detail,
+              }))
             : [
                 { attribute: "Nama", detail: data.nama },
                 { attribute: "Stok", detail: data.stok + " unit" },
@@ -457,7 +468,7 @@ export default function DetailProduct() {
           </div>
           <div className="p-6">
             {activeTab==="deskripsi" ? (
-              <p className="text-[13.5px] text-gray-600 leading-[1.85] m-0">{product.description}</p>
+              <p className="text-[13.5px] text-gray-600 leading-[1.85] m-0">{product.detailDescription || product.description}</p>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-[#e8edf4] overflow-hidden">
                 <table className="w-full border-collapse">

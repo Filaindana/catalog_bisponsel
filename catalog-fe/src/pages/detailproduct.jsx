@@ -1,7 +1,7 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { ArrowLeft, Star, ShieldCheck, Truck, RefreshCw, Headphones } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ArrowLeft, Star } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import { FiBox, FiUsers, FiTag, FiShield } from "react-icons/fi";
 import "swiper/css";
 
@@ -12,6 +12,7 @@ import keyboardImg from "../assets/keyboard.png";
 import soundImg    from "../assets/sound.png";
 import monitorImg  from "../assets/monitor.png";
 import ProductCard from "../components/ProductCard";
+import { getProdukById } from "../utils/services/produkService";
 
 /* ── Style inject ── */
 if (typeof document !== "undefined" && !document.querySelector("[data-detail-style]")) {
@@ -76,28 +77,28 @@ if (typeof document !== "undefined" && !document.querySelector("[data-detail-sty
 }
 
 /* ── DATA ── */
-const product = {
-  name:"PC Gaming Pro Ryzen Edition",
-  category:"Komputer (PC)",
-  price:17499000,
-  rating:4.8,
-  reviews:120,
-  stock:15,
-  colors:["#1e1e1e","#1a3a5c","#5c1a1a","#2d5c1a"],
-  colorLabels:["Onyx Black","Navy Blue","Cardinal Red","Forest Green"],
-  images:[monitorImg,laptopImg,mouseImg,keyboardImg,soundImg],
-  description:"PC Gaming Pro Ryzen Edition adalah komputer gaming performa tinggi yang dirancang untuk memberikan pengalaman gaming terbaik. Dilengkapi dengan prosesor AMD Ryzen 7 terbaru dan GPU RTX 4060 yang powerful, sistem ini mampu menjalankan game AAA terbaru dengan framerate tinggi.",
-  specs:[
-    {attribute:"Prosesor",    detail:"AMD Ryzen 7 7700X"},
-    {attribute:"GPU",         detail:"NVIDIA RTX 4060 8GB"},
-    {attribute:"RAM",         detail:"16GB DDR5 5600MHz"},
-    {attribute:"Storage",     detail:"SSD NVMe 1TB"},
-    {attribute:"Motherboard", detail:"B650 ATX"},
-    {attribute:"PSU",         detail:"650W 80+ Gold"},
-    {attribute:"Case",        detail:"ATX Mid Tower RGB"},
-    {attribute:"OS",          detail:"Windows 11 Home"},
-  ],
-};
+// const product = {
+//   name:"PC Gaming Pro Ryzen Edition",
+//   category:"Komputer (PC)",
+//   price:17499000,
+//   rating:4.8,
+//   reviews:120,
+//   stock:15,
+//   colors:["#1e1e1e","#1a3a5c","#5c1a1a","#2d5c1a"],
+//   colorLabels:["Onyx Black","Navy Blue","Cardinal Red","Forest Green"],
+//   images:[monitorImg,laptopImg,mouseImg,keyboardImg,soundImg],
+//   description:"PC Gaming Pro Ryzen Edition adalah komputer gaming performa tinggi yang dirancang untuk memberikan pengalaman gaming terbaik. Dilengkapi dengan prosesor AMD Ryzen 7 terbaru dan GPU RTX 4060 yang powerful, sistem ini mampu menjalankan game AAA terbaru dengan framerate tinggi.",
+//   specs:[
+//     {attribute:"Prosesor",    detail:"AMD Ryzen 7 7700X"},
+//     {attribute:"GPU",         detail:"NVIDIA RTX 4060 8GB"},
+//     {attribute:"RAM",         detail:"16GB DDR5 5600MHz"},
+//     {attribute:"Storage",     detail:"SSD NVMe 1TB"},
+//     {attribute:"Motherboard", detail:"B650 ATX"},
+//     {attribute:"PSU",         detail:"650W 80+ Gold"},
+//     {attribute:"Case",        detail:"ATX Mid Tower RGB"},
+//     {attribute:"OS",          detail:"Windows 11 Home"},
+//   ],
+// };
 
 const relatedProducts = Array.from({length:6},(_,i)=>({
   id:i+1, name:"PC Gaming Pro Ryzen Edition", category:"Komputer (PC)",
@@ -160,11 +161,87 @@ export default function DetailProduct() {
   const [activeTab,   setActiveTab]       = useState("spesifikasi");
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity]           = useState(1);
-  const [saved,    setSaved]              = useState(relatedProducts.map(()=>false));
+  const [saved, setSaved] = useState([]);
   const zoom = useZoom();
+  const [product, setProduct] = useState({
+    name: "",
+    category: "",
+    price: 0,
+    rating: 0,
+    reviews: 0,
+    stock: 0,
+    colors: [],
+    colorLabels: [],
+    images: [],
+    description: "",
+    specs: [],
+  });
 
   const fmt = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g,".");
 
+  const { id } = useParams();
+  console.log("Product ID:", id);
+  
+  // const BASE_URL = "http://localhost:8000";
+
+  const getImageUrl = (path) => {
+    if (!path) return "/fallback.jpg";
+    if (path.startsWith("http")) return path;
+    return `http://localhost:8000/storage/${path}`;
+  };
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await getProdukById(id);
+
+        const mapped = {
+          id: data.id,
+          name: data.nama,
+          price: data.harga,
+          stock: data.stok,
+          rating: data.rating || 4.5,
+          reviews: data.reviews || 0,
+
+          category: data.kategori?.nama || "Produk",
+
+          // ✅ dari backend langsung
+          // images: data.images?.length
+          // ? data.images.map((img) => `${BASE_URL}/storage/${img}`)
+          //   : [`${BASE_URL}/storage/${data.gambar}`],
+          images: data.images?.length
+            ? data.images.map(getImageUrl)
+            : [getImageUrl(data.gambar)],
+
+
+          colors: data.colors || [],
+          colorLabels: data.color_labels || [],
+
+          description: data.deskripsi,
+
+          // ✅ sementara pakai specs JSON
+          specs: data.specs?.length
+            ? data.specs
+            : [
+                { attribute: "Nama", detail: data.nama },
+                { attribute: "Stok", detail: data.stok + " unit" },
+              ],
+        };
+
+        setProduct(mapped);
+      } catch (err) {
+        console.error("Gagal ambil produk:", err);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+  
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
+  
   return (
     <div className="detail-root bg-[#f5f7fa] min-h-screen">
       {/* tighter max-width + reduced horizontal padding */}
@@ -200,7 +277,8 @@ export default function DetailProduct() {
                   {/* Main product image */}
                   <img
                     key={activeImage}
-                    src={product.images[activeImage]}
+                    src={product.images?.[activeImage] || product.images?.[0]}
+                    onError={(e) => (e.target.src = "/fallback.jpg")}
                     alt={product.name}
                     className="relative z-0 object-contain w-full max-h-75"
                     style={{ animation:"scaleIn .28s ease both" }}
@@ -216,7 +294,8 @@ export default function DetailProduct() {
                   >
                     <img
                       ref={zoom.previewRef}
-                      src={product.images[activeImage]}
+                      src={product.images?.[activeImage] || product.images?.[0]}
+                      onError={(e) => (e.target.src = "/fallback.jpg")}
                       alt="zoom"
                     />
                   </div>
@@ -301,7 +380,7 @@ export default function DetailProduct() {
               {/* Color */}
               <div>
                 <p className="text-[12px] font-semibold text-gray-600 mb-2">
-                  Warna: <span className="font-bold text-[#072B50]">{product.colorLabels[selectedColor]}</span>
+                  Warna: <span className="font-bold text-[#072B50]">{product.colorLabels?.[selectedColor] || "-"}</span>
                 </p>
                 <div className="flex gap-2.5">
                   {product.colors.map((color,i)=>(

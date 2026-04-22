@@ -18,6 +18,7 @@ class Produk extends Model
         'kategori_id',
         'nama',
         'deskripsi',
+        'deskripsi_detail',
         'harga',
         'stok',
         'rating',
@@ -30,6 +31,11 @@ class Produk extends Model
         'stok'        => 'integer',
         'rating'      => 'float',
         'adalah_promo' => 'boolean',
+         // 🔥 TAMBAHAN WAJIB
+        'colors'       => 'array',
+        'color_labels' => 'array',
+        'images'       => 'array',
+        'specs'        => 'array',
     ];
 
     public function kategori(): BelongsTo
@@ -47,7 +53,12 @@ class Produk extends Model
     //     return $this->hasMany(GambarProduk::class, 'produk_id');
     // }
 
-    public function spesifikasi(): HasMany
+    // public function spesifikasi(): HasMany
+    // {
+    //     return $this->hasMany(SpesifikasiProduk::class, 'produk_id');
+    // }
+
+    public function spesifikasi()
     {
         return $this->hasMany(SpesifikasiProduk::class, 'produk_id');
     }

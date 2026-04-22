@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ProdukSeeder::class,
             GambarProdukSeeder::class,
             SpesifikasiProdukSeeder::class,
+            // DetailDeskripsiSeeder::class,
             CabangSeeder::class,
             AktivitasSeeder::class,
             PromoSeeder::class,

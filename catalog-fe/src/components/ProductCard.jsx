@@ -27,9 +27,17 @@ export default function ProductCard({
 
   const saveIsFilled = saved || hoverSave;
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else if (product?.id) {
+      navigate(`/product/${product.id}`);
+    }
+  };
+
   return (
     <div
-      onClick={onClick}
+      onClick={handleClick}
       className={`pc-gradient-hover rounded-2xl cursor-pointer p-0.5 bg-gray-200 ${
         compact ? "min-w-50" : "min-w-55"
       }`}

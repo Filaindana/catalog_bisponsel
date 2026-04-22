@@ -53,6 +53,7 @@ Route::apiResource('kategori', KategoriController::class)->only(['index', 'show'
 Route::apiResource('promo', PromoController::class)->only(['index', 'show']);
 
 // Relasi tambahan
+Route::get('/produk/{id}', [GambarProdukController::class, 'show']);
 Route::get('/produk/{id}/gambar', [GambarProdukController::class, 'index']);
 Route::get('/produk/{id}/spesifikasi', [SpesifikasiProdukController::class, 'index']);
 

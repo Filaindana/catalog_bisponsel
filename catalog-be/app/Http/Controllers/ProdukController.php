@@ -13,6 +13,7 @@ class ProdukController
     public function index(Request $request): JsonResponse
     {
         $query = Produk::with(['kategori', 'spesifikasi']);
+        // $query = Produk::with(['kategori', 'spesifikasi', 'gambar']);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
@@ -193,4 +194,17 @@ class ProdukController
             'message' => 'Produk berhasil dihapus.',
         ]);
     }
+
+    // public function latest(): JsonResponse
+    // {
+    //     $produk = Produk::with(['kategori', 'gambar'])
+    //         ->orderBy('dibuat_pada', 'desc')
+    //         ->take(10) // ambil 10 produk terbaru
+    //         ->get();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'data'   => $produk
+    //     ]);
+    // }
 }

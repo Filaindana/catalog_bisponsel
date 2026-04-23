@@ -79,7 +79,16 @@ export const getActivePromoProducts = async () => {
 
     const promos = res?.data?.data || [];
 
+    // ambil hanya promo dengan status "aktif" untuk ditampilkan di homepage
     const activePromos = promos.filter(p => p.status === "aktif");
+
+    // ambil semua promo tanpa filter status 
+    // const activePromos = promos; 
+
+    // ambil promo dengan filter aktif dan segera
+    // const activePromos = promos.filter(p =>
+    //   ["aktif", "segera"].includes(p.status)
+    // );
 
     console.log("FULL RESPONSE:", res.data);
     console.log("PROMOS RAW:", promos);

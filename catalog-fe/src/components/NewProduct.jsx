@@ -8,10 +8,10 @@ const formatPrice = (price) =>
 
 export default function NewProduct() {
   const { savedMap, toggleSave } = useFavorit();
-  const scrollRef  = useRef(null);
+  const scrollRef = useRef(null);
   const [products, setProducts] = useState([]);
   const isDragging = useRef(false);
-  const startX     = useRef(0);
+  const startX = useRef(0);
   const scrollLeft = useRef(0);
 
   const onMouseDown = (e) => {
@@ -26,9 +26,12 @@ export default function NewProduct() {
     e.preventDefault();
     const x = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     const walk = (x - startX.current) * 1.5;
-    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - walk;
+    if (scrollRef.current)
+      scrollRef.current.scrollLeft = scrollLeft.current - walk;
   };
-  const stopDrag = () => { isDragging.current = false; };
+  const stopDrag = () => {
+    isDragging.current = false;
+  };
   const scrollBy = (dir) => {
     if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
   };
@@ -38,16 +41,20 @@ export default function NewProduct() {
       try {
         const res = await api("/produk?sort=latest&per_page=8");
         const list = res?.data?.data || [];
-        setProducts(list.map((p) => ({
-          id: p.id,
-          name: p.nama,
-          category: p.kategori?.nama || "-",
-          spec: p.deskripsi || "-",
-          price: formatPrice(p.harga),
-          rating: p.rating || 0,
-          image: p.gambar ? `http://localhost:8000/images/${p.gambar}` : "/fallback.jpg",
-          badge: "New",
-        })));
+        setProducts(
+          list.map((p) => ({
+            id: p.id,
+            name: p.nama,
+            category: p.kategori?.nama || "-",
+            spec: p.deskripsi || "-",
+            price: formatPrice(p.harga),
+            rating: p.rating || 0,
+            image: p.gambar
+              ? `http://localhost:8000/images/${p.gambar}`
+              : "/fallback.jpg",
+            badge: "New",
+          })),
+        );
       } catch (err) {
         console.error(err);
       }
@@ -59,26 +66,65 @@ export default function NewProduct() {
   return (
     <section style={{ padding: "50px 0", background: "#fff" }}>
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px" }}>
-
         {/* HEADER */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 28,
+          }}
+        >
           <div>
-            <h2 className="section-title" style={{ margin: 0, borderLeft: "5px solid #072B50", paddingLeft: 14 }}>
+            <h2
+              className="section-title"
+              style={{
+                margin: 0,
+                borderLeft: "5px solid #072B50",
+                paddingLeft: 14,
+              }}
+            >
               Produk Terbaru
             </h2>
-            <div style={{ paddingLeft: 19, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9ca3af", marginTop: 4 }}>
-              <span className="np-bounce">⟶</span> Geser untuk melihat lebih banyak
+            <div
+              style={{
+                paddingLeft: 19,
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                fontSize: 12,
+                color: "#9ca3af",
+                marginTop: 4,
+              }}
+            >
+              <span className="np-bounce">⟶</span> Geser untuk melihat lebih
+              banyak
             </div>
           </div>
           <div className="flex gap-2">
-            {[["‹", -1], ["›", 1]].map(([icon, dir]) => (
+            {[
+              ["‹", -1],
+              ["›", 1],
+            ].map(([icon, dir]) => (
               <button
                 key={dir}
                 onClick={() => scrollBy(dir)}
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 cursor-pointer transition-all duration-200"
-                style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 0 }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
+                className="flex items-center justify-center w-10 h-10 text-xl text-gray-600 transition-all duration-200 bg-white rounded-full cursor-pointer"
+                style={{
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  padding: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "#072B50";
+                  e.currentTarget.style.color = "#fff";
+                  e.currentTarget.style.borderColor = "#072B50";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "#fff";
+                  e.currentTarget.style.color = "#374151";
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                }}
               >
                 {icon}
               </button>
@@ -91,14 +137,22 @@ export default function NewProduct() {
           <div
             ref={scrollRef}
             className="flex gap-5 overflow-x-auto overflow-y-visible"
-            style={{ scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
+            style={{
+              scrollBehavior: "smooth",
+              cursor: "default",
+              padding: "8px 4px 16px",
+              scrollbarWidth: "none",
+            }}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
             {products.map((product) => (
-              <div key={product.id} style={{ flex: "0 0 220px", minWidth: 220 }}>
+              <div
+                key={product.id}
+                style={{ flex: "0 0 220px", minWidth: 220 }}
+              >
                 <ProductCard
                   product={product}
                   saved={!!savedMap[product.id]}
@@ -108,7 +162,6 @@ export default function NewProduct() {
             ))}
           </div>
         </div>
-
       </div>
     </section>
   );

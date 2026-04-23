@@ -3,16 +3,51 @@ import ProductCard from "./ProductCard.jsx";
 import { getActivePromoProducts } from "../utils/services/promoService.js";
 import { useFavorit } from "../context/FavoritContext.jsx";
 
-function useCountdown(targetSeconds) {
-  const [seconds, setSeconds] = useState(targetSeconds);
+// function useCountdown(targetSeconds) {
+//   const [seconds, setSeconds] = useState(targetSeconds);
+//   useEffect(() => {
+//     const t = setInterval(() => setSeconds(s => (s > 0 ? s - 1 : 0)), 1000);
+//     return () => clearInterval(t);
+//   }, []);
+//   const h = Math.floor(seconds / 3600);
+//   const m = Math.floor((seconds % 3600) / 60);
+//   const s = seconds % 60;
+//   return [h, m, s].map(n => String(n).padStart(2, "0"));
+// }
+
+function useCountdownToMidnightWIB() {
+  const [timeLeft, setTimeLeft] = useState(getRemainingTime());
+
+  function getRemainingTime() {
+    const now = new Date();
+
+    // Ambil waktu sekarang dalam WIB (UTC+7)
+    const nowWIB = new Date(
+      now.toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
+    );
+
+    // Set target ke jam 00:00 besok WIB
+    const target = new Date(nowWIB);
+    target.setHours(24, 0, 0, 0); // jam 00:00 next day
+
+    const diff = Math.max(0, Math.floor((target - nowWIB) / 1000));
+
+    return diff;
+  }
+
   useEffect(() => {
-    const t = setInterval(() => setSeconds(s => (s > 0 ? s - 1 : 0)), 1000);
-    return () => clearInterval(t);
+    const interval = setInterval(() => {
+      setTimeLeft(getRemainingTime());
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return [h, m, s].map(n => String(n).padStart(2, "0"));
+
+  const h = Math.floor(timeLeft / 3600);
+  const m = Math.floor((timeLeft % 3600) / 60);
+  const s = timeLeft % 60;
+
+  return [h, m, s].map((n) => String(n).padStart(2, "0"));
 }
 
 export default function PromoHariIni() {
@@ -24,7 +59,8 @@ export default function PromoHariIni() {
   const startX     = useRef(0);
   const scrollLeft = useRef(0);
 
-  const [hours, minutes, secs] = useCountdown(6 * 3600 + 16 * 60 + 40);
+  // const [hours, minutes, secs] = useCountdown(6 * 3600 + 16 * 60 + 40);
+  const [hours, minutes, secs] = useCountdownToMidnightWIB();
 
   const onMouseDown = (e) => {
     const target = e.target;

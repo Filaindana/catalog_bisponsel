@@ -48,6 +48,8 @@ Route::prefix('auth')->group(function () {
 // =======================
 
 // Produk + relasi
+// Route::get('/produk/latest', [ProdukController::class, 'latest']);
+// Route::get('/produk/latest/list', [ProdukController::class, 'latest']);
 Route::apiResource('produk', ProdukController::class)->only(['index', 'show']);
 Route::apiResource('kategori', KategoriController::class)->only(['index', 'show']);
 Route::apiResource('promo', PromoController::class)->only(['index', 'show']);

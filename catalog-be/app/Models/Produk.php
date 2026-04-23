@@ -53,11 +53,6 @@ class Produk extends Model
     //     return $this->hasMany(GambarProduk::class, 'produk_id');
     // }
 
-    // public function spesifikasi(): HasMany
-    // {
-    //     return $this->hasMany(SpesifikasiProduk::class, 'produk_id');
-    // }
-
     public function spesifikasi()
     {
         return $this->hasMany(SpesifikasiProduk::class, 'produk_id');

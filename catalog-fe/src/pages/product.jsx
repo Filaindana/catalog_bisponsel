@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
-// import ProductCard from "../components/ProductCardCompact.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import { getProducts } from "../utils/services/productService.js";
-import { removeFavorit, addFavorit, getFavorit } from "../utils/services/favoritService.js";
+import { useFavorit } from "../context/FavoritContext.jsx";
 
 const categories = [
   "Laptop & Komputer",
@@ -63,15 +62,13 @@ function FilterSection({ title, children, defaultOpen = true }) {
 }
 
 export default function Product() {
+  const { savedMap, toggleSave } = useFavorit();
+
   // ── baca query param ?category=xxx dari URL ──
   const [searchParams] = useSearchParams();
-
-  // const [saved, setSaved] = useState({});
-  const [savedMap, setSavedMap] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedDiscounts, setSelectedDiscounts] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState([]);
   const [sortBy, setSortBy] = useState("Terbaru");
   const [sortOpen, setSortOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -93,7 +90,6 @@ export default function Product() {
         sortBy: sortBy,
         categories: selectedCategories,
         discounts: selectedDiscounts,
-        status: selectedStatus,
         maxPrice: priceRange < 50000000 ? priceRange : undefined,
       });
 
@@ -116,14 +112,12 @@ export default function Product() {
 
   useEffect(() => {
     fetchData();
-    refreshFavorit();
   }, [
     currentPage,
     searchQuery,
     sortBy,
     selectedCategories,
     selectedDiscounts,
-    selectedStatus,
     priceRange,
   ]);
 
@@ -161,7 +155,6 @@ export default function Product() {
     searchQuery ||
     selectedCategories.length > 0 ||
     selectedDiscounts.length > 0 ||
-    selectedStatus.length > 0 ||
     priceRange !== 50000000,
   );
 
@@ -234,46 +227,6 @@ export default function Product() {
     </button>
   );
 
-  const normalizeFavorit = (res) => {
-    return res?.data || res || [];
-  };
-
-  const refreshFavorit = async () => {
-    try {
-      const res = await getFavorit();
-      const data = normalizeFavorit(res);
-
-      const map = {};
-      data.forEach((item) => {
-        map[item.produk.id] = true;
-      });
-
-      setSavedMap(map);
-    } catch (err) {
-      console.error("Gagal ambil favorit:", err);
-    }
-  };
-
-  useEffect(() => {
-    const fetchFavorit = async () => {
-      try {
-        const res = await getFavorit();
-
-        const data = res?.data || res || [];
-
-        const map = {};
-        data.forEach((item) => {
-          map[item.produk.id] = true;
-        });
-
-        setSavedMap(map);
-      } catch (err) {
-        console.error("Gagal ambil favorit:", err);
-      }
-    };
-
-    fetchFavorit();
-  }, []);
 
   return (
     <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
@@ -434,15 +387,6 @@ export default function Product() {
               style={{ width: "100%", accentColor: "#072B50" }}
             />
           </FilterSection>
-          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
-
-          <FilterSection title="Status Produk">
-            {["Tersedia", "Tidak Tersedia"].map((status) =>
-              checkboxLabel(status, selectedStatus.includes(status), () =>
-                toggleItem(selectedStatus, setSelectedStatus, status),
-              ),
-            )}
-          </FilterSection>
         </div>
 
         {/* PRODUK GRID */}
@@ -467,7 +411,6 @@ export default function Product() {
                   onClick={() => {
                     setSelectedCategories([]);
                     setSelectedDiscounts([]);
-                    setSelectedStatus([]);
                     setSearchQuery("");
                     setSearchInput("");
                     setPriceRange(50000000);
@@ -595,29 +538,9 @@ export default function Product() {
                     : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}
-                saved={savedMap[product.id]}
+                saved={!!savedMap[product.id]}
                 compact
-                onToggleSave={async () => {
-                  const isSaved = savedMap[product.id];
-                  setSavedMap((prev) => ({
-                    ...prev,
-                    [product.id]: !isSaved,
-                  }));
-
-                  try {
-                    if (isSaved) {
-                      await removeFavorit(product.id);
-                    } else {
-                      await addFavorit(product.id);
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    setSavedMap((prev) => ({
-                      ...prev,
-                      [product.id]: isSaved,
-                    }));
-                  }
-                }}
+                onToggleSave={() => toggleSave(product.id)}
                   />
               ))}
             </div>

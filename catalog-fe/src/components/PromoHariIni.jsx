@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import ProductCard from "./ProductCard.jsx";
 import { getActivePromoProducts } from "../utils/services/promoService.js";
+import { useFavorit } from "../context/FavoritContext.jsx";
 
 function useCountdown(targetSeconds) {
   const [seconds, setSeconds] = useState(targetSeconds);
@@ -15,10 +16,9 @@ function useCountdown(targetSeconds) {
 }
 
 export default function PromoHariIni() {
+  const { savedMap, toggleSave } = useFavorit();
   const scrollRef  = useRef(null);
-
   const [products, setProducts] = useState([]);
-  const [saved, setSaved] = useState([]);
 
   const isDragging = useRef(false);
   const startX     = useRef(0);
@@ -48,20 +48,17 @@ export default function PromoHariIni() {
   };
 
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const data = await getActivePromoProducts();
-      setProducts(data);
-      setSaved(data.map(() => false));
-      
-      console.log("PROMO PRODUCTS:", data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    const fetchData = async () => {
+      try {
+        const data = await getActivePromoProducts();
+        setProducts(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-  fetchData();
-}, []);
+    fetchData();
+  }, []);
 
   return (
     <section className="py-12.5 bg-white">
@@ -102,7 +99,6 @@ export default function PromoHariIni() {
         </div>
 
         {/* SCROLL TRACK */}
-        
         <div className="pb-2 -mb-2 overflow-hidden">
           <div
             ref={scrollRef}
@@ -115,18 +111,12 @@ export default function PromoHariIni() {
             {products.length === 0 ? (
               <p className="text-gray-400">Loading promo...</p>
             ) : (
-              products.map((product, index) => (
-                <div key={`${product.id}-${index}`}  className="flex-[0_0_220px] min-w-55">
+              products.map((product) => (
+                <div key={product.id} className="flex-[0_0_220px] min-w-55">
                   <ProductCard
                     product={product}
-                    saved={saved[index]}
-                    onToggleSave={() => {
-                      setSaved(prev => {
-                        const u = [...prev];
-                        u[index] = !u[index];
-                        return u;
-                      });
-                    }}
+                    saved={!!savedMap[product.id]}
+                    onToggleSave={() => toggleSave(product.id)}
                     variant="promo"
                   />
                 </div>
@@ -134,7 +124,6 @@ export default function PromoHariIni() {
             )}
           </div>
         </div>
-
 
       </div>
     </section>

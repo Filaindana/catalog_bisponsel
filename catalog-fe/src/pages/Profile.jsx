@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { changePassword, getProfile, updateProfile } from "../utils/services/profileService";
 import { getFavorit, removeFavorit } from "../utils/services/favoritService";
+import { useFavorit } from "../context/FavoritContext.jsx";
 import ProductCard from "../components/ProductCard";
 
 const NAVY = "#072B50";
@@ -382,6 +384,8 @@ function InfoRow({ icon, label, value, valueClass = "", onEdit, editLabel = "Edi
    MAIN — Profile Page
 ═══════════════════════════════ */
 export default function Profile() {
+  const navigate = useNavigate();
+  const { reload } = useFavorit();
   const [tab, setTab] = useState("userdata");
   const [saved, setSaved] = useState([]);
   const [user, setUser] = useState(null);
@@ -396,9 +400,6 @@ export default function Profile() {
     const fetchProfile = async () => {
       try {
         const res = await getProfile();
-        console.log("PROFILE RES:", res);
-        console.log(localStorage.getItem("token"));
-        console.log(res.data);
         setUser(res); // ⬅️ penting!
       } catch (err) {
         console.error("FETCH PROFILE ERROR:", err.message);
@@ -432,32 +433,6 @@ export default function Profile() {
     });
   };
 
-  useEffect(() => {
-    const fetchFavorit = async () => {
-      try {
-        const res = await getFavorit();
-
-        console.log("FAVORIT:", res);
-
-        // mapping dari backend ke format frontend
-        const mapped = res.map((item) => ({
-          id: item.produk.id,
-          category: item.produk.kategori?.nama || "-",
-          name: item.produk.nama,
-          spec: item.produk.deskripsi || "-",
-          price: item.produk.harga,
-          rating: item.produk.rating || 0,
-          image: item.produk.gambar?.[0]?.url || PC_IMG,
-        }));
-
-        setSaved(mapped);
-      } catch (err) {
-        console.error("ERROR FETCH FAVORIT:", err.message);
-      }
-    };
-
-    fetchFavorit();
-  }, []);
 
   const formatPrice = (price) =>
     "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
@@ -472,11 +447,6 @@ export default function Profile() {
       // const products = data.map((item) => item.produk);
       const products = data.map((item) => {
         const p = item.produk;
-        console.log("DATA FAVORIT:", data);
-        data.forEach((item, i) => {
-          console.log("ITEM", i, item.produk);
-        });
-        console.log("KATEGORI:", item.produk.kategori);
 
         return {
           id: p.id,
@@ -532,7 +502,9 @@ export default function Profile() {
             ))}
           </div>
           {tab === "userdata" && (
-            <button className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[13px] font-bold border-0 cursor-pointer transition-colors">
+            <button
+              onClick={() => { localStorage.removeItem("token"); navigate("/login"); }}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[13px] font-bold border-0 cursor-pointer transition-colors">
               <IconLogout /> Logout
             </button>
           )}
@@ -593,7 +565,9 @@ export default function Profile() {
                 <div className="mb-3 text-5xl">🔖</div>
                 <h3 className="text-sm font-bold mb-1.5" style={{ color: NAVY }}>Belum ada item tersimpan</h3>
                 <p className="mb-5 text-sm text-slate-400">Simpan produk favorit kamu dari halaman produk</p>
-                <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity" style={{ background: NAVY }}>
+                <button
+                  onClick={() => navigate("/product")}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-bold text-white border-0 cursor-pointer hover:opacity-90 transition-opacity" style={{ background: NAVY }}>
                   Jelajahi Produk
                 </button>
               </div>
@@ -607,9 +581,8 @@ export default function Profile() {
                     onToggleSave={async () => {
                       try {
                         await removeFavorit(item.id);
-
-                        // langsung update UI (tanpa refresh)
                         setSaved((prev) => prev.filter((x) => x.id !== item.id));
+                        reload();
                       } catch (err) {
                         console.error("Gagal hapus favorit:", err.message);
                       }

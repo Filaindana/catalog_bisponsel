@@ -1,20 +1,15 @@
-import { useRef, useState } from "react";
-import produkImg from "../assets/monitor.png";
+import { useRef, useState, useEffect } from "react";
 import ProductCard from "./ProductCard.jsx";
+import { useFavorit } from "../context/FavoritContext.jsx";
+import api from "../utils/api.js";
 
-const products = [
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-];
+const formatPrice = (price) =>
+  "Rp " + Number(price).toLocaleString("id-ID").replace(/,/g, ".");
 
 export default function NewProduct() {
+  const { savedMap, toggleSave } = useFavorit();
   const scrollRef  = useRef(null);
-  const cardsRef   = useRef(null);
-  const [saved, setSaved] = useState(products.map(() => false));
+  const [products, setProducts] = useState([]);
   const isDragging = useRef(false);
   const startX     = useRef(0);
   const scrollLeft = useRef(0);
@@ -37,6 +32,29 @@ export default function NewProduct() {
   const scrollBy = (dir) => {
     if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await api("/produk?sort=latest&per_page=8");
+        const list = res?.data?.data || [];
+        setProducts(list.map((p) => ({
+          id: p.id,
+          name: p.nama,
+          category: p.kategori?.nama || "-",
+          spec: p.deskripsi || "-",
+          price: formatPrice(p.harga),
+          rating: p.rating || 0,
+          image: p.gambar ? `http://localhost:8000/images/${p.gambar}` : "/fallback.jpg",
+          badge: "New",
+        })));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   return (
     <section style={{ padding: "50px 0", background: "#fff" }}>
@@ -71,7 +89,7 @@ export default function NewProduct() {
         {/* SCROLL TRACK */}
         <div style={{ marginBottom: -8, paddingBottom: 8, overflow: "hidden" }}>
           <div
-            ref={(el) => { scrollRef.current = el; cardsRef.current = el; }}
+            ref={scrollRef}
             className="flex gap-5 overflow-x-auto overflow-y-visible"
             style={{ scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
             onMouseDown={onMouseDown}
@@ -79,13 +97,12 @@ export default function NewProduct() {
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
-            {products.map((product, index) => (
-              // ── sama persis dengan TopProduct: flex 0 0 220px, minWidth 220 ──
-              <div key={index} style={{ flex: "0 0 220px", minWidth: 220 }}>
+            {products.map((product) => (
+              <div key={product.id} style={{ flex: "0 0 220px", minWidth: 220 }}>
                 <ProductCard
-                  product={{ ...product, id: index + 1 }}
-                  saved={saved[index]}
-                  onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+                  product={product}
+                  saved={!!savedMap[product.id]}
+                  onToggleSave={() => toggleSave(product.id)}
                 />
               </div>
             ))}

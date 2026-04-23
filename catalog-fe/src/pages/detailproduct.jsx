@@ -219,14 +219,6 @@ export default function DetailProduct() {
           colorLabels: data.color_labels || [],
 
           description: data.deskripsi_detail,
-
-          // ✅ sementara pakai specs JSON
-          // specs: data.specs?.length
-          //   ? data.specs
-          //   : [
-          //       { attribute: "Nama", detail: data.nama },
-          //       { attribute: "Stok", detail: data.stok + " unit" },
-          //     ],
           
           specs: data.spesifikasi?.length
             ? data.spesifikasi.map((item) => ({

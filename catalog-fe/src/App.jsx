@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { FavoritProvider } from "./context/FavoritContext.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 // import "./index.css";
@@ -27,11 +28,11 @@ import Profile from "./pages/Profile.jsx";
 /* ── Public layout ── */
 function PublicLayout() {
   return (
-    <>
+    <FavoritProvider>
       <Navbar />
       <Outlet />
       <Footer />
-    </>
+    </FavoritProvider>
   );
 }
 

@@ -372,7 +372,170 @@ class SpesifikasiProdukSeeder extends Seeder
             ['produk_id' => 30, 'atribut' => 'Color Depth',     'detail' => '10-bit Color & Log Encoding (GP-Log)'],
             ['produk_id' => 30, 'atribut' => 'Penyimpanan',     'detail' => 'microSD V30 atau UHS-3 recommended'],
 
+            // Produk 31 - Canon EOS R6 Mark II
+            ['produk_id' => 31, 'atribut' => 'Sensor',          'detail' => '24.2 MP Full-Frame CMOS'],
+            ['produk_id' => 31, 'atribut' => 'Prosesor',        'detail' => 'DIGIC X'],
+            ['produk_id' => 31, 'atribut' => 'Kecepatan Foto',  'detail' => 'Hingga 40 fps (Electronic Shutter), 12 fps (Mechanical)'],
+            ['produk_id' => 31, 'atribut' => 'Video',           'detail' => '4K 60p (Uncropped), 6K Raw External Recording'],
+            ['produk_id' => 31, 'atribut' => 'Autofokus',       'detail' => 'Dual Pixel CMOS AF II dengan AI Tracking Manusia/Hewan/Kendaraan'],
+            ['produk_id' => 31, 'atribut' => 'Stabilisasi',     'detail' => 'In-body Image Stabilizer (IBIS) hingga 8.0 stop'],
+            ['produk_id' => 31, 'atribut' => 'ISO',             'detail' => '100 - 102,400 (Expandable to 204,800)'],
+            ['produk_id' => 31, 'atribut' => 'Layar',           'detail' => '3.0" Vari-angle Touchscreen LCD'],
+            ['produk_id' => 31, 'atribut' => 'Konektivitas',    'detail' => 'Wi-Fi 5GHz, Bluetooth 5.0, USB-C (UVC/UAC)'],
+            ['produk_id' => 31, 'atribut' => 'Media Slot',      'detail' => 'Dual Card Slots (SD/SDHC/SDXC UHS-II)'],
 
+            // Produk 32 - Xiaomi Mi Smart Air Purifier 4
+            ['produk_id' => 32, 'atribut' => 'CADR',            'detail' => 'Hingga 400 m³/jam (Area efektif 28-48 m²)'],
+            ['produk_id' => 32, 'atribut' => 'Filtrasi',        'detail' => 'Three-in-one filter (Menghilangkan 99.97% partikel 0.3μm)'],
+            ['produk_id' => 32, 'atribut' => 'Sensor',          'detail' => 'PM2.5 Laser Sensor & Sensor Suhu/Kelembapan'],
+            ['produk_id' => 32, 'atribut' => 'Fitur Khusus',    'detail' => 'Ionisasi negatif membantu menjaga udara tetap segar'],
+            ['produk_id' => 32, 'atribut' => 'Kebisingan',      'detail' => 'Rendah 32.1dB pada Mode Tidur'],
+            ['produk_id' => 32, 'atribut' => 'Kontrol Pintar',  'detail' => 'Aplikasi Mi Home, Google Assistant, & Amazon Alexa'],
+            ['produk_id' => 32, 'atribut' => 'Layar',           'detail' => 'OLED Touch Display dengan indikator kualitas udara real-time'],
+            ['produk_id' => 32, 'atribut' => 'Daya',            'detail' => '30W (Efisiensi energi tinggi)'],
+
+            // Produk 33 - Roborock S8 Robot Vacuum
+            ['produk_id' => 33, 'atribut' => 'Daya Hisap',      'detail' => '6000 Pa HyperForce Suction'],
+            ['produk_id' => 33, 'atribut' => 'Sistem Sikat',    'detail' => 'DuoRoller Riser Brush (Sikat karet ganda anti-lilitan)'],
+            ['produk_id' => 33, 'atribut' => 'Sistem Pel',      'detail' => 'VibraRise Mopping System (3000 getaran/menit + Auto-lift)'],
+            ['produk_id' => 33, 'atribut' => 'Navigasi',        'detail' => 'PreciSense LiDAR Navigation'],
+            ['produk_id' => 33, 'atribut' => 'Hindari Rintangan','detail' => 'Reactive 3D Obstacle Avoidance (Deteksi objek di area gelap)'],
+            ['produk_id' => 33, 'atribut' => 'Baterai',         'detail' => '5200 mAh (Hingga 180 menit penggunaan)'],
+            ['produk_id' => 33, 'atribut' => 'Kapasitas',       'detail' => '400ml Dustbin & 300ml Water Tank'],
+            ['produk_id' => 33, 'atribut' => 'Software',        'detail' => 'Custom Cleaning Routines & 3D Mapping via App'],
+
+            // Produk 34 - Philips Hue Bridge
+            ['produk_id' => 34, 'atribut' => 'Fungsi Utama',    'detail' => 'Otak dari ekosistem pencahayaan pintar Philips Hue'],
+            ['produk_id' => 34, 'atribut' => 'Kapasitas Kontrol','detail' => 'Mendukung hingga 50 lampu dan 12 aksesori'],
+            ['produk_id' => 34, 'atribut' => 'Protokol',        'detail' => 'Zigbee Network Technology'],
+            ['produk_id' => 34, 'atribut' => 'Kompatibilitas',  'detail' => 'Apple HomeKit, Google Assistant, Amazon Alexa, IFTTT'],
+            ['produk_id' => 34, 'atribut' => 'Fitur',           'detail' => 'Kontrol di luar rumah, Sinkronisasi lampu dengan musik/film'],
+            ['produk_id' => 34, 'atribut' => 'Input Daya',      'detail' => '100–240 V AC / 50–60Hz'],
+            ['produk_id' => 34, 'atribut' => 'Dimensi',         'detail' => '90.9 mm x 26 mm'],
+
+            // Produk 35 - Bardi Smart Light Bulb 12W
+            ['produk_id' => 35, 'atribut' => 'Kecerahan',       'detail' => '1110 Lumens (Sangat Terang)'],
+            ['produk_id' => 35, 'atribut' => 'Warna',           'detail' => '16 Juta Warna (RGB) + Warm White to Cool White'],
+            ['produk_id' => 35, 'atribut' => 'Konektivitas',    'detail' => 'WiFi 2.4GHz (Tanpa perlu hub tambahan)'],
+            ['produk_id' => 35, 'atribut' => 'Fitting',         'detail' => 'E27 (Standar lampu rumah Indonesia)'],
+            ['produk_id' => 35, 'atribut' => 'Fitur App',       'detail' => 'Schedule, Grouping, Music Rhythm Sync'],
+            ['produk_id' => 35, 'atribut' => 'Umur Lampu',      'detail' => 'Hingga 50,000 jam'],
+            ['produk_id' => 35, 'atribut' => 'Daya',            'detail' => '12W'],
+
+            // Produk 36 - Ecobee Smart Thermostat
+            ['produk_id' => 36, 'atribut' => 'Sensor',          'detail' => 'Termasuk SmartSensor (Deteksi suhu & okupansi ruangan)'],
+            ['produk_id' => 36, 'atribut' => 'Audio',           'detail' => 'Speaker & Mikrofon internal (Support Alexa & Siri)'],
+            ['produk_id' => 36, 'atribut' => 'Layar',           'detail' => 'Vibrant Glass Touch Display'],
+            ['produk_id' => 36, 'atribut' => 'Penghematan',     'detail' => 'Hingga 26% penghematan biaya pemanasan/pendinginan'],
+            ['produk_id' => 36, 'atribut' => 'Konektivitas',    'detail' => 'Dual-band Wi-Fi, Bluetooth, Apple HomeKit'],
+            ['produk_id' => 36, 'atribut' => 'Keamanan',        'detail' => 'Bisa berfungsi sebagai hub untuk sistem keamanan Ecobee'],
+
+            // Produk 37 - PlayStation 5 Slim
+            ['produk_id' => 37, 'atribut' => 'Volume Desain',   'detail' => '30% lebih kecil dibanding model standar'],
+            ['produk_id' => 37, 'atribut' => 'Storage',         'detail' => '1TB Custom SSD (Internal)'],
+            ['produk_id' => 37, 'atribut' => 'Drive Optik',     'detail' => 'Ultra HD Blu-ray Disc Drive (Bisa dilepas pasang)'],
+            ['produk_id' => 37, 'atribut' => 'Output',          'detail' => 'Support 4K 120Hz, HDR, VRR, & 8K'],
+            ['produk_id' => 37, 'atribut' => 'Port Depan',      'detail' => '2x USB-C'],
+            ['produk_id' => 37, 'atribut' => 'Audio',           'detail' => 'Tempest 3D AudioTech'],
+
+            // Produk 38 - ASUS ROG Ally
+            ['produk_id' => 38, 'atribut' => 'Prosesor',        'detail' => 'AMD Ryzen Z1 Extreme (8-core, 16-thread, 8.6 TFLOPS)'],
+            ['produk_id' => 38, 'atribut' => 'Layar',           'detail' => '7" FHD (1920x1080) 120Hz, 500 nits, FreeSync Premium'],
+            ['produk_id' => 38, 'atribut' => 'RAM',             'detail' => '16GB LPDDR5 6400MHz'],
+            ['produk_id' => 38, 'atribut' => 'Storage',         'detail' => '512GB PCIe 4.0 NVMe SSD (M.2 2230)'],
+            ['produk_id' => 38, 'atribut' => 'Pendingin',       'detail' => 'Zero Gravity Thermal System (Dual Fan)'],
+            ['produk_id' => 38, 'atribut' => 'Fitur',           'detail' => 'Armoury Crate SE, Fingerprint Power Button'],
+            ['produk_id' => 38, 'atribut' => 'OS',              'detail' => 'Windows 11 Home'],
+
+            // Produk 39 - Nintendo Switch OLED
+            ['produk_id' => 39, 'atribut' => 'Layar',           'detail' => '7-inch OLED Touchscreen (Vibrant Colors)'],
+            ['produk_id' => 39, 'atribut' => 'Storage',         'detail' => '64GB Internal (Support microSD hingga 2TB)'],
+            ['produk_id' => 39, 'atribut' => 'Dock',            'detail' => 'Wired LAN Port terintegrasi di dock'],
+            ['produk_id' => 39, 'atribut' => 'Audio',           'detail' => 'Enhanced Audio dari onboard speaker'],
+            ['produk_id' => 39, 'atribut' => 'Stand',           'detail' => 'Wide adjustable stand untuk mode tabletop'],
+            ['produk_id' => 39, 'atribut' => 'Mode Main',       'detail' => 'Handheld, Tabletop, & TV Mode'],
+
+            // Produk 40 - SteelSeries Arctis Nova Pro
+            ['produk_id' => 40, 'atribut' => 'Driver',          'detail' => 'Premium High Fidelity Drivers'],
+            ['produk_id' => 40, 'atribut' => 'Audio Hub',       'detail' => 'GameDAC Gen 2 (96KHz/24-Bit resolution)'],
+            ['produk_id' => 40, 'atribut' => 'Mikrofon',        'detail' => 'ClearCast Gen 2 Noise Cancelling (Bidirectional)'],
+            ['produk_id' => 40, 'atribut' => 'Fitur Suara',     'detail' => '360° Spatial Audio & Sonar Software EQ'],
+            ['produk_id' => 40, 'atribut' => 'Konektivitas',    'detail' => 'Multi-System Connect (Dual USB Ports untuk PC/Konsol)'],
+            ['produk_id' => 40, 'atribut' => 'Ergonomi',        'detail' => 'ComfortMAX System (Height-adjustable earmuffs)'],
+
+            // Produk 41 - Xbox Series X
+            ['produk_id' => 41, 'atribut' => 'CPU',             'detail' => '8X Cores @ 3.8 GHz (3.66 GHz w/SMT) Custom Zen 2 CPU'],
+            ['produk_id' => 41, 'atribut' => 'GPU',             'detail' => '12 TFLOPS, 52 CUs @1.825 GHz Custom RDNA 2 GPU'],
+            ['produk_id' => 41, 'atribut' => 'RAM',             'detail' => '16GB GDDR6 w/320b bus'],
+            ['produk_id' => 41, 'atribut' => 'Storage',         'detail' => '1TB Custom NVME SSD (Support Expansion Card)'],
+            ['produk_id' => 41, 'atribut' => 'Output Video',   'detail' => 'True 4K @ 120fps, Up to 8K HDR, DirectX Raytracing'],
+            ['produk_id' => 41, 'atribut' => 'Fitur Utama',    'detail' => 'Quick Resume, Velocity Architecture, Smart Delivery'],
+            ['produk_id' => 41, 'atribut' => 'Drive Optik',     'detail' => '4K UHD Blu-ray'],
+
+            // Produk 42 - Logitech G Pro X Superlight
+            ['produk_id' => 42, 'atribut' => 'Bobot',           'detail' => 'Kurang dari 63 gram (Ultra Lightweight)'],
+            ['produk_id' => 42, 'atribut' => 'Sensor',          'detail' => 'HERO 25K (100 - 25,600 DPI)'],
+            ['produk_id' => 42, 'atribut' => 'Konektivitas',    'detail' => 'LIGHTSPEED Wireless (1ms report rate)'],
+            ['produk_id' => 42, 'atribut' => 'Baterai',         'detail' => 'Hingga 70 jam penggunaan konstan'],
+            ['produk_id' => 42, 'atribut' => 'Kaki Mouse',      'detail' => 'Large additive-free PTFE feet (Glide halus)'],
+            ['produk_id' => 42, 'atribut' => 'Prosesor',        'detail' => '32-bit ARM'],
+            ['produk_id' => 42, 'atribut' => 'Fitur',           'detail' => 'POWERPLAY compatible, Onboard memory'],
+
+            // Produk 43 - TP-Link Archer AXE75
+            ['produk_id' => 43, 'atribut' => 'Standar WiFi',    'detail' => 'WiFi 6E (802.11ax) Tri-Band'],
+            ['produk_id' => 43, 'atribut' => 'Kecepatan',       'detail' => '5400 Mbps (6GHz: 2402Mbps, 5GHz: 2402Mbps, 2.4GHz: 574Mbps)'],
+            ['produk_id' => 43, 'atribut' => 'Prosesor',        'detail' => '1.7 GHz Quad-Core CPU'],
+            ['produk_id' => 43, 'atribut' => 'Antena',          'detail' => '6× High-Performance Antennas'],
+            ['produk_id' => 43, 'atribut' => 'Fitur Keamanan',  'detail' => 'TP-Link HomeShield & WPA3'],
+            ['produk_id' => 43, 'atribut' => 'Port USB',        'detail' => '1× USB 3.0 Port'],
+
+            // Produk 44 - Ubiquiti UniFi Dream Machine
+            ['produk_id' => 44, 'atribut' => 'Tipe Perangkat',  'detail' => 'All-in-one Router, Switch, & Access Point'],
+            ['produk_id' => 44, 'atribut' => 'WiFi Standard',   'detail' => '802.11ac (WiFi 5) Wave 2'],
+            ['produk_id' => 44, 'atribut' => 'Port',            'detail' => '4x LAN Gigabit Ports, 1x WAN Gigabit Port'],
+            ['produk_id' => 44, 'atribut' => 'Fitur Enterprise','detail' => 'Integrated UniFi Network Controller Software'],
+            ['produk_id' => 44, 'atribut' => 'Keamanan',        'detail' => 'Advanced Firewall, IDS/IPS, & DPI'],
+            ['produk_id' => 44, 'atribut' => 'Antena',          'detail' => 'Internal 4x4 MU-MIMO untuk 5GHz'],
+
+            // Produk 45 - ASUS RT-AX88U Pro
+            ['produk_id' => 45, 'atribut' => 'Standar WiFi',    'detail' => 'WiFi 6 (802.11ax) Dual-Band'],
+            ['produk_id' => 45, 'atribut' => 'Kecepatan',       'detail' => '6000 Mbps (4804 Mbps di 5GHz, 1148 Mbps di 2.4GHz)'],
+            ['produk_id' => 45, 'atribut' => 'Port Ethernet',   'detail' => 'Dual 2.5G Ports (WAN/LAN) + 4x Gigabit LAN'],
+            ['produk_id' => 45, 'atribut' => 'Prosesor',        'detail' => '2.0 GHz quad-core 64-bit CPU'],
+            ['produk_id' => 45, 'atribut' => 'Fitur Gaming',    'detail' => 'Mobile Game Mode, Gear Accelerator, OpenNAT'],
+            ['produk_id' => 45, 'atribut' => 'Keamanan',        'detail' => 'AiProtection Pro bertenaga Trend Micro'],
+
+            // Produk 46 - Google Nest WiFi Pro
+            ['produk_id' => 46, 'atribut' => 'Teknologi Mesh',  'detail' => 'WiFi 6E Tri-Band Mesh System'],
+            ['produk_id' => 46, 'atribut' => 'Cakupan',         'detail' => 'Hingga 120 meter persegi per router'],
+            ['produk_id' => 46, 'atribut' => 'Smart Home',      'detail' => 'Matter hub terintegrasi & Thread border router'],
+            ['produk_id' => 46, 'atribut' => 'Port',            'detail' => '2x Ethernet ports (1 Gbps) per router'],
+            ['produk_id' => 46, 'atribut' => 'Fitur AI',        'detail' => 'Self-monitoring & Auto-optimization jaringan'],
+            ['produk_id' => 46, 'atribut' => 'Keamanan',        'detail' => 'Secure Boot & Firmware updates otomatis'],
+
+            // Produk 47 - Netgear Nighthawk M6
+            ['produk_id' => 47, 'atribut' => 'Tipe Perangkat',  'detail' => '5G Mobile Hotspot Router'],
+            ['produk_id' => 47, 'atribut' => 'Kecepatan 5G',    'detail' => 'Sub-6 5G up to 2.5 Gbps'],
+            ['produk_id' => 47, 'atribut' => 'WiFi Standard',   'detail' => 'WiFi 6 (AX3600)'],
+            ['produk_id' => 47, 'atribut' => 'Baterai',         'detail' => '5040 mAh (Hingga 13 jam penggunaan)'],
+            ['produk_id' => 47, 'atribut' => 'Layar',           'detail' => '2.4" LCD Touch Screen'],
+            ['produk_id' => 47, 'atribut' => 'Port',            'detail' => '2.5G Ethernet Port & USB-C'],
+
+            // Produk 48 - Xiaomi AX3000 Mesh
+            ['produk_id' => 48, 'atribut' => 'Standar WiFi',    'detail' => 'WiFi 6 (802.11ax) Dual-Band'],
+            ['produk_id' => 48, 'atribut' => 'Kecepatan',       'detail' => '2976 Mbps (2402 Mbps @5GHz + 574 Mbps @2.4GHz)'],
+            ['produk_id' => 48, 'atribut' => 'Bandwidth',       'detail' => 'Support 160MHz high bandwidth'],
+            ['produk_id' => 48, 'atribut' => 'Prosesor',        'detail' => 'Qualcomm IPQ5000 Dual-core CPU'],
+            ['produk_id' => 48, 'atribut' => 'Mesh Tech',       'detail' => 'Xiaomi self-developed Mesh (Connect up to 10 devices)'],
+            ['produk_id' => 48, 'atribut' => 'RAM/ROM',         'detail' => '256MB RAM'],
+
+            // Produk 49 - MikroTik hAP ax3
+            ['produk_id' => 49, 'atribut' => 'Standar WiFi',    'detail' => 'WiFi 6 (802.11ax) + 802.11ac support'],
+            ['produk_id' => 49, 'atribut' => 'CPU',             'detail' => 'Quad-Core IPQ-6010 1.8 GHz'],
+            ['produk_id' => 49, 'atribut' => 'RAM',             'detail' => '1GB RAM'],
+            ['produk_id' => 49, 'atribut' => 'Port',            'detail' => '1x 2.5G Ethernet, 4x Gigabit Ethernet, 1x USB 3.0'],
+            ['produk_id' => 49, 'atribut' => 'OS',              'detail' => 'RouterOS v7 (License level 6)'],
+            ['produk_id' => 49, 'atribut' => 'Antena',          'detail' => 'External high-gain antennas (Up to 5.5 dBi)'],
         ];
 
         DB::table('spesifikasi_produk')->insert($spesifikasi);

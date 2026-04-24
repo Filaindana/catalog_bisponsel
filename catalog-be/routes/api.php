@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 👤 User
     Route::get('/users', [UsersController::class, 'index']);
+    Route::put('/users/{id}', [UsersController::class, 'update']);
 
     // 🛍️ Produk
     Route::apiResource('produk', ProdukController::class)->except(['index', 'show']);

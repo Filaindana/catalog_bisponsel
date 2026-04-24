@@ -12,7 +12,7 @@ import keyboardImg from "../assets/keyboard.png";
 import soundImg    from "../assets/sound.png";
 import monitorImg  from "../assets/monitor.png";
 import ProductCard from "../components/ProductCard";
-import { getProdukById } from "../utils/services/produkService";
+import { getProdukById, getProdukTerkait } from "../utils/services/produkService";
 
 /* ── Style inject ── */
 if (typeof document !== "undefined" && !document.querySelector("[data-detail-style]")) {
@@ -100,11 +100,6 @@ if (typeof document !== "undefined" && !document.querySelector("[data-detail-sty
 //   ],
 // };
 
-const relatedProducts = Array.from({length:6},(_,i)=>({
-  id:i+1, name:"PC Gaming Pro Ryzen Edition", category:"Komputer (PC)",
-  price:17499000, rating:4.8,
-  image:[monitorImg,laptopImg,mouseImg,keyboardImg,soundImg][i%5],
-}));
 
 const GUARANTEES = [
   { icon: <FiBox size={17}/>,    label: "Stok Terupdate",     sub: "Selalu diperbarui"       },
@@ -162,6 +157,7 @@ export default function DetailProduct() {
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity]           = useState(1);
   const [saved, setSaved] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const zoom = useZoom();
   const [product, setProduct] = useState({
     name: "",
@@ -190,6 +186,8 @@ export default function DetailProduct() {
     if (path.startsWith("http")) return path;
     return `/images/${path}`;
   };
+
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -232,6 +230,18 @@ export default function DetailProduct() {
         };
 
         setProduct(mapped);
+
+        if (data.kategori_id) {
+          const related = await getProdukTerkait(data.kategori_id, data.id);
+          setRelatedProducts(related.map((p) => ({
+            id: p.id,
+            name: p.nama,
+            category: p.kategori?.nama || "",
+            price: fmt(p.harga),
+            rating: p.rating || 4.5,
+            image: getImageUrl(p.gambar),
+          })));
+        }
       } catch (err) {
         console.error("Gagal ambil produk:", err);
       }
@@ -495,18 +505,23 @@ export default function DetailProduct() {
               className="arrow-btn w-9 h-9 min-w-9 rounded-full bg-white border border-[#e8edf4] shadow-sm cursor-pointer flex items-center justify-center text-lg text-gray-600">‹</button>
             <div className="flex-1 min-w-0">
               <Swiper onSwiper={s=>(swiperRef.current=s)} spaceBetween={12} slidesPerView={5}
+                loop={relatedProducts.length >= 5}
                 breakpoints={{
                   320:{slidesPerView:1.5,spaceBetween:10},
                   480:{slidesPerView:2.5,spaceBetween:11},
                   640:{slidesPerView:3,spaceBetween:12},
                   1024:{slidesPerView:5,spaceBetween:12},
                 }}>
-                {relatedProducts.map((item,index)=>(
+                {relatedProducts.length === 0 ? (
+                  <SwiperSlide>
+                    <p className="text-sm text-gray-400 py-4">Tidak ada produk terkait.</p>
+                  </SwiperSlide>
+                ) : relatedProducts.map((item, index) => (
                   <SwiperSlide key={item.id}>
                     <ProductCard compact
-                      product={{id:item.id,category:item.category,name:item.name,price:fmt(item.price),rating:item.rating,image:item.image}}
+                      product={item}
                       saved={saved[index]}
-                      onToggleSave={()=>setSaved(prev=>{const u=[...prev];u[index]=!u[index];return u;})}
+                      onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
                     />
                   </SwiperSlide>
                 ))}

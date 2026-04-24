@@ -6,6 +6,18 @@ export const getProduk = async (page = 1) => {
   return res.data; // pagination object
 };
 
+// GET PRODUK TERKAIT (same kategori, exclude current id)
+export const getProdukTerkait = async (kategoriId, excludeId, limit = 8) => {
+  try {
+    const res = await api(`/produk?kategori_id=${kategoriId}&per_page=${limit + 1}`);
+    const items = res.data?.data || [];
+    return items.filter((p) => p.id !== excludeId).slice(0, limit);
+  } catch (err) {
+    console.error("Gagal ambil produk terkait:", err.message);
+    return [];
+  }
+};
+
 // GET DETAIL PRODUK
 // export const getProdukById = async (id) => {
 //   const res = await api(`/produk/${id}`);

@@ -1,6 +1,117 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logoImg from "../assets/logo.png";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, X } from "lucide-react";
+
+const PRIVACY_CONTENT = `
+**Kebijakan Privasi BizPonsel**
+Terakhir diperbarui: April 2026
+
+BizPonsel berkomitmen untuk melindungi privasi pengguna. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda.
+
+**1. Informasi yang Kami Kumpulkan**
+Kami mengumpulkan informasi yang Anda berikan secara langsung, seperti nama, alamat email, dan nomor telepon saat mendaftar atau menghubungi kami.
+
+**2. Penggunaan Informasi**
+Informasi Anda digunakan untuk memproses pesanan, mengirimkan pembaruan produk, memberikan layanan pelanggan, dan meningkatkan pengalaman pengguna di platform kami.
+
+**3. Keamanan Data**
+Kami menggunakan enkripsi SSL dan langkah-langkah keamanan industri standar untuk melindungi data Anda dari akses tidak sah.
+
+**4. Berbagi Informasi**
+Kami tidak menjual atau menyewakan informasi pribadi Anda kepada pihak ketiga tanpa persetujuan Anda, kecuali diwajibkan oleh hukum.
+
+**5. Cookie**
+Kami menggunakan cookie untuk meningkatkan pengalaman penelusuran Anda. Anda dapat menonaktifkan cookie melalui pengaturan browser kapan saja.
+
+**6. Hak Pengguna**
+Anda berhak mengakses, memperbarui, atau menghapus informasi pribadi Anda dengan menghubungi kami di info@bismarcatalog.com.
+
+**7. Perubahan Kebijakan**
+Kami dapat memperbarui kebijakan ini sewaktu-waktu. Perubahan signifikan akan diberitahukan melalui email atau notifikasi di website.
+`;
+
+const TERMS_CONTENT = `
+**Syarat & Ketentuan BizPonsel**
+Terakhir diperbarui: April 2026
+
+Dengan menggunakan layanan BizPonsel, Anda menyetujui syarat dan ketentuan berikut.
+
+**1. Penggunaan Layanan**
+Platform ini hanya boleh digunakan untuk tujuan yang sah. Pengguna dilarang melakukan aktivitas yang melanggar hukum atau merugikan pengguna lain.
+
+**2. Akun Pengguna**
+Anda bertanggung jawab menjaga kerahasiaan kredensial akun Anda. Setiap aktivitas yang terjadi di bawah akun Anda menjadi tanggung jawab Anda sepenuhnya.
+
+**3. Informasi Produk**
+Kami berusaha menyajikan informasi produk yang akurat, namun tidak menjamin ketersediaan atau harga produk setiap saat. Harga dapat berubah tanpa pemberitahuan sebelumnya.
+
+**4. Layanan Pelanggan**
+Untuk pertanyaan atau keluhan, hubungi kami melalui halaman Kontak atau email info@bismarcatalog.com. Kami akan merespons dalam 1x24 jam kerja.
+
+**5. Hak Kekayaan Intelektual**
+Seluruh konten, logo, dan materi di platform ini adalah milik BizPonsel dan dilindungi hak cipta. Dilarang menyalin atau mendistribusikan tanpa izin tertulis.
+
+**6. Batasan Tanggung Jawab**
+BizPonsel tidak bertanggung jawab atas kerugian tidak langsung yang timbul dari penggunaan platform ini di luar kendali kami.
+
+**7. Hukum yang Berlaku**
+Syarat dan ketentuan ini diatur oleh hukum Republik Indonesia. Segala sengketa diselesaikan melalui pengadilan yang berwenang di Surabaya.
+`;
+
+function PolicyModal({ title, content, onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h2 className="text-[16px] font-bold text-[#072B50] m-0">{title}</h2>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto px-6 py-5 flex flex-col gap-3">
+          {content.trim().split("\n\n").map((block, i) => {
+            if (block.startsWith("**") && block.endsWith("**") && !block.slice(2).includes("**")) {
+              return <h3 key={i} className="text-[13px] font-bold text-[#072B50] mt-2 mb-0">{block.replace(/\*\*/g, "")}</h3>;
+            }
+            const parts = block.split(/(\*\*[^*]+\*\*)/g);
+            return (
+              <p key={i} className="text-[13px] text-gray-600 leading-relaxed m-0">
+                {parts.map((part, j) =>
+                  part.startsWith("**") ? <strong key={j} className="text-[#072B50]">{part.replace(/\*\*/g, "")}</strong> : part
+                )}
+              </p>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-gray-100">
+          <button
+            onClick={onClose}
+            className="w-full py-2.5 rounded-xl text-[13px] font-semibold text-white transition-colors"
+            style={{ background: "#072B50" }}
+          >
+            Saya Mengerti
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const FacebookIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>);
 const InstagramIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>);
@@ -9,6 +120,7 @@ const WhatsAppIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fil
 
 export default function Footer() {
   const navigate = useNavigate();
+  const [activeModal, setActiveModal] = useState(null);
 
   const links = [
     { label: "Beranda", path: "/" },
@@ -32,6 +144,13 @@ export default function Footer() {
   ];
 
   return (
+    <>
+    {activeModal === "privacy" && (
+      <PolicyModal title="Privacy Policy" content={PRIVACY_CONTENT} onClose={() => setActiveModal(null)} />
+    )}
+    {activeModal === "terms" && (
+      <PolicyModal title="Terms of Service" content={TERMS_CONTENT} onClose={() => setActiveModal(null)} />
+    )}
     <footer className="bg-[#072B50]">
 
       {/* ACCENT LINE */}
@@ -118,17 +237,17 @@ export default function Footer() {
       <div className="py-4 px-10 flex flex-col sm:flex-row justify-between items-center gap-3">
         <p className="m-0 text-xs text-white/40">© 2026 BismarCatalog. All rights reserved.</p>
         <div className="flex gap-4">
-          {["Privacy Policy", "Terms of Service"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className="text-xs text-white/40 no-underline hover:text-white transition-colors duration-200"
-            >
-              {item}
-            </a>
-          ))}
+          <button onClick={() => setActiveModal("privacy")}
+            className="text-xs text-white/40 bg-transparent border-none cursor-pointer hover:text-white transition-colors duration-200 p-0">
+            Privacy Policy
+          </button>
+          <button onClick={() => setActiveModal("terms")}
+            className="text-xs text-white/40 bg-transparent border-none cursor-pointer hover:text-white transition-colors duration-200 p-0">
+            Terms of Service
+          </button>
         </div>
       </div>
     </footer>
+    </>
   );
 }

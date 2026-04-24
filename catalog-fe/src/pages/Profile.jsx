@@ -411,13 +411,14 @@ export default function Profile() {
 
   const handleUpdateUser = async (field, value) => {
     try {
-      const res = await updateProfile(user.id, {
-        [field]: value,
-      });
-
-      setUser(res); // ⬅️ update state dari backend
+      const res = await updateProfile(user.id, { [field]: value });
+      setUser(res);
+      // sync ke localStorage agar navbar ikut update
+      const stored = JSON.parse(localStorage.getItem("user") || "{}");
+      localStorage.setItem("user", JSON.stringify({ ...stored, [field]: value }));
     } catch (err) {
       console.error(err);
+      alert(err.message || "Gagal menyimpan perubahan");
     }
   };
 

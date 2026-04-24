@@ -87,7 +87,8 @@ export default function Navbar() {
 
           {/* Dropdown */}
           {user && showDropdown && (
-            <div className="absolute top-[110%] right-0 bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.10)] min-w-42.5 overflow-hidden z-110 border border-gray-100">
+            <div className="absolute top-full right-0 pt-2 z-110">
+            <div className="bg-white rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.10)] min-w-42.5 overflow-hidden border border-gray-100">
               <div
                 onClick={() => navigate("/profile")}
                 className="flex items-center gap-2 px-4 py-3 text-sm text-gray-800 transition-colors cursor-pointer hover:bg-gray-50"
@@ -103,6 +104,7 @@ export default function Navbar() {
                 <FiLogOut size={14} />
                 Logout
               </div>
+            </div>
             </div>
           )}
         </div>

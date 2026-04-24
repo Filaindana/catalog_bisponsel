@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { FavoritProvider } from "./context/FavoritContext.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
@@ -24,6 +24,24 @@ import PromoAdmin from "./pages/admin/Promo.jsx";
 import Cabang from "./pages/admin/Cabang.jsx";
 import Pengaturan from "./pages/admin/Pengaturan.jsx";
 import Profile from "./pages/Profile.jsx";
+
+/* ── Auth helpers ── */
+function getUser() {
+  try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+}
+
+function ProtectedRoute() {
+  const token = localStorage.getItem("token");
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
+function AdminRoute() {
+  const token = localStorage.getItem("token");
+  const user  = getUser();
+  if (!token || !user) return <Navigate to="/login" replace />;
+  if (user.role !== "admin") return <Navigate to="/" replace />;
+  return <Outlet />;
+}
 
 /* ── Public layout ── */
 function PublicLayout() {

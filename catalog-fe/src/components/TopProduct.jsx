@@ -1,7 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import ProductCard from "./ProductCard.jsx";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import api from "../utils/api.js";
+
+const CARD_W = 234; // 220px card + 14px gap
+const AUTO_MS = 3000;
 
 const arrowStyle = {
   position: "absolute", top: "50%", transform: "translateY(-50%)", zIndex: 10,
@@ -17,12 +20,41 @@ const formatPrice = (price) =>
 
 export default function TopProduct() {
   const { savedMap, toggleSave } = useFavorit();
-  const trackRef     = useRef(null);
+  const trackRef      = useRef(null);
   const [products, setProducts] = useState([]);
-  const isDragging   = useRef(false);
-  const startX       = useRef(0);
+  const isDragging    = useRef(false);
+  const startX        = useRef(0);
   const scrollLeftRef = useRef(0);
 
+  /* ── infinite advance ── */
+  const advance = useCallback((dir) => {
+    const el = trackRef.current;
+    if (!el) return;
+    const half = el.scrollWidth / 2;
+
+    // silently normalise if we've drifted into the clone half
+    if (el.scrollLeft >= half) {
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft -= half;
+    } else if (el.scrollLeft < 0) {
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft += half;
+    }
+
+    requestAnimationFrame(() => {
+      el.style.scrollBehavior = "smooth";
+      el.scrollLeft += dir * CARD_W;
+    });
+  }, []);
+
+  /* ── auto-rotate ── */
+  useEffect(() => {
+    if (products.length === 0) return;
+    const timer = setInterval(() => advance(1), AUTO_MS);
+    return () => clearInterval(timer);
+  }, [products, advance]);
+
+  /* ── drag ── */
   const onMouseDown = (e) => {
     isDragging.current = true;
     startX.current = e.pageX - (trackRef.current?.offsetLeft ?? 0);
@@ -35,8 +67,8 @@ export default function TopProduct() {
     if (trackRef.current) trackRef.current.scrollLeft = scrollLeftRef.current - (x - startX.current) * 1.5;
   };
   const stopDrag = () => { isDragging.current = false; };
-  const move = (d) => { if (trackRef.current) trackRef.current.scrollLeft += d * 280; };
 
+  /* ── fetch ── */
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -49,16 +81,17 @@ export default function TopProduct() {
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),
           rating: p.rating || 0,
-          image: p.gambar ? `http://localhost:8000/images/${p.gambar}` : "/fallback.jpg",
+          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
           badge: p.adalah_promo ? "Sale" : undefined,
         })));
       } catch (err) {
         console.error(err);
       }
     };
-
     fetchProducts();
   }, []);
+
+  const looped = [...products, ...products];
 
   return (
     <section style={{ background: "#072B50", padding: "60px 40px" }}>
@@ -77,7 +110,7 @@ export default function TopProduct() {
         {/* KANAN */}
         <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
           <button
-            onClick={() => move(-1)}
+            onClick={() => advance(-1)}
             style={{ ...arrowStyle, left: -18 }}
             onMouseEnter={e => { e.currentTarget.style.background = "#1e40af"; e.currentTarget.style.color = "#fff"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; }}
@@ -91,8 +124,8 @@ export default function TopProduct() {
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
-            {products.map((product) => (
-              <div key={product.id} style={{ flex: "0 0 220px", minWidth: 220 }}>
+            {looped.map((product, i) => (
+              <div key={`${product.id}-${i}`} style={{ flex: "0 0 220px", minWidth: 220 }}>
                 <ProductCard
                   product={product}
                   saved={!!savedMap[product.id]}
@@ -103,7 +136,7 @@ export default function TopProduct() {
           </div>
 
           <button
-            onClick={() => move(1)}
+            onClick={() => advance(1)}
             style={{ ...arrowStyle, right: -18 }}
             onMouseEnter={e => { e.currentTarget.style.background = "#1e40af"; e.currentTarget.style.color = "#fff"; }}
             onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; }}

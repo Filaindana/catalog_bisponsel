@@ -1,7 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import ProductCard from "./ProductCard.jsx";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import api from "../utils/api.js";
+
+const CARD_W = 240; // 220px card + 20px gap
+const AUTO_MS = 3000;
 
 const formatPrice = (price) =>
   "Rp " + Number(price).toLocaleString("id-ID").replace(/,/g, ".");
@@ -14,9 +17,35 @@ export default function NewProduct() {
   const startX = useRef(0);
   const scrollLeft = useRef(0);
 
+  /* ── infinite advance ── */
+  const advance = useCallback((dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const half = el.scrollWidth / 2;
+
+    if (el.scrollLeft >= half) {
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft -= half;
+    } else if (el.scrollLeft < 0) {
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft += half;
+    }
+
+    requestAnimationFrame(() => {
+      el.style.scrollBehavior = "smooth";
+      el.scrollLeft += dir * CARD_W;
+    });
+  }, []);
+
+  /* ── auto-rotate ── */
+  useEffect(() => {
+    if (products.length === 0) return;
+    const timer = setInterval(() => advance(1), AUTO_MS);
+    return () => clearInterval(timer);
+  }, [products, advance]);
+
+  /* ── drag ── */
   const onMouseDown = (e) => {
-    const target = e.target;
-    if (!target.closest(".np-img-wrap")) return;
     isDragging.current = true;
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
@@ -25,106 +54,58 @@ export default function NewProduct() {
     if (!isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
-    const walk = (x - startX.current) * 1.5;
-    if (scrollRef.current)
-      scrollRef.current.scrollLeft = scrollLeft.current - walk;
+    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.5;
   };
-  const stopDrag = () => {
-    isDragging.current = false;
-  };
-  const scrollBy = (dir) => {
-    if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
-  };
+  const stopDrag = () => { isDragging.current = false; };
 
+  /* ── fetch ── */
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const res = await api("/produk?sort=latest&per_page=8");
         const list = res?.data?.data || [];
-        setProducts(
-          list.map((p) => ({
-            id: p.id,
-            name: p.nama,
-            category: p.kategori?.nama || "-",
-            spec: p.deskripsi || "-",
-            price: formatPrice(p.harga),
-            rating: p.rating || 0,
-            image: p.gambar
-              ? `http://localhost:8000/images/${p.gambar}`
-              : "/fallback.jpg",
-            badge: "New",
-          })),
-        );
+        setProducts(list.map((p) => ({
+          id: p.id,
+          name: p.nama,
+          category: p.kategori?.nama || "-",
+          spec: p.deskripsi || "-",
+          price: formatPrice(p.harga),
+          rating: p.rating || 0,
+          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
+          badge: "New",
+        })));
       } catch (err) {
         console.error(err);
       }
     };
-
     fetchProducts();
   }, []);
+
+  const looped = [...products, ...products];
 
   return (
     <section style={{ padding: "50px 0", background: "#fff" }}>
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 40px" }}>
+
         {/* HEADER */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 28,
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
           <div>
-            <h2
-              className="section-title"
-              style={{
-                margin: 0,
-                borderLeft: "5px solid #072B50",
-                paddingLeft: 14,
-              }}
-            >
+            <h2 className="section-title" style={{ margin: 0, borderLeft: "5px solid #072B50", paddingLeft: 14 }}>
               Produk Terbaru
             </h2>
-            <div
-              style={{
-                paddingLeft: 19,
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                fontSize: 12,
-                color: "#9ca3af",
-                marginTop: 4,
-              }}
-            >
-              <span className="np-bounce">⟶</span> Geser untuk melihat lebih
-              banyak
+            <div style={{ paddingLeft: 19, display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#9ca3af", marginTop: 4 }}>
+              <span className="np-bounce">⟶</span> Geser untuk melihat lebih banyak
             </div>
           </div>
           <div className="flex gap-2">
-            {[
-              ["‹", -1],
-              ["›", 1],
-            ].map(([icon, dir]) => (
+            {[["‹", -1], ["›", 1]].map(([icon, dir]) => (
               <button
                 key={dir}
-                onClick={() => scrollBy(dir)}
-                className="flex items-center justify-center w-10 h-10 text-xl text-gray-600 transition-all duration-200 bg-white rounded-full cursor-pointer"
-                style={{
-                  border: "1px solid #e5e7eb",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  padding: 0,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "#072B50";
-                  e.currentTarget.style.color = "#fff";
-                  e.currentTarget.style.borderColor = "#072B50";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "#fff";
-                  e.currentTarget.style.color = "#374151";
-                  e.currentTarget.style.borderColor = "#e5e7eb";
-                }}
+                onClick={() => advance(dir)}
+                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 cursor-pointer transition-all duration-200"
+                style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 0 }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; e.currentTarget.style.borderColor = "#e5e7eb"; }}
               >
                 {icon}
               </button>
@@ -137,22 +118,14 @@ export default function NewProduct() {
           <div
             ref={scrollRef}
             className="flex gap-5 overflow-x-auto overflow-y-visible"
-            style={{
-              scrollBehavior: "smooth",
-              cursor: "default",
-              padding: "8px 4px 16px",
-              scrollbarWidth: "none",
-            }}
+            style={{ scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
-            {products.map((product) => (
-              <div
-                key={product.id}
-                style={{ flex: "0 0 220px", minWidth: 220 }}
-              >
+            {looped.map((product, i) => (
+              <div key={`${product.id}-${i}`} style={{ flex: "0 0 220px", minWidth: 220 }}>
                 <ProductCard
                   product={product}
                   saved={!!savedMap[product.id]}

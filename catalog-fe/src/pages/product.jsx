@@ -534,7 +534,7 @@ export default function Product() {
                   price: formatPrice(product.harga),
                   rating: product.rating || 0,
                   image: product.gambar
-                    ? `http://localhost:8000/images/${product.gambar}`
+                    ? `/images/${product.gambar}`
                     : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}

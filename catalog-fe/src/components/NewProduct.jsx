@@ -1,7 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import ProductCard from "./ProductCard.jsx";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import api from "../utils/api.js";
+
+const CARD_W = 240; // 220px card + 20px gap
+const AUTO_MS = 3000;
 
 const formatPrice = (price) =>
   "Rp " + Number(price).toLocaleString("id-ID").replace(/,/g, ".");
@@ -14,9 +17,35 @@ export default function NewProduct() {
   const startX     = useRef(0);
   const scrollLeft = useRef(0);
 
+  /* ── infinite advance ── */
+  const advance = useCallback((dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const half = el.scrollWidth / 2;
+
+    if (el.scrollLeft >= half) {
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft -= half;
+    } else if (el.scrollLeft < 0) {
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft += half;
+    }
+
+    requestAnimationFrame(() => {
+      el.style.scrollBehavior = "smooth";
+      el.scrollLeft += dir * CARD_W;
+    });
+  }, []);
+
+  /* ── auto-rotate ── */
+  useEffect(() => {
+    if (products.length === 0) return;
+    const timer = setInterval(() => advance(1), AUTO_MS);
+    return () => clearInterval(timer);
+  }, [products, advance]);
+
+  /* ── drag ── */
   const onMouseDown = (e) => {
-    const target = e.target;
-    if (!target.closest(".np-img-wrap")) return;
     isDragging.current = true;
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
@@ -25,14 +54,11 @@ export default function NewProduct() {
     if (!isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
-    const walk = (x - startX.current) * 1.5;
-    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - walk;
+    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.5;
   };
   const stopDrag = () => { isDragging.current = false; };
-  const scrollBy = (dir) => {
-    if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
-  };
 
+  /* ── fetch ── */
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -45,16 +71,17 @@ export default function NewProduct() {
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),
           rating: p.rating || 0,
-          image: p.gambar ? `http://localhost:8000/images/${p.gambar}` : "/fallback.jpg",
+          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
           badge: "New",
         })));
       } catch (err) {
         console.error(err);
       }
     };
-
     fetchProducts();
   }, []);
+
+  const looped = [...products, ...products];
 
   return (
     <section style={{ padding: "50px 0", background: "#fff" }}>
@@ -74,7 +101,7 @@ export default function NewProduct() {
             {[["‹", -1], ["›", 1]].map(([icon, dir]) => (
               <button
                 key={dir}
-                onClick={() => scrollBy(dir)}
+                onClick={() => advance(dir)}
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 cursor-pointer transition-all duration-200"
                 style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 0 }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
@@ -97,8 +124,8 @@ export default function NewProduct() {
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
-            {products.map((product) => (
-              <div key={product.id} style={{ flex: "0 0 220px", minWidth: 220 }}>
+            {looped.map((product, i) => (
+              <div key={`${product.id}-${i}`} style={{ flex: "0 0 220px", minWidth: 220 }}>
                 <ProductCard
                   product={product}
                   saved={!!savedMap[product.id]}

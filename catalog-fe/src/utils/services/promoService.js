@@ -19,7 +19,7 @@ const getBannerColor = (status) => {
 };
 
 const getImageUrl = (path) =>
-  path ? `http://localhost:8000/storage/${path}` : "/fallback.jpg";
+  path ? `/storage/${path}` : "/fallback.jpg";
 
 /* ================= GET PROMOS ================= */
 
@@ -102,7 +102,7 @@ export const getActivePromoProducts = async () => {
           stock: p.stok,
 
           image: p.gambar
-            ? `http://localhost:8000/storage/${p.gambar}`
+            ? `/storage/${p.gambar}`
             : "/fallback.jpg",
 
           discount: 15,

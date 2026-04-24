@@ -188,7 +188,7 @@ export default function DetailProduct() {
   const getImageUrl = (path) => {
     if (!path) return "/fallback.jpg";
     if (path.startsWith("http")) return path;
-    return `http://localhost:8000/images/${path}`;
+    return `/images/${path}`;
   };
 
   useEffect(() => {

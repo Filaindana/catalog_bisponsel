@@ -35,7 +35,7 @@ const slides = [
   },
 ];
 
-const DURATION = 5000;
+const DURATION = 6000;
 
 export default function Hero() {
   const navigate      = useNavigate();
@@ -73,7 +73,6 @@ export default function Hero() {
         className="absolute inset-0 bg-center bg-cover"
         style={{
           backgroundImage: `url(${s.image})`,
-          animation: "hKB 5.5s ease forwards",
         }}
       />
 

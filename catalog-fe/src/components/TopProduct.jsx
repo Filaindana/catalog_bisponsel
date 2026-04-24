@@ -32,11 +32,12 @@ export default function TopProduct() {
     if (!el) return;
     const half = el.scrollWidth / 2;
 
-    // silently normalise if we've drifted into the clone half
-    if (el.scrollLeft >= half) {
+    if (dir > 0 && el.scrollLeft >= half) {
+      // kanan: sudah di copy kedua → jump ke copy pertama
       el.style.scrollBehavior = "auto";
       el.scrollLeft -= half;
-    } else if (el.scrollLeft < 0) {
+    } else if (dir < 0 && el.scrollLeft < CARD_W) {
+      // kiri: hampir di posisi 0 → jump ke copy kedua agar bisa scroll mundur
       el.style.scrollBehavior = "auto";
       el.scrollLeft += half;
     }

@@ -32,8 +32,12 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#072B50] pt-12.5">
-      <div className="px-10 mx-auto max-w-300">
+    <footer className="bg-[#072B50]">
+
+      {/* ACCENT LINE */}
+      <div style={{ height: 4, background: "linear-gradient(90deg, #3b82f6 0%, #60a5fa 50%, #a78bfa 100%)" }} />
+
+      <div className="px-10 mx-auto max-w-300 pt-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.8fr_1fr_1.6fr_1.6fr] gap-10 pb-10">
 
           {/* KOLOM 1 - BRAND */}
@@ -42,23 +46,29 @@ export default function Footer() {
               <img src={logoImg} alt="Logo" className="object-contain h-9" />
               <span className="text-lg font-bold text-white">BizPonsel</span>
             </div>
-            <p className="text-[13px] text-[#d7d7d7] leading-[1.8] m-0">
+            <p className="text-[13px] text-[#b0bec5] leading-[1.9] m-0 mb-5">
               Toko elektronik terpercaya dengan pilihan produk terlengkap dan
               harga terbaik untuk kebutuhan teknologi Anda.
             </p>
+            {/* rating/trust badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/10 bg-white/5">
+              <span style={{ color: "#facc15", fontSize: 13 }}>★★★★★</span>
+              <span className="text-[12px] text-white/60">Terpercaya sejak 2015</span>
+            </div>
           </div>
 
           {/* KOLOM 2 - QUICK LINKS */}
           <div>
-            <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Quick Links</h4>
-            <ul className="list-none p-0 m-0 flex flex-col gap-2.5">
+            <h4 className="footer-heading">Quick Links</h4>
+            <ul className="list-none p-0 m-0 flex flex-col gap-2">
               {links.map((item) => (
                 <li key={item.label}>
                   <span
                     onClick={() => { navigate(item.path); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-                    className="text-[13px] text-[#d7d7d7] flex items-center gap-1.5 cursor-pointer hover:text-white transition-colors duration-200"
+                    className="footer-link"
                   >
-                    <span className="text-blue-400">›</span> {item.label}
+                    <span className="footer-link-arrow">›</span>
+                    {item.label}
                   </span>
                 </li>
               ))}
@@ -67,12 +77,12 @@ export default function Footer() {
 
           {/* KOLOM 3 - CONTACT US */}
           <div>
-            <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Contact Us</h4>
-            <div className="flex flex-col gap-3.5">
+            <h4 className="footer-heading">Contact Us</h4>
+            <div className="flex flex-col gap-3">
               {contacts.map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="text-[#d7d7d7] mt-0.5 shrink-0">{item.icon}</span>
-                  <span className="text-[13px] text-[#d7d7d7] leading-[1.6]">{item.text}</span>
+                <div key={i} className="flex items-start gap-3 group">
+                  <span className="shrink-0 mt-0.5 text-blue-400">{item.icon}</span>
+                  <span className="text-[13px] text-[#b0bec5] leading-[1.6] group-hover:text-white transition-colors duration-200">{item.text}</span>
                 </div>
               ))}
             </div>
@@ -80,8 +90,8 @@ export default function Footer() {
 
           {/* KOLOM 4 - FOLLOW US */}
           <div>
-            <h4 className="text-[15px] font-bold text-white mt-0 mb-5 pb-2.5">Follow Us</h4>
-            <p className="text-[13px] text-[#d7d7d7] mb-4 leading-[1.6]">
+            <h4 className="footer-heading">Follow Us</h4>
+            <p className="text-[13px] text-[#b0bec5] mb-4 leading-[1.7]">
               Ikuti kami di media sosial untuk update produk dan promo terbaru.
             </p>
             <div className="flex gap-2.5">
@@ -90,8 +100,7 @@ export default function Footer() {
                   key={social.label}
                   href="#"
                   title={social.label}
-                  className={`w-10 h-10 rounded-[10px] ${social.bg} flex items-center justify-center text-white no-underline hover:-translate-y-1 transition-all duration-200`}
-                  style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.25)" }}
+                  className={`footer-social ${social.bg}`}
                 >
                   {social.icon}
                 </a>
@@ -100,17 +109,20 @@ export default function Footer() {
           </div>
 
         </div>
+
+        {/* DIVIDER */}
+        <div style={{ height: 1, background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1) 20%, rgba(255,255,255,0.1) 80%, transparent)" }} />
       </div>
 
       {/* BOTTOM BAR */}
-      <div className="bg-[#061e38] py-4.5 px-10 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-[#1e4d7b]">
-        <p className="m-0 text-xs text-white">© 2026 BismarCatalog. All rights reserved.</p>
+      <div className="py-4 px-10 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <p className="m-0 text-xs text-white/40">© 2026 BismarCatalog. All rights reserved.</p>
         <div className="flex gap-4">
           {["Privacy Policy", "Terms of Service"].map((item) => (
             <a
               key={item}
               href="#"
-              className="text-xs text-[#d7d7d7] no-underline hover:text-white transition-colors duration-200"
+              className="text-xs text-white/40 no-underline hover:text-white transition-colors duration-200"
             >
               {item}
             </a>

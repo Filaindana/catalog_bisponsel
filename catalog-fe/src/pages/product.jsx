@@ -67,7 +67,10 @@ export default function Product() {
   // ── baca query param ?category=xxx dari URL ──
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(() => {
+    const cat = searchParams.get("category");
+    return cat ? [cat] : [];
+  });
   const [selectedDiscounts, setSelectedDiscounts] = useState([]);
   const [sortBy, setSortBy] = useState("Terbaru");
   const [sortOpen, setSortOpen] = useState(false);
@@ -121,18 +124,14 @@ export default function Product() {
     priceRange,
   ]);
 
-  // ── auto-filter saat URL berubah ──
+  // ── scroll ke konten saat ada category di URL ──
   useEffect(() => {
-    const cat = searchParams.get("category");
-    if (cat) {
-      setSelectedCategories([cat]);
-      setCurrentPage(1);
-      // scroll ke konten produk
+    if (searchParams.get("category")) {
       setTimeout(() => {
         document.getElementById("product-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
-  }, [searchParams]);
+  }, []);
 
   const toggleItem = (list, setList, item) => {
     if (list.includes(item)) {

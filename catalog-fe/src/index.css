@@ -115,6 +115,38 @@ body {
   animation: fadeUp 0.6s ease both;
 }
 
+.h-tag,
+.h-h1,
+.h-desc,
+.h-btn {
+  animation: none;
+}
+
+/* Pill-shaped indicator dots */
+.h-dot {
+  border: none;
+  cursor: pointer;
+  border-radius: 99px;
+  transition: all 0.35s ease;
+  padding: 0;
+}
+
+.h-dot.on {
+  width: 24px;
+  height: 7px;
+  background: #60a5fa;
+}
+
+.h-dot.off {
+  width: 7px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.h-dot.off:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
 /* ── Button CTA ─────────────────────────── */
 .h-cta {
   display: inline-flex;
@@ -133,6 +165,16 @@ body {
   background: transparent;
   color: #fff;
   transform: translateY(-2px);
+}
+
+/* ── New Product bounce arrow ────────────── */
+@keyframes npBounce {
+  0%, 100% { transform: translateX(0); }
+  50%       { transform: translateX(5px); }
+}
+.np-bounce {
+  display: inline-block;
+  animation: npBounce 1.2s ease-in-out infinite;
 }
 
 /* ── Product Card Hover ─────────────────── */
@@ -158,6 +200,77 @@ body {
   background-size: 300% 300%;
   animation: gradientBorder 2s infinite;
   transform: translateY(-4px);
+}
+
+/* ── Footer ──────────────────────────────── */
+.footer-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 18px 0;
+  padding-bottom: 10px;
+  position: relative;
+}
+.footer-heading::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 28px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #b0bec5;
+  cursor: pointer;
+  position: relative;
+  padding-bottom: 1px;
+  transition: color 0.2s ease;
+}
+.footer-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  width: 0;
+  height: 1px;
+  background: #60a5fa;
+  transition: width 0.25s ease;
+}
+.footer-link:hover {
+  color: #ffffff;
+}
+.footer-link:hover::after {
+  width: calc(100% - 16px);
+}
+.footer-link-arrow {
+  color: #3b82f6;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.footer-social {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.footer-social:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  filter: brightness(1.15);
 }
 
 /* ── Countdown Box ───────────────────────── */

@@ -1,4 +1,5 @@
-const BASE_URL = "/api";
+// const BASE_URL = "/api";
+const BASE_URL = "http://localhost:8000/api";
 
 // ambil token
 const getToken = () => localStorage.getItem("token");

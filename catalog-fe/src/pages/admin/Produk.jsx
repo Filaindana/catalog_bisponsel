@@ -49,7 +49,7 @@ const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
 const formatPrice = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
 
-const kategoriOptions = [
+const defaultKategoriOptions = [
   "Laptop & Komputer",
   "Smartphone",
   "Tablet",
@@ -58,7 +58,7 @@ const kategoriOptions = [
   "Printer",
   "Kamera",
 ];
-const brandOptions = [
+const defaultBrandOptions = [
   "ASUS",
   "Samsung",
   "Apple",
@@ -134,7 +134,7 @@ const CustomSelect = ({
   const toggleOpen = () => {
     setOpen((prev) => {
       if (prev === true) {
-        setHoveredIdx(-1); // reset saat ditutup
+        setHoveredIdx(-1);
       }
       return !prev;
     });
@@ -147,7 +147,6 @@ const CustomSelect = ({
 
   return (
     <div ref={containerRef} style={{ position: "relative", width: "100%" }}>
-      {/* Trigger */}
       <button
         type="button"
         onClick={toggleOpen}
@@ -194,7 +193,6 @@ const CustomSelect = ({
         />
       </button>
 
-      {/* Dropdown panel */}
       <div
         style={{
           position: "absolute",
@@ -248,7 +246,6 @@ const CustomSelect = ({
                 transition: "background 0.12s",
               }}
             >
-              {/* Active dot */}
               <span
                 style={{
                   width: "6px",
@@ -399,7 +396,7 @@ function ViewProductModal({ product, onClose }) {
 /* ══════════════════════════
    ADD MODAL
 ══════════════════════════ */
-function AddProductModal({ onClose, onSave }) {
+function AddProductModal({ onClose, onSave, brandOptions, kategoriOptions }) {
   const [form, setForm] = useState({
     name: "",
     category: "",
@@ -415,6 +412,11 @@ function AddProductModal({ onClose, onSave }) {
     { name: "product-main.jpg", progress: 100, size: "1.2 MB" },
     { name: "product-side.jpg", progress: 65, size: "0.9 MB" },
   ]);
+
+  // ekstrak nama brand saja untuk dropdown (support format string & objek)
+  const brandNames = brandOptions.map((b) =>
+    typeof b === "string" ? b : b.nama
+  );
 
   return (
     <Overlay onClose={onClose}>
@@ -500,7 +502,7 @@ function AddProductModal({ onClose, onSave }) {
                     onChange={(e) =>
                       setForm({ ...form, brand: e.target.value })
                     }
-                    options={brandOptions}
+                    options={brandNames}
                     placeholder="Pilih brand..."
                   />
                 </Field>
@@ -840,12 +842,261 @@ function AddProductModal({ onClose, onSave }) {
   );
 }
 
+/* ══════════════════════════════════════════
+   ADD BRAND & KATEGORI MODAL — dengan upload logo
+══════════════════════════════════════════ */
+function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKategoris }) {
+  const [tab, setTab] = useState("brand");
+  const [inputBrand, setInputBrand] = useState("");
+  const [inputKategori, setInputKategori] = useState("");
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [logoFile, setLogoFile] = useState(null);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleLogoChange = (file) => {
+    if (!file) return;
+    setLogoFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setLogoPreview(e.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const addBrand = () => {
+    if (!inputBrand.trim()) return;
+    setBrands([...brands, { nama: inputBrand.trim(), logo: logoPreview || null }]);
+    setInputBrand("");
+    setLogoPreview(null);
+    setLogoFile(null);
+  };
+
+  const addKategori = () => {
+    if (!inputKategori.trim()) return;
+    setKategoris([...kategoris, inputKategori.trim()]);
+    setInputKategori("");
+  };
+
+  return (
+    <Overlay onClose={onClose}>
+      <div className="bg-white rounded-2xl w-120 overflow-hidden shadow-2xl modal-wrap">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5" style={{ background: NAVY }}>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)" }}>
+              <Layers size={16} color="#fff" />
+            </div>
+            <div>
+              <p className="text-[15px] font-extrabold text-white m-0 mb-0.5">Tambah Brand & Kategori</p>
+              <p className="text-[11px] text-white/55 m-0">Kelola referensi data produk</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
+            <X size={14} />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex border-b border-gray-100 bg-[#fdfdfd]">
+          {["brand", "kategori"].map((t) => (
+            <button key={t} onClick={() => setTab(t)}
+              className="flex-1 py-3.5 border-none bg-transparent cursor-pointer text-[12.5px] font-bold capitalize transition-all"
+              style={{ color: tab === t ? NAVY : "#9ca3af", borderBottom: tab === t ? `2.5px solid ${NAVY}` : "2.5px solid transparent" }}>
+              {t === "brand" ? "Brand" : "Kategori"}
+            </button>
+          ))}
+        </div>
+
+        {/* Body */}
+        <div className="p-6 flex flex-col gap-4 max-h-[70vh] overflow-y-auto">
+          {tab === "brand" ? (
+            <>
+              {/* Input nama brand */}
+              <div>
+                <label className={labelCls}>Nama Brand</label>
+                <input
+                  value={inputBrand}
+                  onChange={(e) => setInputBrand(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addBrand()}
+                  placeholder="Contoh: Sony, Realme, Toshiba..."
+                  className={inputCls}
+                />
+              </div>
+
+              {/* Upload logo */}
+              <div>
+                <label className={labelCls}>Logo Brand</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(e) => handleLogoChange(e.target.files[0])}
+                />
+
+                {!logoPreview ? (
+                  /* Drop zone */
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                    onDragLeave={() => setDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragOver(false);
+                      handleLogoChange(e.dataTransfer.files[0]);
+                    }}
+                    className="flex flex-col items-center gap-2 py-6 rounded-xl border-2 border-dashed cursor-pointer transition-all"
+                    style={{
+                      borderColor: dragOver ? NAVY : "#e2e8f0",
+                      background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
+                    }}
+                  >
+                    <div
+                      className="w-11 h-11 rounded-xl flex items-center justify-center transition-all"
+                      style={{ background: dragOver ? NAVY : "rgba(7,43,80,0.07)" }}
+                    >
+                      <Upload size={20} color={dragOver ? "#fff" : NAVY} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[13px] font-bold text-gray-700 m-0 mb-0.5">
+                        Drag & drop logo di sini
+                      </p>
+                      <p className="text-[11.5px] text-gray-400 m-0">
+                        PNG, SVG, JPG · Maks. 2MB · Transparan lebih baik
+                      </p>
+                    </div>
+                    <div className="px-4 py-2 rounded-lg text-white text-[12px] font-bold" style={{ background: NAVY }}>
+                      Pilih File
+                    </div>
+                  </div>
+                ) : (
+                  /* Preview logo */
+                  <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50">
+                    <div
+                      className="w-16 h-16 rounded-xl flex items-center justify-center border border-gray-200 shrink-0"
+                      style={{ background: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 10px 10px" }}
+                    >
+                      <img src={logoPreview} alt="preview" className="w-12 h-12 object-contain" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-bold text-gray-800 m-0 mb-0.5 truncate">{logoFile?.name}</p>
+                      <p className="text-[11.5px] text-gray-400 m-0">
+                        {logoFile ? (logoFile.size / 1024).toFixed(1) + " KB" : ""}
+                      </p>
+                      <span className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                        <Check size={10} strokeWidth={3} /> Siap diupload
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => { setLogoPreview(null); setLogoFile(null); }}
+                      className="w-7 h-7 rounded-lg border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center shrink-0 hover:bg-red-100 transition-colors"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Tombol tambah */}
+              <button
+                onClick={addBrand}
+                className="w-full py-2.5 rounded-xl border-none text-white text-[13px] font-bold cursor-pointer transition-all hover:opacity-90"
+                style={{
+                  background: NAVY,
+                  boxShadow: "0 4px 14px rgba(7,43,80,0.2)",
+                  opacity: inputBrand.trim() ? 1 : 0.45,
+                }}
+                disabled={!inputBrand.trim()}
+              >
+                Simpan Brand
+              </button>
+
+              {/* Daftar brand */}
+              <div>
+                <label className={labelCls}>Daftar Brand ({brands.length})</label>
+                <div className="flex flex-col gap-2">
+                  {brands.map((b, i) => {
+                    const nama = typeof b === "string" ? b : b.nama;
+                    const logo = typeof b === "string" ? null : b.logo;
+                    return (
+                      <div key={i} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9]">
+                        <div className="flex items-center gap-3">
+                          {logo ? (
+                            <div
+                              className="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 shrink-0"
+                              style={{ background: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 8px 8px" }}
+                            >
+                              <img src={logo} alt={nama} className="w-6 h-6 object-contain" />
+                            </div>
+                          ) : (
+                            <div
+                              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                              style={{ background: "rgba(7,43,80,0.08)" }}
+                            >
+                              <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>
+                                {nama.slice(0, 2).toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          <span className="text-[13px] font-semibold" style={{ color: NAVY }}>{nama}</span>
+                        </div>
+                        <button
+                          onClick={() => setBrands(brands.filter((_, idx) => idx !== i))}
+                          className="w-6 h-6 rounded-md border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:bg-red-100 transition-colors"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex gap-2">
+                <input value={inputKategori} onChange={(e) => setInputKategori(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addKategori()}
+                  placeholder="Nama kategori baru..." className={`${inputCls} flex-1`} />
+                <button onClick={addKategori} className="px-4 py-2.5 rounded-xl border-none text-white text-[12.5px] font-bold cursor-pointer shrink-0" style={{ background: NAVY }}>
+                  + Tambah
+                </button>
+              </div>
+              <label className={labelCls}>Daftar Kategori ({kategoris.length})</label>
+              <div className="flex flex-col gap-2">
+                {kategoris.map((k, i) => (
+                  <div key={i} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9]">
+                    <div className="flex items-center gap-2.5">
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: NAVY }} />
+                      <span className="text-[13px] font-semibold" style={{ color: NAVY }}>{k}</span>
+                    </div>
+                    <button onClick={() => setKategoris(kategoris.filter((_, idx) => idx !== i))}
+                      className="w-6 h-6 rounded-md border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:bg-red-100 transition-colors">
+                      <X size={10} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-end gap-2.5 px-6 py-4 border-t border-gray-100 bg-gray-50">
+          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors">Batal</button>
+          <button onClick={onClose} className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13px] font-bold hover:opacity-90 transition-all" style={{ background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}>Simpan</button>
+        </div>
+      </div>
+    </Overlay>
+  );
+}
+
 /* ══════════════════════════
    MAIN PAGE
 ══════════════════════════ */
 export default function Produk() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showBrandKategoriModal, setShowBrandKategoriModal] = useState(false);
   const [viewProduct, setViewProduct] = useState(null);
   const [editProduct, setEditProduct] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -856,6 +1107,9 @@ export default function Produk() {
     stock: "",
     promo: false,
   });
+
+  const [brandOptions, setBrandOptions] = useState(defaultBrandOptions);
+  const [kategoriOptions, setKategoriOptions] = useState(defaultKategoriOptions);
 
   const [products, setProducts] = useState([]);
   const [meta, setMeta] = useState({
@@ -878,7 +1132,6 @@ export default function Produk() {
 
         console.log("FULL RES:", res);
 
-        // ✅ sekarang langsung array
         const raw = res.data || [];
 
         const mapped = raw.map((item) => ({
@@ -892,8 +1145,6 @@ export default function Produk() {
         }));
 
         setProducts(mapped);
-
-        // ✅ pagination
         setTotalPages(res.last_page || 1);
 
         setMeta({
@@ -1030,16 +1281,28 @@ export default function Produk() {
             Kelola inventaris dan katalog produk Anda di sini
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer hover:opacity-90 hover:-translate-y-px transition-all shrink-0"
-          style={{
-            background: NAVY,
-            boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
-          }}
-        >
-          <Plus size={15} /> Tambah Produk
-        </button>
+        <div className="flex gap-2.5 shrink-0">
+          <button
+            onClick={() => setShowBrandKategoriModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer hover:opacity-90 hover:-translate-y-px transition-all"
+            style={{
+              background: "#0e4a8a",
+              boxShadow: `0 4px 14px rgba(7,43,80,0.2)`,
+            }}
+          >
+            <Layers size={15} /> Brand & Kategori
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer hover:opacity-90 hover:-translate-y-px transition-all"
+            style={{
+              background: NAVY,
+              boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
+            }}
+          >
+            <Plus size={15} /> Tambah Produk
+          </button>
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -1239,6 +1502,17 @@ export default function Produk() {
         <AddProductModal
           onClose={() => setShowAddModal(false)}
           onSave={handleAddSave}
+          brandOptions={brandOptions}
+          kategoriOptions={kategoriOptions}
+        />
+      )}
+      {showBrandKategoriModal && (
+        <AddBrandKategoriModal
+          onClose={() => setShowBrandKategoriModal(false)}
+          brands={brandOptions}
+          setBrands={setBrandOptions}
+          kategoris={kategoriOptions}
+          setKategoris={setKategoriOptions}
         />
       )}
 

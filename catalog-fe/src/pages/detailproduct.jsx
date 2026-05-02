@@ -341,7 +341,7 @@ export default function DetailProduct() {
             </div>
 
             {/* ── RIGHT: PRODUCT INFO ── */}
-            <div className="flex flex-col gap-3.5 p-5 sm:p-6">
+            <div className="flex flex-col gap-5 p-7 sm:p-8">
 
               {/* Category + badge */}
               <div className="flex flex-wrap items-center gap-2">
@@ -396,7 +396,7 @@ export default function DetailProduct() {
                 </div>
               </div>
 
-              {/* Quantity */}
+              {/* Quantity 
               <div>
                 <p className="text-[12px] font-semibold text-gray-600 mb-2">Jumlah</p>
                 <div className="flex items-center">
@@ -410,6 +410,7 @@ export default function DetailProduct() {
                   <span className="ml-3 text-[11px] text-gray-400">maks. {product.stock}</span>
                 </div>
               </div>
+              */}
 
               {/* WhatsApp */}
               <a

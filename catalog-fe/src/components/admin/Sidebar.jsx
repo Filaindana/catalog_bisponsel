@@ -35,7 +35,7 @@ export default function Sidebar() {
           </div>
           <div>
             <h1 className="text-[13.5px] font-extrabold text-slate-900 m-0 leading-tight">
-              BismarCatalog
+              Bizponsel
             </h1>
             <p className="text-[11px] text-slate-400 m-0">Admin Panel</p>
           </div>

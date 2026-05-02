@@ -437,19 +437,19 @@ function AddModal({ onClose, onSave }) {
                 </p>
               </div>
 
-              {/* ── Color Picker ── */}
+              {/* ── Color Picker ── 
               <ColorPicker
                 value={form.bannerColor}
                 onChange={(c) => setForm({ ...form, bannerColor: c })}
-              />
+              /> */}
 
-              {/* Preview */}
+              {/* Preview 
               <div className="flex items-center gap-3">
                 <BannerChip color={form.bannerColor} />
                 <p className="text-[12px] text-gray-400 m-0">
                   Preview warna banner
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 

@@ -44,11 +44,7 @@ export default function Navbar() {
 
       {/* RIGHT — Bell + Admin */}
       <div className="flex items-center gap-4">
-        {/* Notification Bell */}
-        <div className="relative w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center cursor-pointer hover:bg-slate-200 transition-colors">
-          <Bell size={17} className="text-slate-600" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
-        </div>
+        
 
         {/* Admin Info */}
         <div className="flex items-center gap-2.5">

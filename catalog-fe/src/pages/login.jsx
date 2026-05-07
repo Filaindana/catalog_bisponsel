@@ -72,10 +72,11 @@ export default function Login() {
 
       const res = await login(email, password);
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
 
-      navigate("/");
+      const redirectPath = res.user?.peran === "admin" ? "/admin" : "/";
+      navigate(redirectPath);
     } catch (err) {
       setErrorMsg(err.message || "Email atau password salah.");
     } finally {

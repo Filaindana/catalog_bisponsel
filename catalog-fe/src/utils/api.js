@@ -1,10 +1,8 @@
-// const BASE_URL = "/api";
-const BASE_URL = "http://localhost:8000/api";
+const BASE_URL = "/api";
 
 // ambil token
 const getToken = () => localStorage.getItem("token");
 
-// wrapper fetch
 const api = async (endpoint, options = {}) => {
   const token = getToken();
 
@@ -18,7 +16,13 @@ const api = async (endpoint, options = {}) => {
     },
   });
 
-  const data = await res.json();
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    console.log(err);    
+    throw new Error("Response bukan JSON / kosong");
+  }
 
   if (!res.ok) {
     throw new Error(data.message || "API Error");

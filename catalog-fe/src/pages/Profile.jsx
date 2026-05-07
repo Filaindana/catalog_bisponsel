@@ -438,37 +438,68 @@ export default function Profile() {
   const formatPrice = (price) =>
     "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
 
+  // const fetchSaved = async () => {
+  //   try {
+  //     const res = await getFavorit();
+
+  //     const data = res?.data || res || [];
+
+  //     // 🔥 ubah jadi format product
+  //     // const products = data.map((item) => item.produk);
+  //     const products = data.map((item) => {
+  //       const p = item.produk;
+
+  //       return {
+  //         id: p.id,
+  //         // category: p.kategori?.nama || "-",
+  //         category: p.kategori?.nama || categories[p.kategori_id] || "-",
+  //         name: p.nama,
+  //         spec: p.deskripsi || "-",
+  //         price: formatPrice(p.harga),
+  //         rating: p.rating || 0,
+  //         image: p.gambar
+  //           ? `/images/${p.gambar}`
+  //           : "/fallback.jpg",
+  //         badge: p.adalah_promo ? "Sale" : undefined,
+  //       };
+  //     });
+
+  //     setSaved(products);
+  //   } catch (err) {
+  //     console.error(err);
+  //   }
+  // };
+  
   const fetchSaved = async () => {
-    try {
-      const res = await getFavorit();
+  try {
+    const res = await getFavorit();
+    // getFavorit() return raw res sekarang
+    const data = Array.isArray(res?.data) ? res.data : [];
 
-      const data = res?.data || res || [];
-
-      // 🔥 ubah jadi format product
-      // const products = data.map((item) => item.produk);
-      const products = data.map((item) => {
-        const p = item.produk;
+    const products = data
+      .map((item) => {
+        const p = item?.produk;
+        if (!p) return null; // skip kalau data rusak
 
         return {
           id: p.id,
-          // category: p.kategori?.nama || "-",
           category: p.kategori?.nama || categories[p.kategori_id] || "-",
           name: p.nama,
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),
           rating: p.rating || 0,
-          image: p.gambar
-            ? `/images/${p.gambar}`
-            : "/fallback.jpg",
+          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
           badge: p.adalah_promo ? "Sale" : undefined,
         };
-      });
+      })
+      .filter(Boolean); // buang yang null
 
-      setSaved(products);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    setSaved(products);
+  } catch (err) {
+    console.error("fetchSaved error:", err);
+    setSaved([]); // reset ke kosong kalau error
+  }
+};
 
   useEffect(() => {
     if (tab === "saved") {

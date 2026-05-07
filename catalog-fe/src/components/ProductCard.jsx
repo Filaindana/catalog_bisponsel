@@ -27,11 +27,22 @@ export default function ProductCard({
 
   const saveIsFilled = saved || hoverSave;
 
+  // const handleClick = () => {
+  //   if (onClick) {
+  //     onClick();
+  //   } else if (product?.slug) {
+  //     navigate(`/product/${product.slug}`)
+  //   }
+  // };
   const handleClick = () => {
-    if (onClick) {
-      onClick();
-    } else if (product?.id) {
-      navigate(`/product/${product.id}`);
+    console.log("CLICK PRODUCT:", product);
+
+    if (onClick) return onClick();
+
+    if (product?.slug) {
+      navigate(`/product/${product.slug}`);
+    } else {
+      console.warn("Slug kosong!", product);
     }
   };
 

@@ -100,6 +100,10 @@ export default function Product() {
 
       // 🔥 FIX FLEXIBLE RESPONSE
       const list = res?.products || res?.data || [];
+      
+      // 🔥 INI YANG KAMU TAMBAH
+      console.log("🔥 ALL PRODUCTS:", list);
+      console.log("🔥 FIRST PRODUCT:", list?.[0]);
 
       setProducts(list);
       setTotalPages(res?.totalPages || 1);
@@ -527,6 +531,7 @@ export default function Product() {
                 key={product.id}
                 product={{
                   id: product.id,
+                  slug: product.slug, // 🔥 TAMBAH INI
                   category: product.kategori?.nama || "-",
                   name: product.nama,
                   spec: product.deskripsi || "-",

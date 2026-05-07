@@ -6,13 +6,8 @@ import { FiBox, FiUsers, FiTag, FiShield } from "react-icons/fi";
 import "swiper/css";
 
 
-import laptopImg   from "../assets/laptop.png";
-import mouseImg    from "../assets/mouse.png";
-import keyboardImg from "../assets/keyboard.png";
-import soundImg    from "../assets/sound.png";
-import monitorImg  from "../assets/monitor.png";
 import ProductCard from "../components/ProductCard";
-import { getProdukById, getProdukTerkait } from "../utils/services/produkService";
+import { getProdukBySlug, getProdukTerkait } from "../utils/services/produkService";
 
 /* ── Style inject ── */
 if (typeof document !== "undefined" && !document.querySelector("[data-detail-style]")) {
@@ -76,31 +71,6 @@ if (typeof document !== "undefined" && !document.querySelector("[data-detail-sty
   document.head.appendChild(s);
 }
 
-/* ── DATA ── */
-// const product = {
-//   name:"PC Gaming Pro Ryzen Edition",
-//   category:"Komputer (PC)",
-//   price:17499000,
-//   rating:4.8,
-//   reviews:120,
-//   stock:15,
-//   colors:["#1e1e1e","#1a3a5c","#5c1a1a","#2d5c1a"],
-//   colorLabels:["Onyx Black","Navy Blue","Cardinal Red","Forest Green"],
-//   images:[monitorImg,laptopImg,mouseImg,keyboardImg,soundImg],
-//   description:"PC Gaming Pro Ryzen Edition adalah komputer gaming performa tinggi yang dirancang untuk memberikan pengalaman gaming terbaik. Dilengkapi dengan prosesor AMD Ryzen 7 terbaru dan GPU RTX 4060 yang powerful, sistem ini mampu menjalankan game AAA terbaru dengan framerate tinggi.",
-//   specs:[
-//     {attribute:"Prosesor",    detail:"AMD Ryzen 7 7700X"},
-//     {attribute:"GPU",         detail:"NVIDIA RTX 4060 8GB"},
-//     {attribute:"RAM",         detail:"16GB DDR5 5600MHz"},
-//     {attribute:"Storage",     detail:"SSD NVMe 1TB"},
-//     {attribute:"Motherboard", detail:"B650 ATX"},
-//     {attribute:"PSU",         detail:"650W 80+ Gold"},
-//     {attribute:"Case",        detail:"ATX Mid Tower RGB"},
-//     {attribute:"OS",          detail:"Windows 11 Home"},
-//   ],
-// };
-
-
 const GUARANTEES = [
   { icon: <FiBox size={17}/>,    label: "Stok Terupdate",     sub: "Selalu diperbarui"       },
   { icon: <FiUsers size={17}/>,  label: "Layanan Terbaik",    sub: "Cepat dan responsif"     },
@@ -159,25 +129,27 @@ export default function DetailProduct() {
   const [saved, setSaved] = useState([]);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const zoom = useZoom();
-  const [product, setProduct] = useState({
-    name: "",
-    category: "",
-    price: 0,
-    rating: 0,
-    reviews: 0,
-    stock: 0,
-    colors: [],
-    colorLabels: [],
-    images: [],
-    description: "",
-    detailDescription: "",
-    specs: [],
-  });
+  const [product, setProduct] = useState(null);
+  // const [product, setProduct] = useState({
+  //   name: "",
+  //   category: "",
+  //   price: 0,
+  //   rating: 0,
+  //   reviews: 0,
+  //   stock: 0,
+  //   colors: [],
+  //   colorLabels: [],
+  //   images: [],
+  //   description: "",
+  //   detailDescription: "",
+  //   specs: [],
+  // });
 
   const fmt = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g,".");
 
-  const { id } = useParams();
-  console.log("Product ID:", id);
+  // const { id } = useParams();
+  // console.log("Product ID:", id);
+  const { slug } = useParams();
   
   // const BASE_URL = "http://localhost:8000";
 
@@ -187,15 +159,27 @@ export default function DetailProduct() {
     return `/images/${path}`;
   };
 
-  useEffect(() => { window.scrollTo(0, 0); }, [id]);
+  useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const data = await getProdukById(id);
+        // const data = await getProdukBySlug(slug);
+        console.log("SLUG:", slug);
+        const response = await getProdukBySlug(slug);
+        console.log("DETAIL DATA:", response);
 
+        const data = response?.data || response;
+
+        if (!data) {
+          console.error("Produk tidak ditemukan");
+          return;
+        }
+        
         const mapped = {
           id: data.id,
+          slug: data.slug,
+
           name: data.nama,
           price: data.harga,
           stock: data.stok,
@@ -204,20 +188,16 @@ export default function DetailProduct() {
 
           category: data.kategori?.nama || "Produk",
 
-          // ✅ dari backend langsung
-          // images: data.images?.length
-          // ? data.images.map((img) => `${BASE_URL}/storage/${img}`)
-          //   : [`${BASE_URL}/storage/${data.gambar}`],
           images: data.images?.length
             ? data.images.map(getImageUrl)
             : [getImageUrl(data.gambar)],
 
-
           colors: data.colors || [],
           colorLabels: data.color_labels || [],
 
-          description: data.deskripsi_detail,
-          
+          description: data.deskripsi,
+          detailDescription: data.deskripsi_detail,
+
           specs: data.spesifikasi?.length
             ? data.spesifikasi.map((item) => ({
                 attribute: item.atribut,
@@ -235,6 +215,7 @@ export default function DetailProduct() {
           const related = await getProdukTerkait(data.kategori_id, data.id);
           setRelatedProducts(related.map((p) => ({
             id: p.id,
+            slug: p.slug,
             name: p.nama,
             category: p.kategori?.nama || "",
             price: fmt(p.harga),
@@ -248,7 +229,7 @@ export default function DetailProduct() {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [slug]);
   
 
   if (!product) {
@@ -514,7 +495,7 @@ export default function DetailProduct() {
                 }}>
                 {relatedProducts.length === 0 ? (
                   <SwiperSlide>
-                    <p className="text-sm text-gray-400 py-4">Tidak ada produk terkait.</p>
+                    <p className="py-4 text-sm text-gray-400">Tidak ada produk terkait.</p>
                   </SwiperSlide>
                 ) : relatedProducts.map((item, index) => (
                   <SwiperSlide key={item.id}>

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
     class ProdukSeeder extends Seeder
     {
@@ -96,6 +97,7 @@ use Illuminate\Support\Facades\DB;
                 // INSERT PRODUK
                 $produkId = DB::table('produk')->insertGetId([
                     ...$item,
+                    'slug' => Str::slug($item['nama']),
                     'deskripsi_detail' => $deskripsiDetail, // 🔥 INI DIA
                     'colors' => json_encode($colors),
                     'color_labels' => json_encode($colorLabels),

@@ -39,7 +39,7 @@ function AdminRoute() {
   const token = localStorage.getItem("token");
   const user  = getUser();
   if (!token || !user) return <Navigate to="/login" replace />;
-  if (user.role !== "admin") return <Navigate to="/" replace />;
+  if (user.peran !== "admin") return <Navigate to="/" replace />;
   return <Outlet />;
 }
 
@@ -81,19 +81,23 @@ function App() {
           <Route index element={<Home />} />
           <Route path="promo" element={<Promo />} />
           <Route path="product" element={<Product />} />
-          <Route path="product/:id" element={<DetailProduct />} />
-          {/* <Route path="product/detail" element={<DetailProduct />} /> */}
+          {/* <Route path="product/:id" element={<DetailProduct />} /> */}
+          <Route path="product/:slug" element={<DetailProduct />} />
           <Route path="contact" element={<Contact />} />
-          <Route path="profile" element={<Profile />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="profile" element={<Profile />} />
+          </Route>
         </Route>
 
         {/* Admin */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="produk" element={<Produk />} />
-          <Route path="promo" element={<PromoAdmin />} />
-          <Route path="cabang" element={<Cabang />} />
-          <Route path="pengaturan" element={<Pengaturan />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="produk" element={<Produk />} />
+            <Route path="promo" element={<PromoAdmin />} />
+            <Route path="cabang" element={<Cabang />} />
+            <Route path="pengaturan" element={<Pengaturan />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

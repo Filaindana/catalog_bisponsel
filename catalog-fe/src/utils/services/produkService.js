@@ -19,14 +19,13 @@ export const getProdukTerkait = async (kategoriId, excludeId, limit = 8) => {
 };
 
 // GET DETAIL PRODUK
-
-export const getProdukById = async (id) => {
+export const getProdukBySlug = async (slug) => {
   try {
-    const res = await api(`/produk/${id}`);
+    const res = await api(`/produk/${slug}`);
     return res.data;
   } catch (err) {
     console.error("Gagal ambil produk:", err.message);
-    return null; // 🔥 penting
+    return null;
   }
 };
 
@@ -39,16 +38,16 @@ export const createProduk = async (data) => {
 };
 
 // UPDATE PRODUK
-export const updateProduk = async (id, data) => {
-  return await api(`/produk/${id}`, {
+export const updateProduk = async (slug, data) => {
+  return await api(`/produk/${slug}`, {
     method: "PUT",
     body: JSON.stringify(data),
   });
 };
 
 // DELETE PRODUK
-export const deleteProduk = async (id) => {
-  return await api(`/produk/${id}`, {
+export const deleteProduk = async (slug) => {
+  return await api(`/produk/${slug}`, {
     method: "DELETE",
   });
 };

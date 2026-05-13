@@ -130,20 +130,6 @@ export default function DetailProduct() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const zoom = useZoom();
   const [product, setProduct] = useState(null);
-  // const [product, setProduct] = useState({
-  //   name: "",
-  //   category: "",
-  //   price: 0,
-  //   rating: 0,
-  //   reviews: 0,
-  //   stock: 0,
-  //   colors: [],
-  //   colorLabels: [],
-  //   images: [],
-  //   description: "",
-  //   detailDescription: "",
-  //   specs: [],
-  // });
 
   const fmt = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g,".");
 
@@ -151,11 +137,23 @@ export default function DetailProduct() {
   // console.log("Product ID:", id);
   const { slug } = useParams();
   
-  // const BASE_URL = "http://localhost:8000";
-
   const getImageUrl = (path) => {
     if (!path) return "/fallback.jpg";
-    if (path.startsWith("http")) return path;
+
+    // kalau object gambar
+    if (typeof path === "object") {
+      path = path.path;
+    }
+
+    // safety lagi
+    if (typeof path !== "string") {
+      return "/fallback.jpg";
+    }
+
+    if (path.startsWith("http")) {
+      return path;
+    }
+
     return `/images/${path}`;
   };
 

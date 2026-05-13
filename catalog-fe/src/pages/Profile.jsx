@@ -6,17 +6,6 @@ import { useFavorit } from "../context/FavoritContext.jsx";
 import ProductCard from "../components/ProductCard";
 
 const NAVY = "#072B50";
-const PC_IMG = "https://images.unsplash.com/photo-1593640408182-31c228f37e8e?w=400&q=80";
-
-// const categories = [
-//   "Keyboard",
-//   "Kabel Lan",
-//   "Laptop",
-//   "Speaker",
-//   "Mouse",
-//   "Handphone",
-//   "Komputer (PC)",
-// ];
 
 const categories = {
   1: "Laptop",
@@ -438,38 +427,6 @@ export default function Profile() {
   const formatPrice = (price) =>
     "Rp " + price.toLocaleString("id-ID").replace(/,/g, ".");
 
-  // const fetchSaved = async () => {
-  //   try {
-  //     const res = await getFavorit();
-
-  //     const data = res?.data || res || [];
-
-  //     // 🔥 ubah jadi format product
-  //     // const products = data.map((item) => item.produk);
-  //     const products = data.map((item) => {
-  //       const p = item.produk;
-
-  //       return {
-  //         id: p.id,
-  //         // category: p.kategori?.nama || "-",
-  //         category: p.kategori?.nama || categories[p.kategori_id] || "-",
-  //         name: p.nama,
-  //         spec: p.deskripsi || "-",
-  //         price: formatPrice(p.harga),
-  //         rating: p.rating || 0,
-  //         image: p.gambar
-  //           ? `/images/${p.gambar}`
-  //           : "/fallback.jpg",
-  //         badge: p.adalah_promo ? "Sale" : undefined,
-  //       };
-  //     });
-
-  //     setSaved(products);
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
-  // };
-  
   const fetchSaved = async () => {
   try {
     const res = await getFavorit();

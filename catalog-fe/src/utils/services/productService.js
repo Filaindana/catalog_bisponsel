@@ -1,103 +1,78 @@
 import api from "../api";
 
-/* ─────────────────────────────
-   QUERY BUILDER
-───────────────────────────── */
-const buildParams = (filters) => {
-  const params = {};
-
-  if (filters.search) params.search = filters.search;
-  if (filters.maxPrice) params.max_price = filters.maxPrice;
-
-  if (filters.categories?.length) {
-    params["category[]"] = filters.categories;
-  }
-
-  if (filters.status?.length) {
-    params["status[]"] = filters.status;
-  }
-
-  if (filters.discounts?.length) {
-    params["discounts[]"] = filters.discounts;
-  }
-
-  switch (filters.sortBy) {
-    case "Harga Terendah":
-      params.sort = "price_asc";
-      break;
-    case "Harga Tertinggi":
-      params.sort = "price_desc";
-      break;
-    case "Rating":
-      params.sort = "rating";
-      break;
-    default:
-      params.sort = "latest";
-  }
-
-  params.page = filters.page || 1;
-  params.per_page = filters.limit || 15;
-
-  return params;
-};
-
-/* ─────────────────────────────
-   GET LIST PRODUK
-───────────────────────────── */
-export const getProducts = async (filters = {}) => {
-  const params = buildParams(filters);
-
-  const qs = new URLSearchParams();
-  Object.entries(params).forEach(([key, val]) => {
-    if (Array.isArray(val)) {
-      val.forEach((v) => qs.append(key, v));
-    } else if (val !== undefined && val !== null) {
-      qs.append(key, val);
+const productService = {
+  // Get all products with optional query params
+  async getProducts(params = {}) {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const endpoint = queryString ? `/produk?${queryString}` : '/produk';
+      const response = await api(endpoint);
+      console.log('API Response getProducts:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in getProducts:', error);
+      throw error;
     }
-  });
+  },
 
-  const res = await api(`/produk?${qs.toString()}`);
+  // Get single product by slug
+  async getProductBySlug(slug) {
+    try {
+      const response = await api(`/produk/${slug}`);
+      console.log('API Response getProductBySlug:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in getProductBySlug:', error);
+      throw error;
+    }
+  },
 
-  return {
-    products: res.data.data || [],
-    currentPage: res.data.current_page,
-    totalPages: res.data.last_page,
-    meta: res.data.meta || {},
-  };
+  // Create new product
+  async createProduct(data) {
+    try {
+      const response = await api('/produk', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      console.log('API Response createProduct:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in createProduct:', error);
+      throw error;
+    }
+  },
+
+  // Update product by slug
+  async updateProduct(slug, data) {
+    try {
+      const response = await api(`/produk/${slug}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+      console.log('API Response updateProduct:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in updateProduct:', error);
+      throw error;
+    }
+  },
+
+  // Delete product by slug
+  async deleteProduct(slug) {
+    try {
+      const response = await api(`/produk/${slug}`, {
+        method: 'DELETE',
+      });
+      console.log('API Response deleteProduct:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in deleteProduct:', error);
+      throw error;
+    }
+  },
 };
 
-/* ─────────────────────────────
-   GET DETAIL BY SLUG (FIXED)
-───────────────────────────── */
-// export const getProdukBySlug = async (slug) => {
-//   try {
-//     if (!slug) {
-//       console.error("Slug is undefined");
-//       return null;
-//     }
-
-//     const res = await api(`/produk/${slug}`);
-
-//     return res.data.data;
-//   } catch (err) {
-//     console.error("Gagal ambil produk:", err.message);
-//     return null;
-//   }
-// };
-
-export const getProdukBySlug = async (slug) => {
-  try {
-    const res = await api(`/produk/${slug}`);
-
-    console.log("FULL RES:", res);
-    console.log("RES.DATA:", res.data);
-
-    return res.data;
-  } catch (err) {
-    console.error("Gagal ambil produk:", err);
-    return null;
-  }
-};
+export default productService;
 
 /* ─────────────────────────────
    RELATED PRODUCTS

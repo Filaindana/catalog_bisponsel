@@ -1,9 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import {
-  getProduk,
-  deleteProduk,
-  createProduk,
-} from "../../utils/services/produkService";
+import productService from "../../utils/services/productService";
 import {
   Eye,
   Pencil,
@@ -878,11 +874,11 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
 
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-white rounded-2xl w-120 overflow-hidden shadow-2xl modal-wrap">
+      <div className="overflow-hidden bg-white shadow-2xl rounded-2xl w-120 modal-wrap">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5" style={{ background: NAVY }}>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)" }}>
+            <div className="flex items-center justify-center w-9 h-9 rounded-xl" style={{ background: "rgba(255,255,255,0.15)" }}>
               <Layers size={16} color="#fff" />
             </div>
             <div>
@@ -890,7 +886,7 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
               <p className="text-[11px] text-white/55 m-0">Kelola referensi data produk</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg border-none cursor-pointer flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
+          <button onClick={onClose} className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer" style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
             <X size={14} />
           </button>
         </div>
@@ -944,14 +940,14 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                       setDragOver(false);
                       handleLogoChange(e.dataTransfer.files[0]);
                     }}
-                    className="flex flex-col items-center gap-2 py-6 rounded-xl border-2 border-dashed cursor-pointer transition-all"
+                    className="flex flex-col items-center gap-2 py-6 transition-all border-2 border-dashed cursor-pointer rounded-xl"
                     style={{
                       borderColor: dragOver ? NAVY : "#e2e8f0",
                       background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
                     }}
                   >
                     <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center transition-all"
+                      className="flex items-center justify-center transition-all w-11 h-11 rounded-xl"
                       style={{ background: dragOver ? NAVY : "rgba(7,43,80,0.07)" }}
                     >
                       <Upload size={20} color={dragOver ? "#fff" : NAVY} />
@@ -970,12 +966,12 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                   </div>
                 ) : (
                   /* Preview logo */
-                  <div className="flex items-center gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50">
+                  <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
                     <div
-                      className="w-16 h-16 rounded-xl flex items-center justify-center border border-gray-200 shrink-0"
+                      className="flex items-center justify-center w-16 h-16 border border-gray-200 rounded-xl shrink-0"
                       style={{ background: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 10px 10px" }}
                     >
-                      <img src={logoPreview} alt="preview" className="w-12 h-12 object-contain" />
+                      <img src={logoPreview} alt="preview" className="object-contain w-12 h-12" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] font-bold text-gray-800 m-0 mb-0.5 truncate">{logoFile?.name}</p>
@@ -988,7 +984,7 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                     </div>
                     <button
                       onClick={() => { setLogoPreview(null); setLogoFile(null); }}
-                      className="w-7 h-7 rounded-lg border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center shrink-0 hover:bg-red-100 transition-colors"
+                      className="flex items-center justify-center text-red-500 transition-colors border-none rounded-lg cursor-pointer w-7 h-7 bg-red-50 shrink-0 hover:bg-red-100"
                     >
                       <X size={12} />
                     </button>
@@ -1022,14 +1018,14 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                         <div className="flex items-center gap-3">
                           {logo ? (
                             <div
-                              className="w-8 h-8 rounded-lg flex items-center justify-center border border-gray-200 shrink-0"
+                              className="flex items-center justify-center w-8 h-8 border border-gray-200 rounded-lg shrink-0"
                               style={{ background: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 8px 8px" }}
                             >
-                              <img src={logo} alt={nama} className="w-6 h-6 object-contain" />
+                              <img src={logo} alt={nama} className="object-contain w-6 h-6" />
                             </div>
                           ) : (
                             <div
-                              className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                              className="flex items-center justify-center w-8 h-8 rounded-lg shrink-0"
                               style={{ background: "rgba(7,43,80,0.08)" }}
                             >
                               <span className="text-[10px] font-extrabold" style={{ color: NAVY }}>
@@ -1041,7 +1037,7 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                         </div>
                         <button
                           onClick={() => setBrands(brands.filter((_, idx) => idx !== i))}
-                          className="w-6 h-6 rounded-md border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:bg-red-100 transition-colors"
+                          className="flex items-center justify-center w-6 h-6 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100"
                         >
                           <X size={10} />
                         </button>
@@ -1070,7 +1066,7 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                       <span className="text-[13px] font-semibold" style={{ color: NAVY }}>{k}</span>
                     </div>
                     <button onClick={() => setKategoris(kategoris.filter((_, idx) => idx !== i))}
-                      className="w-6 h-6 rounded-md border-none bg-red-50 text-red-500 cursor-pointer flex items-center justify-center hover:bg-red-100 transition-colors">
+                      className="flex items-center justify-center w-6 h-6 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100">
                       <X size={10} />
                     </button>
                   </div>
@@ -1112,6 +1108,8 @@ export default function Produk() {
   const [kategoriOptions, setKategoriOptions] = useState(defaultKategoriOptions);
 
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [meta, setMeta] = useState({
     promo_count: 0,
     low_stock_count: 0,
@@ -1122,114 +1120,171 @@ export default function Produk() {
   const promoCount = meta.promo_count;
   const lowStockCount = meta.low_stock_count;
 
-  useEffect(() => {
-    const fetchProduk = async () => {
-      try {
-        const res = await getProduk({
-          page: currentPage,
-          limit: 12,
-        });
-
-        console.log("FULL RES:", res);
-
-        const raw = res.data || [];
-
-        const mapped = raw.map((item) => ({
-          id: item.id,
-          name: item.nama,
-          category: item.kategori?.nama || "-",
-          price: item.harga,
-          stock: item.stok,
-          promo: item.adalah_promo,
-          image: "📦",
-        }));
-
-        setProducts(mapped);
-        setTotalPages(res.last_page || 1);
-
-        setMeta({
-          promo_count: mapped.filter((p) => p.promo).length,
-          low_stock_count: mapped.filter((p) => p.stock < 10).length,
-        });
-      } catch (err) {
-        console.error("Gagal ambil produk:", err);
-      }
-    };
-
-    fetchProduk();
-  }, [currentPage]);
-
-  const openEdit = (p) => {
-    setEditProduct(p);
-    setEditForm({
-      name: p.name,
-      category: p.category,
-      price: String(p.price),
-      stock: String(p.stock),
-      promo: p.promo,
-    });
-  };
-  const handleSaveEdit = () => {
-    if (editProduct)
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.id === editProduct.id
-            ? {
-                ...p,
-                ...editForm,
-                price: Number(editForm.price),
-                stock: Number(editForm.stock),
-              }
-            : p,
-        ),
-      );
-    setEditProduct(null);
-  };
-
-  const handleDelete = async () => {
+  // Fetch products function
+  const fetchProducts = async () => {
     try {
-      await deleteProduk(deleteId);
-      setDeleteId(null);
-      const res = await getProduk(currentPage);
-      setProducts(
-        res.data.map((item) => ({
-          id: item.id,
-          name: item.nama,
-          category: item.kategori?.nama || "-",
-          price: item.harga,
-          stock: item.stok,
-          promo: item.adalah_promo,
-          image: "📦",
-        })),
-      );
-    } catch (err) {
-      console.error(err);
+      setLoading(true);
+      setError("");
+
+      const params = {
+        page: currentPage,
+        per_page: 12,
+      };
+
+      const response = await productService.getProducts(params);
+
+      console.log("API Response:", response);
+
+      const raw = response.data?.data || [];
+
+      const mapped = raw.map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        name: item.nama,
+        category: item.kategori?.nama || "-",
+        price: item.harga,
+        stock: item.stok,
+        promo: item.adalah_promo,
+        image: "📦",
+        // Keep full data for editing
+        fullData: item,
+      }));
+
+      setProducts(mapped);
+      setTotalPages(response.data?.last_page || 1);
+      setMeta(response.meta || {
+        promo_count: 0,
+        low_stock_count: 0,
+      });
+
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setError(error.message || "Failed to fetch products");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAddSave = async (data) => {
+  useEffect(() => {
+    fetchProducts();
+  }, [currentPage]);
+
+  const handleUpdate = async (slug, data) => {
     try {
-      await createProduk({
+      setLoading(true);
+      setError("");
+
+      const productData = {
+        kategori_id: data.kategori_id,
         nama: data.name,
-        kategori_id: 1,
+        slug: data.slug || undefined, // Don't send if empty
+        deskripsi: data.deskripsi || "",
+        deskripsi_detail: data.deskripsi_detail || "",
         harga: Number(data.price),
         stok: Number(data.stock),
-        deskripsi: data.description,
+        rating: data.rating || 0,
+        adalah_promo: data.promo || false,
+        gambar: data.gambar || [], // Array of image URLs
+        spesifikasi: data.spesifikasi || [], // Array of {atribut, detail}
+      };
+
+      await productService.updateProduct(slug, productData);
+
+      // Refresh products after update
+      await fetchProducts();
+
+      setEditProduct(null);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      setError(error.message || "Failed to update product");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openEdit = (product) => {
+    setEditProduct(product);
+    setEditForm({
+      name: product.name,
+      category: product.category,
+      price: String(product.price),
+      stock: String(product.stock),
+      promo: product.promo,
+      // Add more fields as needed
+      slug: product.slug,
+      deskripsi: product.fullData?.deskripsi || "",
+      deskripsi_detail: product.fullData?.deskripsi_detail || "",
+      rating: product.fullData?.rating || 0,
+      gambar: product.fullData?.gambar?.map(g => g.url_gambar) || [],
+      spesifikasi: product.fullData?.spesifikasi?.map(s => ({
+        atribut: s.atribut,
+        detail: s.detail
+      })) || [],
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editProduct) {
+      handleUpdate(editProduct.slug, {
+        ...editForm,
+        price: Number(editForm.price),
+        stock: Number(editForm.stock),
       });
-      const res = await getProduk(currentPage);
-      setProducts(
-        res.data.map((item) => ({
-          id: item.id,
-          name: item.nama,
-          category: item.kategori?.nama || "-",
-          price: item.harga,
-          stock: item.stok,
-          promo: item.adalah_promo,
-          image: "📦",
-        })),
-      );
-    } catch (err) {
-      console.error(err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteId) return;
+
+    try {
+      setLoading(true);
+      setError("");
+
+      await productService.deleteProduct(deleteId);
+
+      // Refresh products after delete
+      await fetchProducts();
+
+      setDeleteId(null);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      setError(error.message || "Failed to delete product");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async (formData) => {
+    try {
+      setLoading(true);
+      setError("");
+
+      // Map form data to backend format
+      const productData = {
+        kategori_id: 1, // Default kategori, bisa diubah berdasarkan form.category
+        nama: formData.name,
+        slug: undefined, // Let backend generate
+        deskripsi: formData.description,
+        deskripsi_detail: "",
+        harga: Number(formData.price),
+        stok: Number(formData.stock),
+        rating: 0,
+        adalah_promo: false,
+        gambar: [], // For now empty, can be updated later
+        spesifikasi: [], // For now empty, can be updated later
+      };
+
+      await productService.createProduct(productData);
+
+      // Refresh products after create
+      await fetchProducts();
+
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("Error creating product:", error);
+      setError(error.message || "Failed to create product");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1333,6 +1388,26 @@ export default function Produk() {
         ))}
       </div>
 
+      {/* Error Display */}
+      {error && (
+        <div className="p-4 mb-4 border border-red-200 bg-red-50 rounded-xl">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} color="#dc2626" />
+            <span className="font-medium text-red-700">Error: {error}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Loading Display */}
+      {loading && (
+        <div className="p-4 mb-4 border border-blue-200 bg-blue-50 rounded-xl">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-b-2 border-blue-600 rounded-full animate-spin"></div>
+            <span className="font-medium text-blue-700">Loading...</span>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
         <div
@@ -1429,7 +1504,7 @@ export default function Produk() {
                         <Pencil size={13} />
                       </button>
                       <button
-                        onClick={() => setDeleteId(product.id)}
+                        onClick={() => setDeleteId(product.slug)}
                         className="flex items-center justify-center w-8 h-8 text-red-500 border-none rounded-lg cursor-pointer action-btn"
                       >
                         <Trash2 size={13} />
@@ -1501,7 +1576,7 @@ export default function Produk() {
       {showAddModal && (
         <AddProductModal
           onClose={() => setShowAddModal(false)}
-          onSave={handleAddSave}
+          onSave={handleCreate}
           brandOptions={brandOptions}
           kategoriOptions={kategoriOptions}
         />

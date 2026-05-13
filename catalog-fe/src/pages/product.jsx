@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
 import ProductCard from "../components/ProductCard.jsx";
-import { getProducts } from "../utils/services/productService.js";
+import productService from "../utils/services/productService.js";
 import { useFavorit } from "../context/FavoritContext.jsx";
 
 const categories = [
@@ -87,26 +87,28 @@ export default function Product() {
     try {
       setLoading(true);
 
-      const res = await getProducts({
+      const res = await productService.getProducts({
         page: currentPage,
         search: searchQuery,
         sortBy: sortBy,
-        categories: selectedCategories,
-        discounts: selectedDiscounts,
+        categories: selectedCategories.join(","),
+        discounts: selectedDiscounts.join(","),
         maxPrice: priceRange < 50000000 ? priceRange : undefined,
       });
 
       console.log("RES:", res);
 
       // 🔥 FIX FLEXIBLE RESPONSE
-      const list = res?.products || res?.data || [];
+      // const list = res?.products || res?.data || [];
+      const list = res?.data?.data || [];
       
       // 🔥 INI YANG KAMU TAMBAH
       console.log("🔥 ALL PRODUCTS:", list);
       console.log("🔥 FIRST PRODUCT:", list?.[0]);
 
       setProducts(list);
-      setTotalPages(res?.totalPages || 1);
+      // setTotalPages(res?.totalPages || 1);
+      setTotalPages(res?.data?.last_page || 1);
 
     } catch (err) {
       console.error(err);
@@ -537,8 +539,9 @@ export default function Product() {
                   spec: product.deskripsi || "-",
                   price: formatPrice(product.harga),
                   rating: product.rating || 0,
-                  image: product.gambar
-                    ? `/images/${product.gambar}`
+                  image:
+                  Array.isArray(product.images) && product.images.length > 0
+                    ? `http://127.0.0.1:8000/storage/${product.images[0]}`
                     : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}

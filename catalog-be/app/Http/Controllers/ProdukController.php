@@ -3,17 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Produk;
-use App\Models\GambarProduk;
-use App\Models\SpesifikasiProduk;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Routing\Controller as BaseController;
 
-class ProdukController
+class ProdukController extends BaseController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Produk::with(['kategori', 'spesifikasi']);
-        // $query = Produk::with(['kategori', 'spesifikasi', 'gambar']);
+        $query = Produk::with(['kategori', 'spesifikasi', 'gambar']);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
@@ -60,7 +60,7 @@ class ProdukController
             'price_asc'  => $query->orderBy('harga', 'asc'),
             'price_desc' => $query->orderBy('harga', 'desc'),
             'rating'     => $query->orderBy('rating', 'desc'),
-            default      => $query->orderBy('dibuat_pada', 'desc'),
+            default      => $query->latest(),
         };
 
         $produk = $query->paginate($request->get('per_page', 12))
@@ -82,14 +82,9 @@ class ProdukController
         ]);
     }
 
-    // public function show(int $id): JsonResponse
-    // {
-    //     $produk = Produk::with(['kategori', 'spesifikasi', 'promo'])->findOrFail($id);
     public function show(string $slug): JsonResponse
     {
-        // dd($slug);
-
-        $produk = Produk::with(['kategori', 'spesifikasi', 'promo'])
+        $produk = Produk::with(['kategori', 'spesifikasi', 'promo', 'gambar'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -112,41 +107,53 @@ class ProdukController
             'rating'            => 'nullable|numeric|min:0|max:5',
             'adalah_promo'      => 'boolean',
             'gambar'            => 'nullable|array',
-            'gambar.*'          => 'url',
+            'gambar.*'          => 'nullable|string',
             'spesifikasi'       => 'nullable|array',
             'spesifikasi.*.atribut' => 'required_with:spesifikasi|string',
             'spesifikasi.*.detail'  => 'required_with:spesifikasi|string',
         ]);
 
-        $produk = Produk::create($validated);
+        try {
+            DB::beginTransaction();
 
-        if (!empty($validated['gambar'])) {
-            foreach ($validated['gambar'] as $url) {
-                GambarProduk::create(['produk_id' => $produk->id, 'url_gambar' => $url]);
+            $produkData = collect($validated)->except(['gambar', 'spesifikasi'])->toArray();
+            $produkData['slug'] = $validated['slug'] ?? Str::slug($validated['nama']);
+
+            $produk = Produk::create($produkData);
+
+            if (!empty($validated['gambar'])) {
+                foreach ($validated['gambar'] as $url) {
+                    $produk->gambar()->create(['url_gambar' => $url]);
+                }
             }
-        }
 
-        if (!empty($validated['spesifikasi'])) {
-            foreach ($validated['spesifikasi'] as $spec) {
-                SpesifikasiProduk::create([
-                    'produk_id' => $produk->id,
-                    'atribut'   => $spec['atribut'],
-                    'detail'    => $spec['detail'],
-                ]);
+            if (!empty($validated['spesifikasi'])) {
+                foreach ($validated['spesifikasi'] as $spec) {
+                    $produk->spesifikasi()->create([
+                        'atribut' => $spec['atribut'],
+                        'detail'  => $spec['detail'],
+                    ]);
+                }
             }
-        }
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Produk berhasil dibuat.',
-            'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi']),
-        ], 201);
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Produk berhasil dibuat.',
+                'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi']),
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    // public function update(Request $request, int $id): JsonResponse
-    // {
-    //     $produk = Produk::findOrFail($id);
-    public function update(Request $request, string $slug)
+    public function update(Request $request, string $slug): JsonResponse
     {
         $produk = Produk::where('slug', $slug)->firstOrFail();
 
@@ -159,54 +166,82 @@ class ProdukController
             'harga'             => 'sometimes|integer|min:0',
             'stok'              => 'sometimes|integer|min:0',
             'rating'            => 'nullable|numeric|min:0|max:5',
-            'adalah_promo'      => 'boolean',
+            'adalah_promo'      => 'sometimes|boolean',
             'gambar'            => 'nullable|array',
-            'gambar.*'          => 'url',
+            'gambar.*'          => 'nullable|string',
             'spesifikasi'       => 'nullable|array',
             'spesifikasi.*.atribut' => 'required_with:spesifikasi|string',
             'spesifikasi.*.detail'  => 'required_with:spesifikasi|string',
         ]);
 
-        $produk->update($validated);
+        try {
+            DB::beginTransaction();
 
-        if (isset($validated['gambar'])) {
-            $produk->gambar()->delete();
-            foreach ($validated['gambar'] as $url) {
-                GambarProduk::create(['produk_id' => $produk->id, 'url_gambar' => $url]);
+            $produkData = collect($validated)->except(['gambar', 'spesifikasi'])->toArray();
+            if (empty($produkData['slug'])) {
+                unset($produkData['slug']);
             }
-        }
 
-        if (isset($validated['spesifikasi'])) {
-            $produk->spesifikasi()->delete();
-            foreach ($validated['spesifikasi'] as $spec) {
-                SpesifikasiProduk::create([
-                    'produk_id' => $produk->id,
-                    'atribut'   => $spec['atribut'],
-                    'detail'    => $spec['detail'],
-                ]);
+            $produk->update($produkData);
+
+            if (isset($validated['gambar'])) {
+                $produk->gambar()->delete();
+                foreach ($validated['gambar'] as $url) {
+                    $produk->gambar()->create(['url_gambar' => $url]);
+                }
             }
-        }
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Produk berhasil diperbarui.',
-            'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi']),
-        ]);
+            if (isset($validated['spesifikasi'])) {
+                $produk->spesifikasi()->delete();
+                foreach ($validated['spesifikasi'] as $spec) {
+                    $produk->spesifikasi()->create([
+                        'atribut' => $spec['atribut'],
+                        'detail'  => $spec['detail'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Produk berhasil diperbarui.',
+                'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi']),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    // public function destroy(int $id): JsonResponse
-    // {
-    //     $produk = Produk::findOrFail($id);
-    public function destroy(string $slug)
+    public function destroy(string $slug): JsonResponse
     {
         $produk = Produk::where('slug', $slug)->firstOrFail();
-        $produk->gambar()->delete();
-        $produk->spesifikasi()->delete();
-        $produk->delete();
 
-        return response()->json([
-            'status'  => true,
-            'message' => 'Produk berhasil dihapus.',
-        ]);
+        try {
+            DB::beginTransaction();
+
+            $produk->gambar()->delete();
+            $produk->spesifikasi()->delete();
+            $produk->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => true,
+                'message' => 'Produk berhasil dihapus.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

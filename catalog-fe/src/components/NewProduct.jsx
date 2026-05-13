@@ -66,16 +66,24 @@ export default function NewProduct() {
       try {
         const res = await api("/produk?sort=latest&per_page=8");
         const list = res?.data?.data || [];
+
         setProducts(list.map((p) => ({
           id: p.id,
+          slug: p.slug, 
           name: p.nama,
           category: p.kategori?.nama || "-",
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),
           rating: p.rating || 0,
-          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
+
+          image:
+            Array.isArray(p.images) && p.images.length > 0
+              ? `http://127.0.0.1:8000/storage/${p.images[0]}`
+              : "/fallback.jpg",
+
           badge: "New",
         })));
+        
       } catch (err) {
         console.error(err);
       }
@@ -104,7 +112,7 @@ export default function NewProduct() {
               <button
                 key={dir}
                 onClick={() => advance(dir)}
-                className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 cursor-pointer transition-all duration-200"
+                className="flex items-center justify-center w-10 h-10 text-xl text-gray-600 transition-all duration-200 bg-white rounded-full cursor-pointer"
                 style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 0 }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#374151"; e.currentTarget.style.borderColor = "#e5e7eb"; }}

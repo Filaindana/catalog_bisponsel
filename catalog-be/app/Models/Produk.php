@@ -25,7 +25,6 @@ class Produk extends Model
         'stok',
         'rating',
         'adalah_promo',
-        'gambar',
     ];
 
     protected $casts = [
@@ -55,7 +54,7 @@ class Produk extends Model
     //     return $this->hasMany(GambarProduk::class, 'produk_id');
     // }
 
-    public function spesifikasi()
+    public function spesifikasi(): HasMany
     {
         return $this->hasMany(SpesifikasiProduk::class, 'produk_id');
     }

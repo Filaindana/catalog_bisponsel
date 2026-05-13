@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 // 🔐 AUTH
 // use App\Http\Controllers\Api\AuthController;
 
-// 📦 CONTROLLERS (INDONESIA)
+// 📦 CONTROLLERS
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
@@ -47,15 +47,16 @@ Route::prefix('auth')->group(function () {
 // 🌐 PUBLIC
 // =======================
 
-// Produk + relasi
-Route::apiResource('produk', ProdukController::class)->only(['index', 'show']);
+// Route::apiResource('produk', ProdukController::class)->only(['index', 'show']);
 Route::apiResource('kategori', KategoriController::class)->only(['index', 'show']);
 Route::apiResource('promo', PromoController::class)->only(['index', 'show']);
 
 // Relasi tambahan
-Route::get('/produk/{id}', [GambarProdukController::class, 'show']);
-Route::get('/produk/{id}/gambar', [GambarProdukController::class, 'index']);
-Route::get('/produk/{id}/spesifikasi', [SpesifikasiProdukController::class, 'index']);
+// Route::get('/produk/{id}', [GambarProdukController::class, 'show']);
+Route::get('/produk', [ProdukController::class, 'index']);
+Route::get('/produk/{slug}', [ProdukController::class, 'show']);
+Route::get('/produk/{slug}/gambar', [GambarProdukController::class, 'index']);
+Route::get('/produk/{slug}/spesifikasi', [SpesifikasiProdukController::class, 'index']);
 
 // Cabang & aktivitas
 Route::apiResource('cabang', CabangController::class)->only(['index', 'show']);
@@ -72,6 +73,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 👤 User
     Route::get('/users', [UsersController::class, 'index']);
+    Route::put('/users/{id}', [UsersController::class, 'update']);
 
     // 🛍️ Produk
     Route::apiResource('produk', ProdukController::class)->except(['index', 'show']);

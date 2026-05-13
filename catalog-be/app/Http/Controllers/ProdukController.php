@@ -13,24 +13,57 @@ class ProdukController
     public function index(Request $request): JsonResponse
     {
         $query = Produk::with(['kategori', 'spesifikasi']);
+        // $query = Produk::with(['kategori', 'spesifikasi', 'gambar']);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
+        }
+
+        if ($request->filled('category')) {
+            $categories = (array) $request->input('category');
+            $query->whereHas('kategori', fn($q) => $q->whereIn('nama', $categories));
         }
 
         if ($request->filled('adalah_promo')) {
             $query->where('adalah_promo', filter_var($request->adalah_promo, FILTER_VALIDATE_BOOLEAN));
         }
 
+        if ($request->filled('discounts')) {
+            $discounts = (array) $request->input('discounts');
+            if (in_array('Diskon', $discounts)) {
+                $query->where('adalah_promo', true);
+            }
+        }
+
         if ($request->filled('search')) {
             $query->where('nama', 'like', '%' . $request->search . '%');
         }
 
-        // PAGINATION (buat table)
-        // $produk = $query->orderBy('dibuat_pada', 'desc')
-        //     ->paginate($request->get('per_page', 12));
-        $produk = $query->orderBy('dibuat_pada', 'desc')
-            ->paginate($request->get('per_page', 12))
+        if ($request->filled('max_price')) {
+            $query->where('harga', '<=', (int) $request->max_price);
+        }
+
+        if ($request->filled('status')) {
+            $statusList = (array) $request->input('status');
+            $query->where(function ($q) use ($statusList) {
+                if (in_array('Tersedia', $statusList)) {
+                    $q->orWhere('stok', '>', 0);
+                }
+                if (in_array('Tidak Tersedia', $statusList)) {
+                    $q->orWhere('stok', '=', 0);
+                }
+            });
+        }
+
+        $sort = $request->input('sort', 'latest');
+        match ($sort) {
+            'price_asc'  => $query->orderBy('harga', 'asc'),
+            'price_desc' => $query->orderBy('harga', 'desc'),
+            'rating'     => $query->orderBy('rating', 'desc'),
+            default      => $query->orderBy('dibuat_pada', 'desc'),
+        };
+
+        $produk = $query->paginate($request->get('per_page', 12))
             ->appends($request->query());
 
         // 🔥 GLOBAL COUNT (BUKAN PER PAGE)
@@ -49,9 +82,16 @@ class ProdukController
         ]);
     }
 
-    public function show(int $id): JsonResponse
+    // public function show(int $id): JsonResponse
+    // {
+    //     $produk = Produk::with(['kategori', 'spesifikasi', 'promo'])->findOrFail($id);
+    public function show(string $slug): JsonResponse
     {
-        $produk = Produk::with(['kategori', 'spesifikasi', 'promo'])->findOrFail($id);
+        // dd($slug);
+
+        $produk = Produk::with(['kategori', 'spesifikasi', 'promo'])
+            ->where('slug', $slug)
+            ->firstOrFail();
 
         return response()->json([
             'status' => true,
@@ -64,6 +104,7 @@ class ProdukController
         $validated = $request->validate([
             'kategori_id'       => 'required|exists:kategori,id',
             'nama'              => 'required|string|max:255',
+            'slug'              => 'nullable|string|max:255|unique:produk,slug',
             'deskripsi'         => 'nullable|string',
             'deskripsi_detail'  => 'nullable|string',
             'harga'             => 'required|integer|min:0',
@@ -102,13 +143,17 @@ class ProdukController
         ], 201);
     }
 
-    public function update(Request $request, int $id): JsonResponse
+    // public function update(Request $request, int $id): JsonResponse
+    // {
+    //     $produk = Produk::findOrFail($id);
+    public function update(Request $request, string $slug)
     {
-        $produk = Produk::findOrFail($id);
+        $produk = Produk::where('slug', $slug)->firstOrFail();
 
         $validated = $request->validate([
             'kategori_id'       => 'sometimes|exists:kategori,id',
             'nama'              => 'sometimes|string|max:255',
+            'slug'              => 'nullable|string|max:255|unique:produk,slug,' . $produk->id,
             'deskripsi'         => 'nullable|string',
             'deskripsi_detail'  => 'nullable|string',
             'harga'             => 'sometimes|integer|min:0',
@@ -149,9 +194,12 @@ class ProdukController
         ]);
     }
 
-    public function destroy(int $id): JsonResponse
+    // public function destroy(int $id): JsonResponse
+    // {
+    //     $produk = Produk::findOrFail($id);
+    public function destroy(string $slug)
     {
-        $produk = Produk::findOrFail($id);
+        $produk = Produk::where('slug', $slug)->firstOrFail();
         $produk->gambar()->delete();
         $produk->spesifikasi()->delete();
         $produk->delete();

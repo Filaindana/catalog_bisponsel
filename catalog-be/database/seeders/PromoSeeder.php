@@ -34,32 +34,59 @@ class PromoSeeder extends Seeder
             ['Gaming Gear Rush', 'Diskon keyboard, mouse, headset gaming.'],
         ];
 
+        // foreach ($data as $i => $item) {
+
+        //     // Random status
+        //     $statusList = ['aktif', 'segera', 'berakhir'];
+        //     $status = $statusList[array_rand($statusList)];
+
+        //     // Atur tanggal berdasarkan status
+        //     if ($status === 'aktif') {
+        //         $start = $now->copy()->subDays(rand(1, 10));
+        //         $end   = $now->copy()->addDays(rand(1, 10));
+        //     } elseif ($status === 'segera') {
+        //         $start = $now->copy()->addDays(rand(5, 20));
+        //         $end   = $start->copy()->addDays(rand(1, 10));
+        //     } else {
+        //         $start = $now->copy()->subDays(rand(20, 40));
+        //         $end   = $now->copy()->subDays(rand(1, 10));
+        //     }
+
+        //     $promo[] = [
+        //         'nama'            => $item[0],
+        //         'deskripsi'       => $item[1],
+        //         'tanggal_mulai'   => $start,
+        //         'tanggal_selesai' => $end,
+        //         'status'          => $status,
+        //         'banner'          => 'https://source.unsplash.com/1200x600/?technology,' . ($i + 1),
+        //         'dibuat_pada'     => $start->copy()->subDays(rand(5, 15)),
+        //         'diperbarui_pada' => $start,
+        //     ];
+        // }
         foreach ($data as $i => $item) {
 
-            // Random status
-            $statusList = ['aktif', 'segera', 'berakhir'];
-            $status = $statusList[array_rand($statusList)];
-
-            // Atur tanggal berdasarkan status
-            if ($status === 'aktif') {
-                $start = $now->copy()->subDays(rand(1, 10));
-                $end   = $now->copy()->addDays(rand(1, 10));
-            } elseif ($status === 'segera') {
-                $start = $now->copy()->addDays(rand(5, 20));
-                $end   = $start->copy()->addDays(rand(1, 10));
+            if ($i < 7) {
+                $status = 'aktif';
+                $start = $now->copy()->subDays(rand(1, 5));
+                $end   = $now->copy()->addDays(rand(5, 15));
+            } elseif ($i < 11) {
+                $status = 'segera';
+                $start = $now->copy()->addDays(rand(5, 15));
+                $end   = $start->copy()->addDays(rand(5, 10));
             } else {
+                $status = 'berakhir';
                 $start = $now->copy()->subDays(rand(20, 40));
                 $end   = $now->copy()->subDays(rand(1, 10));
             }
 
             $promo[] = [
-                'nama'            => $item[0],
-                'deskripsi'       => $item[1],
-                'tanggal_mulai'   => $start,
+                'nama' => $item[0],
+                'deskripsi' => $item[1],
+                'tanggal_mulai' => $start,
                 'tanggal_selesai' => $end,
-                'status'          => $status,
-                'banner'          => 'https://source.unsplash.com/1200x600/?technology,' . ($i + 1),
-                'dibuat_pada'     => $start->copy()->subDays(rand(5, 15)),
+                'status' => $status,
+                'banner' => 'https://source.unsplash.com/1200x600/?technology,' . ($i + 1),
+                'dibuat_pada' => $start->copy()->subDays(rand(5, 15)),
                 'diperbarui_pada' => $start,
             ];
         }

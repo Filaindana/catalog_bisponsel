@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class Produk extends Model
 {
@@ -17,6 +18,7 @@ class Produk extends Model
     protected $fillable = [
         'kategori_id',
         'nama',
+        'slug',
         'deskripsi',
         'deskripsi_detail',
         'harga',
@@ -53,11 +55,6 @@ class Produk extends Model
     //     return $this->hasMany(GambarProduk::class, 'produk_id');
     // }
 
-    // public function spesifikasi(): HasMany
-    // {
-    //     return $this->hasMany(SpesifikasiProduk::class, 'produk_id');
-    // }
-
     public function spesifikasi()
     {
         return $this->hasMany(SpesifikasiProduk::class, 'produk_id');
@@ -76,5 +73,22 @@ class Produk extends Model
     public function difavoritkan(): HasMany
     {
         return $this->hasMany(Favorit::class, 'produk_id');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($produk) {
+            if (empty($produk->slug)) {
+                $produk->slug = Str::slug($produk->nama);
+            }
+        });
+
+        static::updating(function ($produk) {
+            if (empty($produk->slug)) {
+                $produk->slug = Str::slug($produk->nama);
+            }
+        });
     }
 }

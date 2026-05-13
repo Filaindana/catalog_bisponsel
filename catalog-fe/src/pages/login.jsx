@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 // import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
@@ -42,6 +42,15 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const passwordRef = useRef(null);
+
+  // browser kadang auto-clear password field saat login gagal — restore manual
+  useEffect(() => {
+    if (errorMsg && passwordRef.current && passwordRef.current.value !== password) {
+      passwordRef.current.value = password;
+    }
+  }, [errorMsg, password]);
 
   const isReady = email.trim() !== "" && password.trim() !== "";
 
@@ -59,16 +68,17 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       setLoading(true);
+      setErrorMsg("");
 
       const res = await login(email, password);
 
-      // 🔥 simpan token & user
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("user", JSON.stringify(res.user));
 
-      navigate("/");
+      const redirectPath = res.user?.peran === "admin" ? "/admin" : "/";
+      navigate(redirectPath);
     } catch (err) {
-      alert(err.message);
+      setErrorMsg(err.message || "Email atau password salah.");
     } finally {
       setLoading(false);
     }
@@ -257,6 +267,23 @@ export default function Login() {
         </p>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* ERROR BANNER */}
+          {errorMsg && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "11px 14px", borderRadius: 10,
+              background: "#fff1f2", border: "1px solid #fecdd3",
+              animation: "fadeIn .2s ease",
+            }}>
+              <svg width="16" height="16" fill="none" stroke="#e11d48" strokeWidth="2" viewBox="0 0 24 24" style={{ shrink: 0 }}>
+                <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+              </svg>
+              <span style={{ fontSize: 13, color: "#be123c", fontWeight: 500 }}>{errorMsg}</span>
+              <style>{`@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}`}</style>
+            </div>
+          )}
+
           {/* EMAIL */}
           <div>
             <label style={labelStyle}>Email</label>
@@ -264,7 +291,8 @@ export default function Login() {
               type="email"
               placeholder="contoh@email.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); setErrorMsg(""); }}
+              onKeyDown={(e) => { if (e.key === "Enter" && isReady && !loading) handleLogin(); }}
               style={inputStyle}
               onFocus={(e) => {
                 e.currentTarget.style.border = "1px solid #072B50";
@@ -282,10 +310,13 @@ export default function Login() {
             <label style={labelStyle}>Password</label>
             <div style={{ position: "relative" }}>
               <input
+                ref={passwordRef}
                 type={showPassword ? "text" : "password"}
                 placeholder="Masukkan password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                onChange={(e) => { setPassword(e.target.value); setErrorMsg(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter" && isReady && !loading) handleLogin(); }}
                 style={{ ...inputStyle, paddingRight: 40 }}
                 onFocus={(e) => {
                   e.currentTarget.style.border = "1px solid #072B50";

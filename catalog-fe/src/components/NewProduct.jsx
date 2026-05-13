@@ -1,27 +1,53 @@
-import { useRef, useState } from "react";
-import produkImg from "../assets/monitor.png";
+import { useRef, useState, useEffect, useCallback } from "react";
 import ProductCard from "./ProductCard.jsx";
+import { useFavorit } from "../context/FavoritContext.jsx";
+import api from "../utils/api.js";
 
-const products = [
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-  { category: "Komputer (PC)", name: "PC Gaming Pro Ryzen Edition", spec: "Ryzen 7 • RTX 4060 • 16GB RAM • SSD 1TB", price: "Rp 17.499.000", rating: 4.8, badge: "New", image: produkImg },
-];
+const CARD_W = 240; // 220px card + 20px gap
+const AUTO_MS = 3000;
+
+const formatPrice = (price) =>
+  "Rp " + Number(price).toLocaleString("id-ID").replace(/,/g, ".");
 
 export default function NewProduct() {
-  const scrollRef  = useRef(null);
-  const cardsRef   = useRef(null);
-  const [saved, setSaved] = useState(products.map(() => false));
+  const { savedMap, toggleSave } = useFavorit();
+  const scrollRef = useRef(null);
+  const [products, setProducts] = useState([]);
   const isDragging = useRef(false);
-  const startX     = useRef(0);
+  const startX = useRef(0);
   const scrollLeft = useRef(0);
 
+  /* ── infinite advance ── */
+  const advance = useCallback((dir) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const half = el.scrollWidth / 2;
+
+    if (dir > 0 && el.scrollLeft >= half) {
+      // kanan: sudah di copy kedua → jump ke copy pertama
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft -= half;
+    } else if (dir < 0 && el.scrollLeft < CARD_W) {
+      // kiri: hampir di posisi 0 → jump ke copy kedua agar bisa scroll mundur
+      el.style.scrollBehavior = "auto";
+      el.scrollLeft += half;
+    }
+
+    requestAnimationFrame(() => {
+      el.style.scrollBehavior = "smooth";
+      el.scrollLeft += dir * CARD_W;
+    });
+  }, []);
+
+  /* ── auto-rotate ── */
+  useEffect(() => {
+    if (products.length === 0) return;
+    const timer = setInterval(() => advance(1), AUTO_MS);
+    return () => clearInterval(timer);
+  }, [products, advance]);
+
+  /* ── drag ── */
   const onMouseDown = (e) => {
-    const target = e.target;
-    if (!target.closest(".np-img-wrap")) return;
     isDragging.current = true;
     startX.current = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
     scrollLeft.current = scrollRef.current?.scrollLeft ?? 0;
@@ -30,13 +56,34 @@ export default function NewProduct() {
     if (!isDragging.current) return;
     e.preventDefault();
     const x = e.pageX - (scrollRef.current?.offsetLeft ?? 0);
-    const walk = (x - startX.current) * 1.5;
-    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - walk;
+    if (scrollRef.current) scrollRef.current.scrollLeft = scrollLeft.current - (x - startX.current) * 1.5;
   };
   const stopDrag = () => { isDragging.current = false; };
-  const scrollBy = (dir) => {
-    if (scrollRef.current) scrollRef.current.scrollLeft += dir * 280;
-  };
+
+  /* ── fetch ── */
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await api("/produk?sort=latest&per_page=8");
+        const list = res?.data?.data || [];
+        setProducts(list.map((p) => ({
+          id: p.id,
+          name: p.nama,
+          category: p.kategori?.nama || "-",
+          spec: p.deskripsi || "-",
+          price: formatPrice(p.harga),
+          rating: p.rating || 0,
+          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
+          badge: "New",
+        })));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const looped = [...products, ...products];
 
   return (
     <section style={{ padding: "50px 0", background: "#fff" }}>
@@ -56,7 +103,7 @@ export default function NewProduct() {
             {[["‹", -1], ["›", 1]].map(([icon, dir]) => (
               <button
                 key={dir}
-                onClick={() => scrollBy(dir)}
+                onClick={() => advance(dir)}
                 className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl text-gray-600 cursor-pointer transition-all duration-200"
                 style={{ border: "1px solid #e5e7eb", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", padding: 0 }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#072B50"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#072B50"; }}
@@ -71,7 +118,7 @@ export default function NewProduct() {
         {/* SCROLL TRACK */}
         <div style={{ marginBottom: -8, paddingBottom: 8, overflow: "hidden" }}>
           <div
-            ref={(el) => { scrollRef.current = el; cardsRef.current = el; }}
+            ref={scrollRef}
             className="flex gap-5 overflow-x-auto overflow-y-visible"
             style={{ scrollBehavior: "smooth", cursor: "default", padding: "8px 4px 16px", scrollbarWidth: "none" }}
             onMouseDown={onMouseDown}
@@ -79,19 +126,17 @@ export default function NewProduct() {
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
-            {products.map((product, index) => (
-              // ── sama persis dengan TopProduct: flex 0 0 220px, minWidth 220 ──
-              <div key={index} style={{ flex: "0 0 220px", minWidth: 220 }}>
+            {looped.map((product, i) => (
+              <div key={`${product.id}-${i}`} style={{ flex: "0 0 220px", minWidth: 220 }}>
                 <ProductCard
-                  product={{ ...product, id: index + 1 }}
-                  saved={saved[index]}
-                  onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
+                  product={product}
+                  saved={!!savedMap[product.id]}
+                  onToggleSave={() => toggleSave(product.id)}
                 />
               </div>
             ))}
           </div>
         </div>
-
       </div>
     </section>
   );

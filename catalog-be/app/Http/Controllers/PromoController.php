@@ -11,7 +11,8 @@ class PromoController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Promo::with('produk');
+        // $query = Promo::with('produk');
+        $query = Promo::with('produk.kategori', 'produk.spesifikasi');
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);

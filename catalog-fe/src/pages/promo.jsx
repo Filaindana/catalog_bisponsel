@@ -206,11 +206,11 @@ function InfoBadge({ small = false }) {
 function Ticker() {
   const items = ["🔥 Samsung A55 — Diskon 30%","⚡ iPhone 15 Pro Flash Sale","🎁 TWS Bundle 2+1 Gratis","🆕 Xiaomi 14T Pro Pre-Order","📱 Galaxy Watch 7 Cashback 20%","💻 MacBook Air M3 Flash Sale","🎮 ROG Phone 8 Hot Deal","🚚 Gratis Ongkir Semua Promo"];
   return (
-    <div className="overflow-hidden bg-[#072B50] py-2.5">
+    <div className="overflow-hidden bg-[#072B50] py-4">
       <div className="promo-ticker-inner">
         {[...items,...items].map((x,i) => (
-          <span key={i} className="text-[11.5px] font-medium whitespace-nowrap px-7 text-white/75">
-            {x}<span className="ml-7 text-white/18">◆</span>
+          <span key={i} className="text-[14px] font-semibold whitespace-nowrap px-8 text-white/90">
+            {x}<span className="ml-8 text-white/30">◆</span>
           </span>
         ))}
       </div>
@@ -383,17 +383,51 @@ export default function PromoPage() {
       <Ticker />
 
       {/* ── PAGE HEADER ── */}
-      <div ref={headerRef} className="reveal bg-[#072B50] px-5 md:px-12 py-10 md:py-12">
-        <div className="flex flex-col items-start justify-between gap-6 mx-auto max-w-350 sm:flex-row sm:items-end">
+      <div ref={headerRef} className="reveal relative overflow-hidden px-5 md:px-12 py-12 md:py-16"
+        style={{ background: "linear-gradient(135deg, #061e38 0%, #0a2d52 50%, #0d3666 100%)" }}>
+
+        {/* decorative blobs */}
+        <div style={{ position:"absolute", top:-80, right:-80, width:320, height:320, borderRadius:"50%", background:"radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%)", pointerEvents:"none" }} />
+        <div style={{ position:"absolute", bottom:-60, left:"30%", width:240, height:240, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)", pointerEvents:"none" }} />
+
+        {/* dot grid */}
+        <div style={{ position:"absolute", inset:0, backgroundImage:"radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px)", backgroundSize:"28px 28px", pointerEvents:"none" }} />
+
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mx-auto max-w-350">
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-5 h-0.5 rounded-full bg-white/35" />
-              <span className="text-[10px] font-bold text-white/45 tracking-[2.5px] uppercase">Penawaran Terbatas</span>
+            {/* badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4"
+              style={{ background:"rgba(96,165,250,0.15)", border:"1px solid rgba(96,165,250,0.3)" }}>
+              <span style={{ fontSize:14 }}>🔥</span>
+              <span className="text-[11px] font-bold text-[#93c5fd] tracking-[2px] uppercase">Penawaran Terbatas</span>
             </div>
-            <h1 className="text-2xl md:text-[34px] font-black text-white tracking-tight leading-tight mb-2">
-              Promo Terbaik <span className="text-[#6aaff5]">Bulan Ini</span>
+
+            <h1 className="text-[28px] md:text-[42px] font-black text-white tracking-tight leading-tight mb-3">
+              Promo Terbaik{" "}
+              <span style={{ background:"linear-gradient(90deg, #60a5fa, #a78bfa)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
+                Bulan Ini
+              </span>
             </h1>
-            <p className="text-[13px] text-white/45">{PROMOS.length} penawaran eksklusif · Stok sangat terbatas</p>
+
+            <p className="text-[13px] text-white/50 mb-0">
+              {PROMOS.length} penawaran eksklusif &nbsp;·&nbsp; Stok sangat terbatas
+            </p>
+          </div>
+
+          {/* stats pills */}
+          <div className="flex gap-3 shrink-0">
+            <div className="flex flex-col items-center px-5 py-3 rounded-2xl"
+              style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)" }}>
+              <span className="text-[22px] font-black text-white leading-none">{PROMOS.length}</span>
+              <span className="text-[10px] text-white/45 font-medium mt-1">Promo Aktif</span>
+            </div>
+            <div className="flex flex-col items-center px-5 py-3 rounded-2xl"
+              style={{ background:"rgba(96,165,250,0.12)", border:"1px solid rgba(96,165,250,0.25)" }}>
+              <span className="text-[22px] font-black text-[#93c5fd] leading-none">
+                {Math.max(...PROMOS.map(p => parseInt(p.discount) || 0))}%
+              </span>
+              <span className="text-[10px] text-white/45 font-medium mt-1">Maks. Diskon</span>
+            </div>
           </div>
         </div>
       </div>

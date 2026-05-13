@@ -6,13 +6,8 @@ import { FiBox, FiUsers, FiTag, FiShield } from "react-icons/fi";
 import "swiper/css";
 
 
-import laptopImg   from "../assets/laptop.png";
-import mouseImg    from "../assets/mouse.png";
-import keyboardImg from "../assets/keyboard.png";
-import soundImg    from "../assets/sound.png";
-import monitorImg  from "../assets/monitor.png";
 import ProductCard from "../components/ProductCard";
-import { getProdukById } from "../utils/services/produkService";
+import { getProdukBySlug, getProdukTerkait } from "../utils/services/produkService";
 
 /* ── Style inject ── */
 if (typeof document !== "undefined" && !document.querySelector("[data-detail-style]")) {
@@ -76,36 +71,6 @@ if (typeof document !== "undefined" && !document.querySelector("[data-detail-sty
   document.head.appendChild(s);
 }
 
-/* ── DATA ── */
-// const product = {
-//   name:"PC Gaming Pro Ryzen Edition",
-//   category:"Komputer (PC)",
-//   price:17499000,
-//   rating:4.8,
-//   reviews:120,
-//   stock:15,
-//   colors:["#1e1e1e","#1a3a5c","#5c1a1a","#2d5c1a"],
-//   colorLabels:["Onyx Black","Navy Blue","Cardinal Red","Forest Green"],
-//   images:[monitorImg,laptopImg,mouseImg,keyboardImg,soundImg],
-//   description:"PC Gaming Pro Ryzen Edition adalah komputer gaming performa tinggi yang dirancang untuk memberikan pengalaman gaming terbaik. Dilengkapi dengan prosesor AMD Ryzen 7 terbaru dan GPU RTX 4060 yang powerful, sistem ini mampu menjalankan game AAA terbaru dengan framerate tinggi.",
-//   specs:[
-//     {attribute:"Prosesor",    detail:"AMD Ryzen 7 7700X"},
-//     {attribute:"GPU",         detail:"NVIDIA RTX 4060 8GB"},
-//     {attribute:"RAM",         detail:"16GB DDR5 5600MHz"},
-//     {attribute:"Storage",     detail:"SSD NVMe 1TB"},
-//     {attribute:"Motherboard", detail:"B650 ATX"},
-//     {attribute:"PSU",         detail:"650W 80+ Gold"},
-//     {attribute:"Case",        detail:"ATX Mid Tower RGB"},
-//     {attribute:"OS",          detail:"Windows 11 Home"},
-//   ],
-// };
-
-const relatedProducts = Array.from({length:6},(_,i)=>({
-  id:i+1, name:"PC Gaming Pro Ryzen Edition", category:"Komputer (PC)",
-  price:17499000, rating:4.8,
-  image:[monitorImg,laptopImg,mouseImg,keyboardImg,soundImg][i%5],
-}));
-
 const GUARANTEES = [
   { icon: <FiBox size={17}/>,    label: "Stok Terupdate",     sub: "Selalu diperbarui"       },
   { icon: <FiUsers size={17}/>,  label: "Layanan Terbaik",    sub: "Cepat dan responsif"     },
@@ -162,41 +127,59 @@ export default function DetailProduct() {
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity]           = useState(1);
   const [saved, setSaved] = useState([]);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const zoom = useZoom();
-  const [product, setProduct] = useState({
-    name: "",
-    category: "",
-    price: 0,
-    rating: 0,
-    reviews: 0,
-    stock: 0,
-    colors: [],
-    colorLabels: [],
-    images: [],
-    description: "",
-    specs: [],
-  });
+  const [product, setProduct] = useState(null);
+  // const [product, setProduct] = useState({
+  //   name: "",
+  //   category: "",
+  //   price: 0,
+  //   rating: 0,
+  //   reviews: 0,
+  //   stock: 0,
+  //   colors: [],
+  //   colorLabels: [],
+  //   images: [],
+  //   description: "",
+  //   detailDescription: "",
+  //   specs: [],
+  // });
 
   const fmt = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g,".");
 
-  const { id } = useParams();
-  console.log("Product ID:", id);
+  // const { id } = useParams();
+  // console.log("Product ID:", id);
+  const { slug } = useParams();
   
   // const BASE_URL = "http://localhost:8000";
 
   const getImageUrl = (path) => {
     if (!path) return "/fallback.jpg";
     if (path.startsWith("http")) return path;
-    return `http://localhost:8000/storage/${path}`;
+    return `/images/${path}`;
   };
+
+  useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const data = await getProdukById(id);
+        // const data = await getProdukBySlug(slug);
+        console.log("SLUG:", slug);
+        const response = await getProdukBySlug(slug);
+        console.log("DETAIL DATA:", response);
 
+        const data = response?.data || response;
+
+        if (!data) {
+          console.error("Produk tidak ditemukan");
+          return;
+        }
+        
         const mapped = {
           id: data.id,
+          slug: data.slug,
+
           name: data.nama,
           price: data.harga,
           stock: data.stok,
@@ -205,23 +188,21 @@ export default function DetailProduct() {
 
           category: data.kategori?.nama || "Produk",
 
-          // ✅ dari backend langsung
-          // images: data.images?.length
-          // ? data.images.map((img) => `${BASE_URL}/storage/${img}`)
-          //   : [`${BASE_URL}/storage/${data.gambar}`],
           images: data.images?.length
             ? data.images.map(getImageUrl)
             : [getImageUrl(data.gambar)],
-
 
           colors: data.colors || [],
           colorLabels: data.color_labels || [],
 
           description: data.deskripsi,
+          detailDescription: data.deskripsi_detail,
 
-          // ✅ sementara pakai specs JSON
-          specs: data.specs?.length
-            ? data.specs
+          specs: data.spesifikasi?.length
+            ? data.spesifikasi.map((item) => ({
+                attribute: item.atribut,
+                detail: item.detail,
+              }))
             : [
                 { attribute: "Nama", detail: data.nama },
                 { attribute: "Stok", detail: data.stok + " unit" },
@@ -229,13 +210,26 @@ export default function DetailProduct() {
         };
 
         setProduct(mapped);
+
+        if (data.kategori_id) {
+          const related = await getProdukTerkait(data.kategori_id, data.id);
+          setRelatedProducts(related.map((p) => ({
+            id: p.id,
+            slug: p.slug,
+            name: p.nama,
+            category: p.kategori?.nama || "",
+            price: fmt(p.harga),
+            rating: p.rating || 4.5,
+            image: getImageUrl(p.gambar),
+          })));
+        }
       } catch (err) {
         console.error("Gagal ambil produk:", err);
       }
     };
 
     fetchProduct();
-  }, [id]);
+  }, [slug]);
   
 
   if (!product) {
@@ -458,7 +452,7 @@ export default function DetailProduct() {
           </div>
           <div className="p-6">
             {activeTab==="deskripsi" ? (
-              <p className="text-[13.5px] text-gray-600 leading-[1.85] m-0">{product.description}</p>
+              <p className="text-[13.5px] text-gray-600 leading-[1.85] m-0">{product.detailDescription || product.description}</p>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-[#e8edf4] overflow-hidden">
                 <table className="w-full border-collapse">
@@ -493,18 +487,23 @@ export default function DetailProduct() {
               className="arrow-btn w-9 h-9 min-w-9 rounded-full bg-white border border-[#e8edf4] shadow-sm cursor-pointer flex items-center justify-center text-lg text-gray-600">‹</button>
             <div className="flex-1 min-w-0">
               <Swiper onSwiper={s=>(swiperRef.current=s)} spaceBetween={12} slidesPerView={5}
+                loop={relatedProducts.length >= 5}
                 breakpoints={{
                   320:{slidesPerView:1.5,spaceBetween:10},
                   480:{slidesPerView:2.5,spaceBetween:11},
                   640:{slidesPerView:3,spaceBetween:12},
                   1024:{slidesPerView:5,spaceBetween:12},
                 }}>
-                {relatedProducts.map((item,index)=>(
+                {relatedProducts.length === 0 ? (
+                  <SwiperSlide>
+                    <p className="py-4 text-sm text-gray-400">Tidak ada produk terkait.</p>
+                  </SwiperSlide>
+                ) : relatedProducts.map((item, index) => (
                   <SwiperSlide key={item.id}>
                     <ProductCard compact
-                      product={{id:item.id,category:item.category,name:item.name,price:fmt(item.price),rating:item.rating,image:item.image}}
+                      product={item}
                       saved={saved[index]}
-                      onToggleSave={()=>setSaved(prev=>{const u=[...prev];u[index]=!u[index];return u;})}
+                      onToggleSave={() => setSaved(prev => { const u = [...prev]; u[index] = !u[index]; return u; })}
                     />
                   </SwiperSlide>
                 ))}

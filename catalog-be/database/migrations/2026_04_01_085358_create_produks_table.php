@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kategori_id')->constrained('kategori')->cascadeOnDelete();
             $table->string('nama');
+            $table->string('slug')->unique();
             $table->text('deskripsi')->nullable();
             $table->text('deskripsi_detail')->nullable();
             $table->bigInteger('harga');

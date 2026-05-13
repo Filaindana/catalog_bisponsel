@@ -45,6 +45,18 @@ class PromoProdukSeeder extends Seeder
             ['promo_id' => 5, 'produk_id' => 3],  // MacBook Air M2
             ['promo_id' => 5, 'produk_id' => 4],  // Acer Aspire 5
             ['promo_id' => 5, 'produk_id' => 10], // Samsung Galaxy Tab S9 Ultra
+
+            ['promo_id' => 6, 'produk_id' => 2],
+            ['promo_id' => 6, 'produk_id' => 7],
+
+            ['promo_id' => 7, 'produk_id' => 8],
+            ['promo_id' => 7, 'produk_id' => 10],
+
+            ['promo_id' => 8, 'produk_id' => 14],
+            ['promo_id' => 8, 'produk_id' => 15],
+
+            ['promo_id' => 9, 'produk_id' => 1],
+            ['promo_id' => 9, 'produk_id' => 3],
         ];
 
         DB::table('promo_produk')->insert($promoProduk);

@@ -21,14 +21,13 @@ export const login = async (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 
-  // if (res.token) {
-  //   setToken(res.token);
-  // }
-  if (res.data?.token) {
-    setToken(res.data.token);
+  const authData = res.data || res;
+
+  if (authData?.token) {
+    setToken(authData.token);
   }
 
-  return res;
+  return authData;
 };
 
 

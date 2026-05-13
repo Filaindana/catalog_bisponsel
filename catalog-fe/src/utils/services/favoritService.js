@@ -1,8 +1,9 @@
 import api from "../api";
 
 export const getFavorit = async () => {
-  const res = await api("/favorit"); // endpoint kamu
-  return res.data;
+  // UBAH: jangan ambil .data di sini, kembalikan semua response
+  const res = await api("/favorit");
+  return res; // ← kembalikan mentah
 };
 
 export const removeFavorit = async (produkId) => {

@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'nama'           => 'Super Admin',
-                'email'          => 'admin@tokoonline.com',
+                'email'          => 'admin@bizponsel.com',
                 'password'       => Hash::make('password123'),
                 'peran'          => 'admin',
                 'dibuat_pada'    => now(),
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'nama'           => 'Manajer Toko',
-                'email'          => 'manajer@tokoonline.com',
+                'email'          => 'manajer@bizponsel.com',
                 'password'       => Hash::make('password123'),
                 'peran'          => 'admin',
                 'dibuat_pada'    => now()->subDays(30),

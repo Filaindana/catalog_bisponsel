@@ -1,22 +1,21 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
-// import ProductCard from "../components/ProductCardCompact.jsx";
 import ProductCard from "../components/ProductCard.jsx";
 import { getProducts } from "../utils/services/productService.js";
-import { removeFavorit, addFavorit, getFavorit } from "../utils/services/favoritService.js";
+import { useFavorit } from "../context/FavoritContext.jsx";
 
 const categories = [
-  "Keyboard",
-  "Kabel Lan",
-  "Laptop",
-  "Speaker",
-  "Mouse",
-  "Handphone",
-  "Komputer (PC)",
+  "Laptop & Komputer",
+  "Smartphone & Tablet",
+  "Aksesoris Elektronik",
+  "Audio & Headphone",
+  "Kamera & Fotografi",
+  "Peralatan Rumah",
+  "Gaming",
+  "Networking",
 ];
-const brands = ["MSI", "Lenovo", "HP", "Asus", "Acer"];
-const discounts = ["Diskon", "Best Seller", "New Arrival"];
+const discounts = ["Diskon"];
 
 function FilterSection({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -63,24 +62,25 @@ function FilterSection({ title, children, defaultOpen = true }) {
 }
 
 export default function Product() {
+  const { savedMap, toggleSave } = useFavorit();
+
   // ── baca query param ?category=xxx dari URL ──
   const [searchParams] = useSearchParams();
-
-  // const [saved, setSaved] = useState({});
-  const [savedMap, setSavedMap] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState(() => {
+    const cat = searchParams.get("category");
+    return cat ? [cat] : [];
+  });
   const [selectedDiscounts, setSelectedDiscounts] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState([]);
   const [sortBy, setSortBy] = useState("Terbaru");
   const [sortOpen, setSortOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState(20000000);
+  const [priceRange, setPriceRange] = useState(50000000);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
   const fetchData = async () => {
@@ -91,12 +91,19 @@ export default function Product() {
         page: currentPage,
         search: searchQuery,
         sortBy: sortBy,
+        categories: selectedCategories,
+        discounts: selectedDiscounts,
+        maxPrice: priceRange < 50000000 ? priceRange : undefined,
       });
 
       console.log("RES:", res);
 
       // 🔥 FIX FLEXIBLE RESPONSE
       const list = res?.products || res?.data || [];
+      
+      // 🔥 INI YANG KAMU TAMBAH
+      console.log("🔥 ALL PRODUCTS:", list);
+      console.log("🔥 FIRST PRODUCT:", list?.[0]);
 
       setProducts(list);
       setTotalPages(res?.totalPages || 1);
@@ -106,35 +113,29 @@ export default function Product() {
       setProducts([]); // safety fallback
     } finally {
       setLoading(false);
+      setIsFirstLoad(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-    refreshFavorit(); // ⬅️ TAMBAH INI
   }, [
     currentPage,
     searchQuery,
     sortBy,
     selectedCategories,
-    selectedBrands,
     selectedDiscounts,
-    selectedStatus,
     priceRange,
   ]);
 
-  // ── auto-filter saat URL berubah ──
+  // ── scroll ke konten saat ada category di URL ──
   useEffect(() => {
-    const cat = searchParams.get("category");
-    if (cat) {
-      setSelectedCategories([cat]);
-      setCurrentPage(1);
-      // scroll ke konten produk
+    if (searchParams.get("category")) {
       setTimeout(() => {
         document.getElementById("product-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
-  }, [searchParams]);
+  }, []);
 
   const toggleItem = (list, setList, item) => {
     if (list.includes(item)) {
@@ -156,10 +157,8 @@ export default function Product() {
   const hasActiveFilters = Boolean(
     searchQuery ||
     selectedCategories.length > 0 ||
-    selectedBrands.length > 0 ||
     selectedDiscounts.length > 0 ||
-    selectedStatus.length > 0 ||
-    priceRange !== 20000000,
+    priceRange !== 50000000,
   );
 
   const checkboxLabel = (label, checked, onChange) => (
@@ -231,46 +230,6 @@ export default function Product() {
     </button>
   );
 
-  const normalizeFavorit = (res) => {
-    return res?.data || res || [];
-  };
-
-  const refreshFavorit = async () => {
-    try {
-      const res = await getFavorit();
-      const data = normalizeFavorit(res);
-
-      const map = {};
-      data.forEach((item) => {
-        map[item.produk.id] = true;
-      });
-
-      setSavedMap(map);
-    } catch (err) {
-      console.error("Gagal ambil favorit:", err);
-    }
-  };
-
-  useEffect(() => {
-    const fetchFavorit = async () => {
-      try {
-        const res = await getFavorit();
-
-        const data = res?.data || res || [];
-
-        const map = {};
-        data.forEach((item) => {
-          map[item.produk.id] = true;
-        });
-
-        setSavedMap(map);
-      } catch (err) {
-        console.error("Gagal ambil favorit:", err);
-      }
-    };
-
-    fetchFavorit();
-  }, []);
 
   return (
     <div style={{ background: "#f9fafb", minHeight: "100vh" }}>
@@ -405,15 +364,6 @@ export default function Product() {
           </FilterSection>
           <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
 
-          <FilterSection title="Brand">
-            {brands.map((brand) =>
-              checkboxLabel(brand, selectedBrands.includes(brand), () =>
-                toggleItem(selectedBrands, setSelectedBrands, brand),
-              ),
-            )}
-          </FilterSection>
-          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
-
           <FilterSection title="Diskon">
             {discounts.map((d) =>
               checkboxLabel(d, selectedDiscounts.includes(d), () =>
@@ -425,12 +375,13 @@ export default function Product() {
 
           <FilterSection title="Harga">
             <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "8px" }}>
-              Rp 4.000.069 - {formatPrice(priceRange)}
+              Rp 0 – {formatPrice(priceRange)}
             </div>
             <input
               type="range"
-              min={4000069}
-              max={20000000}
+              min={0}
+              max={50000000}
+              step={500000}
               value={priceRange}
               onChange={(e) => {
                 setPriceRange(Number(e.target.value));
@@ -439,19 +390,10 @@ export default function Product() {
               style={{ width: "100%", accentColor: "#072B50" }}
             />
           </FilterSection>
-          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
-
-          <FilterSection title="Status Produk">
-            {["Tersedia", "Tidak Tersedia"].map((status) =>
-              checkboxLabel(status, selectedStatus.includes(status), () =>
-                toggleItem(selectedStatus, setSelectedStatus, status),
-              ),
-            )}
-          </FilterSection>
         </div>
 
         {/* PRODUK GRID */}
-        <div>
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "800px" }}>
           <div
             style={{
               display: "flex",
@@ -471,12 +413,10 @@ export default function Product() {
                 <span
                   onClick={() => {
                     setSelectedCategories([]);
-                    setSelectedBrands([]);
                     setSelectedDiscounts([]);
-                    setSelectedStatus([]);
                     setSearchQuery("");
                     setSearchInput("");
-                    setPriceRange(20000000);
+                    setPriceRange(50000000);
                     setCurrentPage(1);
                   }}
                   style={{
@@ -567,61 +507,51 @@ export default function Product() {
           </div>
 
           {/* GRID */}
-          {loading ? (
-            <div style={{ textAlign: "center", padding: "60px 0" }}>
-              Loading produk...
+          {isFirstLoad && loading ? (
+            <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af", fontSize: "15px" }}>
+              Memuat produk...
             </div>
-          ) : products.length === 0 ? (
+          ) : !loading && products.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 0", color: "#9ca3af", fontSize: "15px" }}>
               Produk tidak ditemukan.
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "14px" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: "14px",
+                opacity: loading ? 0.4 : 1,
+                pointerEvents: loading ? "none" : "auto",
+                transition: "opacity 0.2s ease",
+              }}
+            >
               {products.map((product) => (
                 <ProductCard
                 key={product.id}
                 product={{
                   id: product.id,
+                  slug: product.slug, // 🔥 TAMBAH INI
                   category: product.kategori?.nama || "-",
                   name: product.nama,
                   spec: product.deskripsi || "-",
                   price: formatPrice(product.harga),
                   rating: product.rating || 0,
                   image: product.gambar
-                    ? `http://localhost:8000/storage/${product.gambar}`
+                    ? `/images/${product.gambar}`
                     : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}
-                saved={savedMap[product.id]}
+                saved={!!savedMap[product.id]}
                 compact
-                onToggleSave={async () => {
-                  const isSaved = savedMap[product.id];
-                  setSavedMap((prev) => ({
-                    ...prev,
-                    [product.id]: !isSaved,
-                  }));
-
-                  try {
-                    if (isSaved) {
-                      await removeFavorit(product.id);
-                    } else {
-                      await addFavorit(product.id);
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    setSavedMap((prev) => ({
-                      ...prev,
-                      [product.id]: isSaved,
-                    }));
-                  }
-                }}
+                onToggleSave={() => toggleSave(product.id)}
                   />
               ))}
             </div>
           )}
 
           {/* PAGINATION */}
-          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "30px" }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "6px", marginTop: "auto", paddingTop: "30px" }}>
             {paginationBtn("‹", () => setCurrentPage((p) => Math.max(1, p - 1)), false, currentPage === 1)}
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <div key={page}>

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
+import { FavoritProvider } from "./context/FavoritContext.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 // import "./index.css";
@@ -24,14 +25,32 @@ import Cabang from "./pages/admin/Cabang.jsx";
 import Pengaturan from "./pages/admin/Pengaturan.jsx";
 import Profile from "./pages/Profile.jsx";
 
+/* ── Auth helpers ── */
+function getUser() {
+  try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+}
+
+function ProtectedRoute() {
+  const token = localStorage.getItem("token");
+  return token ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
+function AdminRoute() {
+  const token = localStorage.getItem("token");
+  const user  = getUser();
+  if (!token || !user) return <Navigate to="/login" replace />;
+  if (user.peran !== "admin") return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
 /* ── Public layout ── */
 function PublicLayout() {
   return (
-    <>
+    <FavoritProvider>
       <Navbar />
       <Outlet />
       <Footer />
-    </>
+    </FavoritProvider>
   );
 }
 
@@ -62,19 +81,23 @@ function App() {
           <Route index element={<Home />} />
           <Route path="promo" element={<Promo />} />
           <Route path="product" element={<Product />} />
-          <Route path="product/:id" element={<DetailProduct />} />
-          {/* <Route path="product/detail" element={<DetailProduct />} /> */}
+          {/* <Route path="product/:id" element={<DetailProduct />} /> */}
+          <Route path="product/:slug" element={<DetailProduct />} />
           <Route path="contact" element={<Contact />} />
-          <Route path="profile" element={<Profile />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="profile" element={<Profile />} />
+          </Route>
         </Route>
 
         {/* Admin */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="produk" element={<Produk />} />
-          <Route path="promo" element={<PromoAdmin />} />
-          <Route path="cabang" element={<Cabang />} />
-          <Route path="pengaturan" element={<Pengaturan />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="produk" element={<Produk />} />
+            <Route path="promo" element={<PromoAdmin />} />
+            <Route path="cabang" element={<Cabang />} />
+            <Route path="pengaturan" element={<Pengaturan />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

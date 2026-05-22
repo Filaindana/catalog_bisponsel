@@ -42,6 +42,7 @@ class PromoController
             'produk' => $promo->produk->map(function ($produk) {
                 return [
                     'id' => $produk->id,
+                    'slug' => $produk->slug,
                     'nama' => $produk->nama,
                     'harga' => $produk->harga,
                     'stok' => $produk->stok,

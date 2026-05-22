@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { sendKontak } from "../utils/services/contactService";
-import { getCabangs } from "../utils/services/cabangService";
+import { getSettings } from "../utils/services/settingsService";
+import { getStatusBuka } from "../utils/getStatusBuka";
 import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ExternalLink } from "lucide-react";
+import { getSocialIcon } from "../utils/getSocialIcon";
 import ceoImg from "../assets/ceo.jpg";
 
 if (typeof document !== "undefined" && !document.querySelector("[data-font-bismar]")) {
@@ -93,15 +95,6 @@ function SocialIcon({ sl, size = 44, iconSize = 22 }) {
 // const TEMP_MAPS = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.096!2d112.7452!3d-7.3118!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7fb0b5c5e5e5f%3A0x1234567890abcdef!2sJl.%20Bendul%20Merisi%20Selatan%20XI%2C%20Bendul%20Merisi%2C%20Kec.%20Wonocolo%2C%20Kota%20SBY%2C%20Jawa%20Timur%2060239!5e0!3m2!1sid!2sid!4v1";
 
 
-const schedule = [
-  { day:"Senin",  open:"08:30", close:"17:00", isOpen:true  },
-  { day:"Selasa", open:"08:30", close:"17:00", isOpen:true  },
-  { day:"Rabu",   open:"08:30", close:"17:00", isOpen:true  },
-  { day:"Kamis",  open:"08:30", close:"17:00", isOpen:true  },
-  { day:"Jumat",  open:"08:30", close:"17:00", isOpen:true  },
-  { day:"Sabtu",  open:"08:00", close:"15:00", isOpen:true  },
-  { day:"Minggu", open:null,    close:null,    isOpen:false },
-];
 
 /* ── Branch Card ── */
 function BranchCard({ branch, index, onClick }) {
@@ -185,8 +178,9 @@ function BranchCard({ branch, index, onClick }) {
 /* ── Main ── */
 export default function Contact() {
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [cabangList, setCabangList] = useState([]);
-  const [loadingCabang, setLoadingCabang] = useState(true);
+  const [settings, setSettings] = useState(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+  const [loadingError, setLoadingError] = useState(null);
   const [now, setNow] = useState(new Date());
   const [jamOpen, setJamOpen] = useState(false);
 
@@ -227,45 +221,51 @@ export default function Contact() {
     return () => clearInterval(t);
   }, []);
 
-  const h = now.getHours(), m = now.getMinutes();
-  const dayIdx = now.getDay() === 0 ? 6 : now.getDay() - 1;
-  const isOpen = (() => {
-    const row = schedule[dayIdx];
-    if (!row.isOpen) return false;
-    const [oh,om] = row.open.split(":").map(Number);
-    const [ch,cm] = row.close.split(":").map(Number);
-    return h*60+m >= oh*60+om && h*60+m < ch*60+cm;
-  })();
+  const bukaStatus = getStatusBuka(settings?.jam_operasional);
+  const branchList = settings?.cabang ?? [];
+  const socialLinksFromSettings = (settings?.social_media || []).map((item) => ({
+    ...item,
+    icon: (size) => {
+      const Icon = getSocialIcon(item.label || item.platform || item.name);
+      return <Icon size={size} />;
+    },
+  }));
+  const contactCards = [
+    {
+      icon: <MapPin size={16} />,
+      label: "Alamat",
+      value: settings?.kontak?.alamat || "Alamat belum disetel",
+    },
+    {
+      icon: <Phone size={16} />,
+      label: "Telepon",
+      value: settings?.kontak?.telepon || "Telepon belum disetel",
+    },
+    {
+      icon: <Mail size={16} />,
+      label: "Email",
+      value: settings?.kontak?.email || "Email belum disetel",
+    },
+  ];
 
   useEffect(() => {
-    const fetchCabang = async () => {
+    const fetchSettings = async () => {
+      setLoadingSettings(true);
+      setLoadingError(null);
+
       try {
-        const res = await getCabangs();
-
-        const mapped = res.map((item) => ({
-          id: item.id,
-          name: item.nama,
-          city: item.kota,
-          address: item.alamat,
-          phone: item.telepon || "-",
-          hours:
-            item.jam_buka && item.jam_tutup
-              ? `${item.jam_buka} - ${item.jam_tutup}`
-              : "Jam belum tersedia",
-          email: item.email || "-",
-          maps: item.maps_link || null,
-          image: item.foto_url || null,
-        }));
-
-        setCabangList(mapped);
+        const res = await getSettings();
+        setSettings(res);
+        setSelectedBranch(res?.cabang?.[0] ?? null);
       } catch (err) {
-        console.error("Error fetch cabang:", err);
+        console.error("Error fetch settings:", err);
+        setLoadingError(err?.message || "Gagal memuat pengaturan.");
       } finally {
-        setLoadingCabang(false); // 🔥 WAJIB ADA
+        setLoadingSettings(false);
       }
     };
 
-    fetchCabang();
+    fetchSettings();
   }, []);
 
   const inp = "w-full px-3 py-2.5 rounded-lg text-[13px] text-gray-900 outline-none transition-all duration-200 focus:ring-2 focus:ring-[#072B50]/10 focus:border-[#072B50]";
@@ -293,11 +293,7 @@ export default function Contact() {
             <p className="text-[13px] text-gray-400 mb-7 leading-relaxed">Jangan ragu untuk menghubungi kami kapan saja.</p>
 
             <div className="flex flex-col gap-4 mb-6">
-              {[
-                { icon:<MapPin size={16}/>, label:"Alamat",  value:"Jl. Raya Rungkut Kidul No. 32, Rungkut Kidul, Kec. Rungkut, Surabaya, Jawa Timur 60293." },
-                { icon:<Phone  size={16}/>, label:"Telepon", value:"+6281130775195" },
-                { icon:<Mail   size={16}/>, label:"Email",   value:"info@bizponselcatalog.com" },
-              ].map((item,i) => (
+              {contactCards.map((item,i) => (
                 <div key={i} className="flex gap-3.5 items-start">
                   <div className="w-9.5 h-9.5 rounded-[9px] flex items-center justify-center text-white shrink-0 bg-[#072B50]">
                     {item.icon}
@@ -326,9 +322,9 @@ export default function Contact() {
                   <div>
                     <p className="text-[11px] text-gray-500 font-semibold m-0">Jam Operasional</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="w-1.25 h-1.25 rounded-full" style={{ background:isOpen?"#22c55e":"#9ca3af", animation:isOpen?"pulse2 2s infinite":"none" }} />
-                      <p className="text-[11px] font-semibold m-0" style={{ color:isOpen?"#15803d":"#9ca3af" }}>
-                        {isOpen ? `Sedang Buka · Tutup ${schedule[dayIdx].close.replace(":",".")} WIB` : "Tutup"}
+                      <div className="w-1.25 h-1.25 rounded-full" style={{ background:bukaStatus.buka?"#22c55e":"#9ca3af", animation:bukaStatus.buka?"pulse2 2s infinite":"none" }} />
+                      <p className="text-[11px] font-semibold m-0" style={{ color:bukaStatus.buka?"#15803d":"#9ca3af" }}>
+                        {bukaStatus.label}
                       </p>
                     </div>
                   </div>
@@ -345,9 +341,9 @@ export default function Contact() {
                     <div style={{ borderRight:"1px solid #dce6f0" }}>
                       <p className="text-[10px] font-bold text-[#072B50] opacity-40 tracking-[1.5px] uppercase m-0 px-3.5 pt-2.5 pb-1.5" style={{ borderBottom:"1px solid #dce6f0" }}>Jam Kerja Pusat</p>
                       {[
-                        { label:"Senin – Jumat", value:"08.30 – 17.00", libur:false },
-                        { label:"Sabtu",         value:"08.00 – 15.00", libur:false },
-                        { label:"Minggu & Nasional", value:"Libur",     libur:true  },
+                        { label: "Senin – Jumat", value: settings?.jam_operasional?.pusat ? `${settings.jam_operasional.pusat.senin_jumat.buka} – ${settings.jam_operasional.pusat.senin_jumat.tutup}` : "Belum disetel", libur: settings?.jam_operasional?.pusat?.senin_jumat?.libur },
+                        { label: "Sabtu", value: settings?.jam_operasional?.pusat ? `${settings.jam_operasional.pusat.sabtu.buka} – ${settings.jam_operasional.pusat.sabtu.tutup}` : "Belum disetel", libur: settings?.jam_operasional?.pusat?.sabtu?.libur },
+                        { label: "Minggu & Nasional", value: "Libur", libur: true },
                       ].map((row,i,arr) => (
                         <div key={i} className="flex justify-between items-center px-3.5 py-2.5 bg-white" style={{ borderBottom:i<arr.length-1?"1px solid #dce6f0":"none" }}>
                           <span className="text-xs" style={{ color:row.libur?"#9ca3af":"#374151" }}>{row.label}</span>
@@ -358,12 +354,9 @@ export default function Contact() {
                     {/* Jam Shift Cabang */}
                     <div>
                       <p className="text-[10px] font-bold text-[#072B50] opacity-40 tracking-[1.5px] uppercase m-0 px-3.5 pt-2.5 pb-1.5" style={{ borderBottom:"1px solid #dce6f0" }}>Jam Shift Cabang</p>
-                      {[
-                        { name:"Marina",       shift1:"09.30–16.00", shift2:"16.00–21.30" },
-                        { name:"Store Street", shift1:"07.30–14.30", shift2:"15.00–22.00" },
-                      ].map((row,i,arr) => (
+                      {settings?.jam_operasional?.cabang?.map((row,i,arr) => (
                         <div key={i} className="px-3.5 py-2.5 bg-white" style={{ borderBottom:i<arr.length-1?"1px solid #dce6f0":"none" }}>
-                          <p className="text-[10px] font-bold text-[#072B50] opacity-50 uppercase tracking-[0.5px] mb-1.5">{row.name}</p>
+                          <p className="text-[10px] font-bold text-[#072B50] opacity-50 uppercase tracking-[0.5px] mb-1.5">{row.nama}</p>
                           <div className="flex gap-1.5">
                             {[row.shift1, row.shift2].map((sh,j) => (
                               <div key={j} className="flex-1 px-2 py-1.5 rounded-md" style={{ background:"#f0f4f9", border:"1px solid #dce6f0" }}>
@@ -486,21 +479,16 @@ export default function Contact() {
             </div>
             <div className="flex items-center gap-2 rounded-full px-4 py-1.5 bg-white" style={{ border:"1px solid #dce6f0" }}>
               <div className="w-1.75 h-1.75 rounded-full bg-green-500" style={{ boxShadow:"0 0 0 3px rgba(34,197,94,.2)" }} />
-              <span className="text-xs font-semibold text-gray-700">{cabangList.length} Cabang Aktif</span>
+              <span className="text-xs font-semibold text-gray-700">{branchList.length} Cabang Aktif</span>
             </div>
           </div>
-          {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {cabangList.map((branch,i) => (
-              <BranchCard key={i} branch={branch} index={i} onClick={() => setSelectedBranch(branch)} />
-            ))}
-          </div> */}
-          {loadingCabang ? (
+          {loadingSettings ? (
             <p className="text-sm text-gray-500">Loading cabang...</p>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {cabangList.map((branch,i) => (
+              {branchList.map((branch,i) => (
                 <BranchCard
-                  key={branch.id}
+                  key={branch.id || i}
                   branch={branch}
                   index={i}
                   onClick={() => setSelectedBranch(branch)}
@@ -590,7 +578,9 @@ export default function Contact() {
                     <p className="text-[10px] text-[#94a3b8] m-0">Klik untuk info akun</p>
                   </div>
                   <div className="flex gap-1.5">
-                    {socialLinks.map(sl => <SocialIcon key={sl.label} sl={sl} size={34} iconSize={17} />)}
+                    {(socialLinksFromSettings.length ? socialLinksFromSettings : socialLinks).map((sl) => (
+                      <SocialIcon key={sl.label || sl.name || sl.platform} sl={sl} size={34} iconSize={17} />
+                    ))}
                   </div>
                 </div>
               </div>

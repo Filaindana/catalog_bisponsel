@@ -29,6 +29,7 @@ const normalizeMeta = (meta = {}) => ({
 
 const normalizePromo = (item = {}) => ({
   id: item.id,
+  slug: item.slug,
   name: item.nama,
   desc: item.deskripsi,
   startDate: item.tanggal_mulai,
@@ -54,6 +55,7 @@ const normalizePromo = (item = {}) => ({
   })),
   products: (item.produk || []).map((p) => ({
     id: p.id,
+    slug: p.slug,
     name: p.nama,
     category: p.kategori?.nama || "Produk",
     price: formatRupiah(p.harga),
@@ -103,14 +105,6 @@ export const getActivePromoProducts = async () => {
     // ambil hanya promo dengan status "aktif" untuk ditampilkan di homepage
     const activePromos = promos.filter(p => p.status === "aktif");
 
-    // ambil semua promo tanpa filter status 
-    // const activePromos = promos; 
-
-    // ambil promo dengan filter aktif dan segera
-    // const activePromos = promos.filter(p =>
-    //   ["aktif", "segera"].includes(p.status)
-    // );
-
     console.log("FULL RESPONSE:", res.data);
     console.log("PROMOS RAW:", promos);
 
@@ -154,7 +148,11 @@ export const getActivePromoProducts = async () => {
 export const getPromoById = async (id) => {
   try {
     const res = await api(`/promo/${id}`);
+
+    console.log("RAW PROMO API:", res.data);
+
     const payload = res.data?.data || res.data || res;
+
     return normalizePromo(payload);
   } catch (err) {
     console.error("Error getPromoById:", err);
@@ -267,25 +265,6 @@ export const deletePromo = async (id) => {
 
 
 /* ================= GET PUBLIC PROMOS ================= */
-
-// export const getPublicPromos = async () => {
-//   try {
-//     const res = await api("/promo");
-
-//     console.log("FULL API RESPONSE:", res.data);
-
-//     // ambil array promo
-//     const promos = res.data.data.data;
-
-//     console.log("PROMOS ARRAY:", promos);
-
-//     return promos.map(normalizePromo);
-
-//   } catch (err) {
-//     console.error("Error getPublicPromos:", err);
-//     throw err;
-//   }
-// };
 
 export const getPublicPromos = async () => {
   try {

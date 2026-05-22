@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Eye,
   EyeOff,
@@ -16,6 +16,9 @@ import {
   Plus,
   X,
 } from "lucide-react";
+import Field from "../../components/form/Field";
+import { getSettings, updateSettings } from "../../utils/services/settingsService";
+import { getStatusBuka } from "../../utils/getStatusBuka";
 
 /* ── Font inject ── */
 if (
@@ -44,39 +47,6 @@ const inputCls =
 const labelCls =
   "block text-[11px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider";
 
-const Field = ({ label, children, hint }) => (
-  <div>
-    <label className={labelCls}>{label}</label>
-    {children}
-    {hint && <p className="text-[11px] text-gray-400 mt-1.5">{hint}</p>}
-  </div>
-);
-
-function getStatusBuka(jamKerja) {
-  const now = new Date();
-  const hari = now.getDay();
-  const jam = now.getHours() + now.getMinutes() / 60;
-  const hariIdx = hari === 0 ? 6 : hari - 1;
-
-  if (hariIdx === 6) return { buka: false, label: "Libur Hari Ini" };
-
-  const range = hariIdx < 5 ? jamKerja.senin_jumat : jamKerja.sabtu;
-  if (!range || range.libur) return { buka: false, label: "Libur Hari Ini" };
-
-  const [bukaH, bukaM] = range.buka.split(":").map(Number);
-  const [tutupH, tutupM] = range.tutup.split(":").map(Number);
-  const bukaDec = bukaH + bukaM / 60;
-  const tutupDec = tutupH + tutupM / 60;
-
-  if (jam >= bukaDec && jam < tutupDec) {
-    return {
-      buka: true,
-      label: `Sedang Buka · Tutup ${range.tutup.replace(":", ".")} WIB`,
-    };
-  }
-  return { buka: false, label: `Tutup · Buka ${range.buka.replace(":", ".")} WIB` };
-}
-
 function TimeInput({ value, onChange }) {
   return (
     <input
@@ -90,22 +60,27 @@ function TimeInput({ value, onChange }) {
 }
 
 export default function Pengaturan() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [savedProfile, setSavedProfile] = useState(false);
-  const [savedKontak, setSavedKontak] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState({ type: "", message: "" });
+  const [error, setError] = useState(null);
   const [jamOpen, setJamOpen] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [profile, setProfile] = useState({
-    nama: "Admin Bizponsel",
-    email: "admin@bizponsel.com",
-    password: "",
+    nama: "",
+    email: "",
+    avatar: null,
+    jabatan: "",
+    quote: "",
   });
 
   const [kontak, setKontak] = useState({
-    whatsapp: "+62 81234567890",
-    email: "support@bizponsel.com",
-    alamat:
-      "Jl. Sudirman No. 123, Gedung Bizponsel Lantai 15, Jakarta Pusat, 10220",
+    whatsapp: "",
+    email: "",
+    alamat: "",
+    telepon: "",
+    maps_embed: "",
   });
 
   const [jamKerja, setJamKerja] = useState({
@@ -114,26 +89,96 @@ export default function Pengaturan() {
     minggu: { libur: true },
   });
 
-  const [cabang, setCabang] = useState([
-    {
-      id: 1,
-      nama: "Marina",
-      shifts: [
-        { label: "Shift 1", buka: "09:30", tutup: "16:00" },
-        { label: "Shift 2", buka: "16:00", tutup: "21:30" },
-      ],
-    },
-    {
-      id: 2,
-      nama: "Store Street",
-      shifts: [
-        { label: "Shift 1", buka: "07:30", tutup: "14:30" },
-        { label: "Shift 2", buka: "15:00", tutup: "22:00" },
-      ],
-    },
-  ]);
+  const [cabang, setCabang] = useState([]);
+  const [socialMedia, setSocialMedia] = useState([]);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
-  const status = getStatusBuka(jamKerja);
+  const status = useMemo(() => getStatusBuka({ pusat: jamKerja }), [jamKerja]);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  useEffect(() => {
+    if (avatarFile) {
+      const previewUrl = URL.createObjectURL(avatarFile);
+      setAvatarPreview(previewUrl);
+      return () => URL.revokeObjectURL(previewUrl);
+    }
+    setAvatarPreview(profile.avatar || null);
+  }, [avatarFile, profile.avatar]);
+
+  const fetchSettings = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const data = await getSettings();
+      setProfile({
+        nama: data.profile?.nama || "",
+        email: data.profile?.email || "",
+        avatar: data.profile?.avatar || null,
+        jabatan: data.profile?.jabatan || "",
+        quote: data.profile?.quote || "",
+      });
+      setKontak({
+        whatsapp: data.kontak?.whatsapp || "",
+        email: data.kontak?.email || "",
+        alamat: data.kontak?.alamat || "",
+        telepon: data.kontak?.telepon || "",
+        maps_embed: data.kontak?.maps_embed || "",
+      });
+      setJamKerja({
+        senin_jumat: {
+          buka: data.jam_operasional?.pusat?.senin_jumat?.buka || "08:30",
+          tutup: data.jam_operasional?.pusat?.senin_jumat?.tutup || "17:00",
+          libur: data.jam_operasional?.pusat?.senin_jumat?.libur ?? false,
+        },
+        sabtu: {
+          buka: data.jam_operasional?.pusat?.sabtu?.buka || "08:00",
+          tutup: data.jam_operasional?.pusat?.sabtu?.tutup || "15:00",
+          libur: data.jam_operasional?.pusat?.sabtu?.libur ?? false,
+        },
+        minggu: {
+          libur: data.jam_operasional?.pusat?.minggu?.libur ?? true,
+        },
+      });
+      setCabang(Array.isArray(data.jam_operasional?.cabang) ? data.jam_operasional.cabang : []);
+      setSocialMedia(Array.isArray(data.social_media) ? data.social_media : []);
+    } catch (err) {
+      console.error(err);
+      setError(err?.message || "Gagal memuat pengaturan.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showToast = (type, message) => {
+    setToast({ type, message });
+    window.setTimeout(() => setToast({ type: "", message: "" }), 3600);
+  };
+
+  const handleAvatarChange = (event) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+    }
+  };
+
+  const handleAddSocial = () => {
+    setSocialMedia((prev) => [...prev, { label: "", url: "", icon: "" }]);
+  };
+
+  const handleUpdateSocial = (index, field, value) => {
+    setSocialMedia((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+    );
+  };
+
+  const handleRemoveSocial = (index) => {
+    setSocialMedia((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const updateJamKerja = (key, field, val) =>
     setJamKerja((prev) => ({
@@ -189,18 +234,42 @@ export default function Pengaturan() {
       },
     ]);
 
-  const removeCabang = (id) =>
-    setCabang((prev) => prev.filter((c) => c.id !== id));
+  const removeCabang = (id) => setCabang((prev) => prev.filter((c) => c.id !== id));
 
-  const handleSaveProfile = () => {
-    setSavedProfile(true);
-    setTimeout(() => setSavedProfile(false), 2000);
+  const handleSaveSettings = async () => {
+    setIsSaving(true);
+    try {
+      await updateSettings({
+        profile,
+        kontak,
+        jam_operasional: { pusat: jamKerja, cabang },
+        social_media: socialMedia,
+        avatarFile,
+      });
+      showToast("success", "Pengaturan berhasil disimpan.");
+      await fetchSettings();
+    } catch (err) {
+      console.error(err);
+      showToast("error", err?.message || "Gagal menyimpan pengaturan.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSaveKontak = () => {
-    setSavedKontak(true);
-    setTimeout(() => setSavedKontak(false), 2000);
-  };
+  if (loading) {
+    return (
+      <div className="p-8 pengaturan-admin">
+        <div className="space-y-4">
+          <div className="w-1/3 h-8 bg-gray-200 rounded-xl animate-pulse" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="h-40 bg-gray-200 rounded-3xl animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pengaturan-admin">
@@ -218,6 +287,23 @@ export default function Pengaturan() {
           </p>
         </div>
       </div>
+
+      {toast.message && (
+        <div
+          className={`px-5 py-4 rounded-2xl mb-6 text-sm font-medium ${
+            toast.type === "success"
+              ? "bg-emerald-50 text-emerald-700"
+              : "bg-red-50 text-red-700"
+          }`}>
+          {toast.message}
+        </div>
+      )}
+
+      {error && (
+        <div className="px-5 py-4 mb-6 text-sm font-medium text-red-700 rounded-2xl bg-red-50">
+          {error}
+        </div>
+      )}
 
       <div className="flex flex-col gap-6">
         {/* ── PROFIL ADMIN ── */}
@@ -239,16 +325,21 @@ export default function Pengaturan() {
 
           <div className="flex flex-col gap-6 p-6">
             {/* Avatar */}
-            <div className="flex items-center gap-5 p-5 border border-gray-100 rounded-xl bg-gray-50">
-              <div
-                className="flex items-center justify-center w-16 h-16 text-3xl border-2 rounded-2xl shrink-0"
-                style={{
-                  background: "rgba(7,43,80,0.08)",
-                  borderColor: "rgba(7,43,80,0.15)",
-                }}
-              >
-                👨
+            <div className="flex flex-col items-center gap-5 p-5 border border-gray-100 md:flex-row rounded-xl bg-gray-50">
+              <div className="relative w-24 h-24 overflow-hidden bg-white border-2 border-gray-200 shadow-sm rounded-3xl">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Avatar preview"
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center w-full h-full text-4xl" style={{ background: "rgba(7,43,80,0.08)" }}>
+                    👤
+                  </div>
+                )}
               </div>
+
               <div className="flex-1">
                 <p className="text-[13.5px] font-bold m-0 mb-0.5" style={{ color: NAVY }}>
                   Foto Profil
@@ -256,14 +347,30 @@ export default function Pengaturan() {
                 <p className="text-[11.5px] text-gray-400 m-0 mb-3">
                   JPG, PNG atau GIF · Maks. 2MB
                 </p>
-                <div className="flex gap-2">
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+                <div className="flex flex-wrap gap-2">
                   <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
                     className="flex items-center gap-1.5 text-white text-[12px] px-4 py-2 rounded-lg cursor-pointer border-none font-bold transition-all hover:opacity-90"
                     style={{ background: NAVY }}
                   >
                     <Upload size={12} /> Upload Foto
                   </button>
-                  <button className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 text-[12px] px-4 py-2 rounded-lg cursor-pointer border-none font-bold transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAvatarFile(null);
+                      setProfile((prev) => ({ ...prev, avatar: null }));
+                    }}
+                    className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-500 text-[12px] px-4 py-2 rounded-lg cursor-pointer border-none font-bold transition-colors"
+                  >
                     <Trash2 size={12} /> Hapus
                   </button>
                 </div>
@@ -296,39 +403,23 @@ export default function Pengaturan() {
               </Field>
             </div>
 
-            {/* Password */}
-            <Field label="Password Baru" hint="Kosongkan jika tidak ingin mengubah password">
-              <div className="relative">
-                <Lock size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Jabatan">
                 <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Masukkan password baru"
-                  value={profile.password}
-                  onChange={(e) => setProfile({ ...profile, password: e.target.value })}
-                  className={`${inputCls} pl-9 pr-10`}
+                  type="text"
+                  value={profile.jabatan}
+                  onChange={(e) => setProfile({ ...profile, jabatan: e.target.value })}
+                  className={inputCls}
                 />
-                <button
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute p-0 text-gray-400 -translate-y-1/2 bg-transparent border-none cursor-pointer right-3 top-1/2 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                </button>
-              </div>
-            </Field>
-
-            {/* Footer */}
-            <div className="flex justify-end pt-2 border-t border-gray-100">
-              <button
-                onClick={handleSaveProfile}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90"
-                style={
-                  savedProfile
-                    ? { background: "#10b981", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }
-                    : { background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }
-                }
-              >
-                {savedProfile ? <><Check size={14} /> Tersimpan!</> : "Simpan Perubahan"}
-              </button>
+              </Field>
+              <Field label="Quote CEO">
+                <textarea
+                  rows={3}
+                  value={profile.quote}
+                  onChange={(e) => setProfile({ ...profile, quote: e.target.value })}
+                  className={`${inputCls} resize-none leading-relaxed`}
+                />
+              </Field>
             </div>
           </div>
         </div>
@@ -381,6 +472,15 @@ export default function Pengaturan() {
                   className={`${inputCls} pl-9 resize-none leading-relaxed`}
                 />
               </div>
+            </Field>
+
+            <Field label="Embed Google Maps" hint="Tempel URL atau kode iframe Google Maps di sini">
+              <textarea
+                rows={3}
+                value={kontak.maps_embed}
+                onChange={(e) => setKontak({ ...kontak, maps_embed: e.target.value })}
+                className={`${inputCls} resize-none leading-relaxed`}
+              />
             </Field>
 
             {/* ── JAM OPERASIONAL ── */}
@@ -544,15 +644,12 @@ export default function Pengaturan() {
             {/* Footer */}
             <div className="flex justify-end pt-2 border-t border-gray-100">
               <button
-                onClick={handleSaveKontak}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90"
-                style={
-                  savedKontak
-                    ? { background: "#10b981", boxShadow: "0 4px 14px rgba(16,185,129,0.3)" }
-                    : { background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }
-                }
+                onClick={handleSaveSettings}
+                disabled={isSaving}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none text-white text-[13.5px] font-bold cursor-pointer transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ background: NAVY, boxShadow: `0 4px 14px rgba(7,43,80,0.28)` }}
               >
-                {savedKontak ? <><Check size={14} /> Tersimpan!</> : "Simpan Pengaturan"}
+                {isSaving ? <><Check size={14} /> Menyimpan...</> : "Simpan Pengaturan"}
               </button>
             </div>
           </div>

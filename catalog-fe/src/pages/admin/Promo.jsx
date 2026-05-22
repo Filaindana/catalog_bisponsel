@@ -1005,7 +1005,10 @@ export default function Promo() {
       {/* Edit Modal */}
       {editPromo && (
         <Overlay onClose={() => setEditPromo(null)}>
-          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-115">
+          {/* <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-115"> */}
+          <div className="bg-white shadow-2xl modal-wrap rounded-2xl w-115 max-h-[90vh] flex flex-col overflow-hidden">
+            
+            {/* Header */}
             <div
               className="flex items-center gap-3 px-6 py-5"
               style={{ background: NAVY }}
@@ -1033,7 +1036,8 @@ export default function Promo() {
               </button>
             </div>
 
-            <div className="flex flex-col gap-4 p-6">
+            {/* Body Scroll */}
+            <div className="flex flex-col flex-1 gap-4 p-6 overflow-y-auto">
               {[
                 { label: "Nama Promo", key: "name" },
                 { label: "Deskripsi", key: "desc" },
@@ -1241,6 +1245,7 @@ export default function Promo() {
                 )}
               </div>
 
+              {/* Footer */}
               <div className="flex gap-2.5 mt-1">
                 <button
                   onClick={() => setEditPromo(null)}

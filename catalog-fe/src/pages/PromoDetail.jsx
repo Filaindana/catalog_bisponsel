@@ -146,55 +146,66 @@ export default function PromoDetail() {
                       Produk Terkait
                     </p>
                     <h2 className="text-xl font-black text-[#0f172a]">
-                      {promo.produk?.length ?? 0} Produk
+                      {promo.products?.length ?? 0} Produk
                     </h2>
                   </div>
                 </div>
-
-                {promo.produk?.length > 0 ? (
-                  <div className="grid gap-4">
-                    {promo.produk.map((product) => (
-                      <div
+                
+                {promo.products?.length > 0 ? (
+                <div className="grid gap-4">
+                    {promo.products.map((product) => (
+                    <div
                         key={product.id}
-                        className="grid gap-4 rounded-3xl border border-[#e2e8f0] bg-[#f8fafc] p-4 sm:grid-cols-[120px_1fr]"
-                      >
+                        onClick={() => {
+                        if (product?.slug) {
+                            navigate(`/product/${product.slug}`);
+                        } else {
+                            console.warn("Slug kosong!", product);
+                        }
+                        }}
+                        className="grid gap-4 rounded-3xl border border-[#e2e8f0] bg-[#f8fafc] p-4 sm:grid-cols-[120px_1fr] cursor-pointer transition-all duration-200 hover:border-[#072B50] hover:shadow-lg"
+                    >
                         <div className="overflow-hidden bg-white rounded-2xl">
-                          <img
+                        <img
                             src={product.image || "/fallback.jpg"}
                             alt={product.name}
-                            className="object-cover w-full h-full"
+                            className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                             onError={(e) => {
-                              e.currentTarget.src = "/fallback.jpg";
+                            e.currentTarget.src = "/fallback.jpg";
                             }}
-                          />
+                        />
                         </div>
+
                         <div className="flex flex-col justify-between gap-3">
-                          <div>
+                        <div>
                             <p className="text-sm font-semibold text-[#334155] mb-1">
-                              {product.name}
+                            {product.name}
                             </p>
+
                             <p className="text-xs text-[#64748b]">
-                              {product.category || "Produk"}
+                            {product.category || "Produk"}
                             </p>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            <span className="text-base font-bold text-[#0f172a]">
-                              {product.price}
-                            </span>
-                            {product.originalPrice && (
-                              <span className="text-xs line-through text-[#94a3b8]">
-                                {product.originalPrice}
-                              </span>
-                            )}
-                          </div>
                         </div>
-                      </div>
+
+                        <div className="flex flex-col gap-2">
+                            <span className="text-base font-bold text-[#0f172a]">
+                            {product.price}
+                            </span>
+
+                            {product.originalPrice && (
+                            <span className="text-xs line-through text-[#94a3b8]">
+                                {product.originalPrice}
+                            </span>
+                            )}
+                        </div>
+                        </div>
+                    </div>
                     ))}
-                  </div>
+                </div>
                 ) : (
-                  <div className="rounded-3xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center text-[#64748b]">
+                <div className="rounded-3xl border border-dashed border-[#cbd5e1] bg-white p-8 text-center text-[#64748b]">
                     Tidak ada produk terkait untuk promo ini.
-                  </div>
+                </div>
                 )}
               </div>
             </div>

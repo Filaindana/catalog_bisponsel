@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             PromoSeeder::class,
             PromoProdukSeeder::class,
             KontakSeeder::class,
+            SettingsSeeder::class,
             PengaturanSeeder::class,
             PenjualanProdukSeeder::class,
             FavoritSeeder::class,

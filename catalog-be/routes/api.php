@@ -19,6 +19,7 @@ use App\Http\Controllers\PenjualanProdukController;
 use App\Http\Controllers\GambarProdukController;
 use App\Http\Controllers\SpesifikasiProdukController;
 use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UsersController;
 
@@ -64,6 +65,7 @@ Route::apiResource('aktivitas', AktivitasController::class)->only(['index', 'sho
 
 // Kontak (public bisa kirim)
 Route::post('/kontak', [KontakController::class, 'store']);
+Route::get('/settings', [SettingsController::class, 'show']);
 
 
 // =======================
@@ -104,8 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('penjualan', PenjualanProdukController::class);
 
     // ⚙️ Pengaturan
-    Route::get('/pengaturan', [PengaturanController::class, 'index']);
-    Route::put('/pengaturan', [PengaturanController::class, 'update']);
+    Route::put('/settings', [SettingsController::class, 'update']);
 
     // 📩 Kontak (admin lihat pesan)
     Route::get('/kontak', [KontakController::class, 'index']);

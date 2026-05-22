@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cabang;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class CabangController
 {
@@ -31,15 +32,21 @@ class CabangController
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'kode'    => 'required|string|max:50|unique:cabang,kode',
-            'nama'    => 'required|string|max:255',
-            'kota'    => 'required|string|max:100',
-            'alamat'  => 'required|string',
-            'telepon' => 'nullable|string|max:20',
-            'jam_buka'   => 'nullable|date_format:H:i',
-            'jam_tutup'  => 'nullable|date_format:H:i',
-            'maps_link'  => 'nullable|url',
+            'kode'      => 'required|string|max:50|unique:cabang,kode',
+            'nama'      => 'required|string|max:255',
+            'kota'      => 'required|string|max:100',
+            'alamat'    => 'required|string',
+            'telepon'   => 'nullable|string|max:20',
+            'email'     => 'nullable|email|max:255',
+            'jam_buka'  => 'nullable|date_format:H:i',
+            'jam_tutup' => 'nullable|date_format:H:i',
+            'maps_link' => 'nullable|url',
+            'foto'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $request->file('foto')->store('cabang', 'public');
+        }
 
         $cabang = Cabang::create($validated);
 
@@ -55,15 +62,24 @@ class CabangController
         $cabang = Cabang::findOrFail($id);
 
         $validated = $request->validate([
-            'kode'    => 'sometimes|string|max:50|unique:cabang,kode,' . $id,
-            'nama'    => 'sometimes|string|max:255',
-            'kota'    => 'sometimes|string|max:100',
-            'alamat'  => 'sometimes|string',
-            'telepon' => 'nullable|string|max:20',
-            'jam_buka'   => 'nullable|date_format:H:i',
-            'jam_tutup'  => 'nullable|date_format:H:i',
-            'maps_link'  => 'nullable|url',
+            'kode'      => 'sometimes|string|max:50|unique:cabang,kode,' . $id,
+            'nama'      => 'sometimes|string|max:255',
+            'kota'      => 'sometimes|string|max:100',
+            'alamat'    => 'sometimes|string',
+            'telepon'   => 'nullable|string|max:20',
+            'email'     => 'nullable|email|max:255',
+            'jam_buka'  => 'nullable|date_format:H:i',
+            'jam_tutup' => 'nullable|date_format:H:i',
+            'maps_link' => 'nullable|url',
+            'foto'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
+
+        if ($request->hasFile('foto')) {
+            if ($cabang->foto) {
+                Storage::disk('public')->delete($cabang->foto);
+            }
+            $validated['foto'] = $request->file('foto')->store('cabang', 'public');
+        }
 
         $cabang->update($validated);
 
@@ -77,6 +93,11 @@ class CabangController
     public function destroy(int $id): JsonResponse
     {
         $cabang = Cabang::findOrFail($id);
+
+        if ($cabang->foto) {
+            Storage::disk('public')->delete($cabang->foto);
+        }
+
         $cabang->delete();
 
         return response()->json([

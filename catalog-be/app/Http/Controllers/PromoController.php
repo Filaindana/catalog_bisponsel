@@ -5,13 +5,65 @@ namespace App\Http\Controllers;
 use App\Models\Promo;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Carbon\Carbon;
 
 class PromoController
 {
+    private function getStatus(Promo $promo): string
+    {
+        $now = Carbon::now();
+        $mulai = $promo->tanggal_mulai ? Carbon::parse($promo->tanggal_mulai) : null;
+        $selesai = $promo->tanggal_selesai ? Carbon::parse($promo->tanggal_selesai) : null;
+
+        if ($mulai && $mulai->isFuture()) {
+            return 'segera';
+        }
+
+        if ($selesai && $selesai->isPast()) {
+            return 'berakhir';
+        }
+
+        return 'aktif';
+    }
+
+    private function formatPromo(Promo $promo): array
+    {
+        $promo->loadMissing('produk.kategori', 'produk.spesifikasi');
+
+        return [
+            'id' => $promo->id,
+            'nama' => $promo->nama,
+            'deskripsi' => $promo->deskripsi,
+            'tanggal_mulai' => optional($promo->tanggal_mulai)->format('Y-m-d'),
+            'tanggal_selesai' => optional($promo->tanggal_selesai)->format('Y-m-d'),
+            'status' => $this->getStatus($promo),
+            'banner' => $promo->banner,
+            'produk' => $promo->produk->map(function ($produk) {
+                return [
+                    'id' => $produk->id,
+                    'nama' => $produk->nama,
+                    'harga' => $produk->harga,
+                    'stok' => $produk->stok,
+                    'rating' => $produk->rating,
+                    'gambar' => $produk->gambar,
+                    'kategori' => $produk->kategori ? [
+                        'id' => $produk->kategori->id,
+                        'nama' => $produk->kategori->nama,
+                    ] : null,
+                    'spesifikasi' => $produk->spesifikasi->map(function ($detail) {
+                        return [
+                            'id' => $detail->id,
+                            'detail' => $detail->detail,
+                        ];
+                    })->all(),
+                ];
+            })->all(),
+        ];
+    }
+
     public function index(Request $request): JsonResponse
     {
-        // $query = Promo::with('produk');
         $query = Promo::with('produk.kategori', 'produk.spesifikasi');
 
         if ($request->filled('status')) {
@@ -22,50 +74,37 @@ class PromoController
             ->paginate($request->get('per_page', 10));
 
         $promo->getCollection()->transform(function ($item) {
-            $now = \Carbon\Carbon::now();
-
-            if ($item->tanggal_mulai > $now) {
-                $status = 'segera';
-            } elseif ($item->tanggal_selesai < $now) {
-                $status = 'berakhir';
-            } else {
-                $status = 'aktif';
-            }
-
-            return [
-                'id' => $item->id,
-                'nama' => $item->nama,
-                'deskripsi' => $item->deskripsi,
-                'tanggal_mulai' => $item->tanggal_mulai?->format('Y-m-d'),
-                'tanggal_selesai' => $item->tanggal_selesai?->format('Y-m-d'),
-                'status' => $status,
-                'banner' => $item->banner,
-                'produk' => $item->produk,
-            ];
+            return $this->formatPromo($item);
         });
+
+        $aktifCount = Promo::whereDate('tanggal_mulai', '<=', now())
+            ->whereDate('tanggal_selesai', '>=', now())
+            ->count();
+
+        $segeraCount = Promo::whereDate('tanggal_mulai', '>', now())
+            ->count();
+
+        $berakhirCount = Promo::whereDate('tanggal_selesai', '<', now())
+            ->count();
 
         return response()->json([
             'status' => true,
-            'data'   => $promo
+            'data' => $promo,
+            'meta' => [
+                'aktif_count' => $aktifCount,
+                'segera_count' => $segeraCount,
+                'berakhir_count' => $berakhirCount,
+            ],
         ]);
     }
 
     public function show(int $id): JsonResponse
     {
-        $promo = Promo::with('produk')->findOrFail($id);
+        $promo = Promo::with('produk.kategori', 'produk.spesifikasi')->findOrFail($id);
 
         return response()->json([
             'status' => true,
-            'data'   => [
-                'id' => $promo->id,
-                'nama' => $promo->nama,
-                'deskripsi' => $promo->deskripsi,
-                'tanggal_mulai' => $promo->tanggal_mulai?->format('Y-m-d'),
-                'tanggal_selesai' => $promo->tanggal_selesai?->format('Y-m-d'),
-                'status' => $promo->status,
-                'banner' => $promo->banner,
-                'produk' => $promo->produk,
-            ],
+            'data' => $this->formatPromo($promo),
         ]);
     }
 
@@ -76,20 +115,32 @@ class PromoController
             'deskripsi' => 'nullable|string',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
-            'banner' => 'nullable|string',
+            'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'produk_terkait' => 'nullable|array',
+            'produk_terkait.*' => 'integer|exists:produk,id',
             'produk_ids' => 'nullable|array',
+            'produk_ids.*' => 'integer|exists:produk,id',
         ]);
 
-        $promo = Promo::create($validated);
-
-        if (!empty($validated['produk_ids'])) {
-            $promo->produk()->sync($validated['produk_ids']);
+        if ($request->hasFile('banner')) {
+            $validated['banner'] = $request->file('banner')->store('promo', 'public');
+        } else {
+            unset($validated['banner']);
         }
+
+        $related = $validated['produk_terkait'] ?? $validated['produk_ids'] ?? [];
+        $promo = Promo::create(Arr::except($validated, ['produk_terkait', 'produk_ids']));
+
+        if (!empty($related)) {
+            $promo->produk()->sync($related);
+        }
+
+        $promo->refresh();
 
         return response()->json([
             'status' => true,
             'message' => 'Promo berhasil dibuat',
-            'data' => $promo->load('produk'),
+            'data' => $this->formatPromo($promo),
         ], 201);
     }
 
@@ -102,20 +153,32 @@ class PromoController
             'deskripsi' => 'nullable|string',
             'tanggal_mulai' => 'sometimes|date',
             'tanggal_selesai' => 'sometimes|date',
-            'banner' => 'nullable|string',
+            'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'produk_terkait' => 'nullable|array',
+            'produk_terkait.*' => 'integer|exists:produk,id',
             'produk_ids' => 'nullable|array',
+            'produk_ids.*' => 'integer|exists:produk,id',
         ]);
 
-        $promo->update($validated);
-
-        if (array_key_exists('produk_ids', $validated)) {
-            $promo->produk()->sync($validated['produk_ids'] ?? []);
+        if ($request->hasFile('banner')) {
+            $validated['banner'] = $request->file('banner')->store('promo', 'public');
+        } else {
+            unset($validated['banner']);
         }
+
+        $related = $validated['produk_terkait'] ?? $validated['produk_ids'] ?? null;
+        $promo->update(Arr::except($validated, ['produk_terkait', 'produk_ids']));
+
+        if ($related !== null) {
+            $promo->produk()->sync($related);
+        }
+
+        $promo->refresh();
 
         return response()->json([
             'status' => true,
             'message' => 'Promo berhasil diupdate',
-            'data' => $promo->load('produk'),
+            'data' => $this->formatPromo($promo),
         ]);
     }
 

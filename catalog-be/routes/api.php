@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // 🔐 AUTH
@@ -20,6 +19,7 @@ use App\Http\Controllers\PenjualanProdukController;
 use App\Http\Controllers\GambarProdukController;
 use App\Http\Controllers\SpesifikasiProdukController;
 use App\Http\Controllers\PengaturanController;
+use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UsersController;
 
 /*
@@ -90,6 +90,9 @@ Route::middleware('auth:sanctum')->group(function () {
     // 🏢 Cabang & Aktivitas
     Route::apiResource('cabang', CabangController::class)->except(['index', 'show']);
     Route::apiResource('aktivitas', AktivitasController::class)->except(['index', 'show']);
+
+    // 📤 Upload gambar produk
+    Route::post('/upload', [UploadController::class, 'store']);
 
     // ⭐ Favorit
     Route::get('/favorit', [FavoritController::class, 'index']);

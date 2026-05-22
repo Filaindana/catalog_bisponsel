@@ -13,7 +13,7 @@ class ProdukController extends BaseController
 {
     public function index(Request $request): JsonResponse
     {
-        $query = Produk::with(['kategori', 'spesifikasi', 'gambar']);
+        $query = Produk::with(['kategori', 'spesifikasi', 'gambar', 'promo']);
 
         if ($request->filled('kategori_id')) {
             $query->where('kategori_id', $request->kategori_id);
@@ -63,7 +63,7 @@ class ProdukController extends BaseController
             default      => $query->latest(),
         };
 
-        $produk = $query->paginate($request->get('per_page', 12))
+        $produk = $query->paginate($request->get('per_page', 15))
             ->appends($request->query());
 
         // 🔥 GLOBAL COUNT (BUKAN PER PAGE)
@@ -106,6 +106,8 @@ class ProdukController extends BaseController
             'stok'              => 'required|integer|min:0',
             'rating'            => 'nullable|numeric|min:0|max:5',
             'adalah_promo'      => 'boolean',
+            'promo_ids'         => 'nullable|array',
+            'promo_ids.*'       => 'integer|exists:promo,id',
             'gambar'            => 'nullable|array',
             'gambar.*'          => 'nullable|string',
             'spesifikasi'       => 'nullable|array',
@@ -116,7 +118,12 @@ class ProdukController extends BaseController
         try {
             DB::beginTransaction();
 
-            $produkData = collect($validated)->except(['gambar', 'spesifikasi'])->toArray();
+            $produkData = collect($validated)->except(['gambar', 'spesifikasi', 'promo_ids'])->toArray();
+            if (array_key_exists('promo_ids', $validated)) {
+                $produkData['adalah_promo'] = count($validated['promo_ids'] ?? []) > 0;
+            } elseif (array_key_exists('adalah_promo', $validated)) {
+                $produkData['adalah_promo'] = $validated['adalah_promo'];
+            }
             $produkData['slug'] = $validated['slug'] ?? Str::slug($validated['nama']);
 
             $produk = Produk::create($produkData);
@@ -136,12 +143,16 @@ class ProdukController extends BaseController
                 }
             }
 
+            if (array_key_exists('promo_ids', $validated)) {
+                $produk->promo()->sync($validated['promo_ids'] ?? []);
+            }
+
             DB::commit();
 
             return response()->json([
                 'status'  => true,
                 'message' => 'Produk berhasil dibuat.',
-                'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi']),
+                'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi', 'promo']),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -167,6 +178,8 @@ class ProdukController extends BaseController
             'stok'              => 'sometimes|integer|min:0',
             'rating'            => 'nullable|numeric|min:0|max:5',
             'adalah_promo'      => 'sometimes|boolean',
+            'promo_ids'         => 'nullable|array',
+            'promo_ids.*'       => 'integer|exists:promo,id',
             'gambar'            => 'nullable|array',
             'gambar.*'          => 'nullable|string',
             'spesifikasi'       => 'nullable|array',
@@ -177,7 +190,12 @@ class ProdukController extends BaseController
         try {
             DB::beginTransaction();
 
-            $produkData = collect($validated)->except(['gambar', 'spesifikasi'])->toArray();
+            $produkData = collect($validated)->except(['gambar', 'spesifikasi', 'promo_ids'])->toArray();
+            if (array_key_exists('promo_ids', $validated)) {
+                $produkData['adalah_promo'] = count($validated['promo_ids'] ?? []) > 0;
+            } elseif (array_key_exists('adalah_promo', $validated)) {
+                $produkData['adalah_promo'] = $validated['adalah_promo'];
+            }
             if (empty($produkData['slug'])) {
                 unset($produkData['slug']);
             }
@@ -201,12 +219,16 @@ class ProdukController extends BaseController
                 }
             }
 
+            if (array_key_exists('promo_ids', $validated)) {
+                $produk->promo()->sync($validated['promo_ids'] ?? []);
+            }
+
             DB::commit();
 
             return response()->json([
                 'status'  => true,
                 'message' => 'Produk berhasil diperbarui.',
-                'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi']),
+                'data'    => $produk->load(['kategori', 'gambar', 'spesifikasi', 'promo']),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();

@@ -18,15 +18,29 @@ class Cabang extends Model
         'kota',
         'alamat',
         'telepon',
+        'email',
         'jam_buka',
         'jam_tutup',
         'maps_link',
+        'foto',
     ];
 
     protected $casts = [
         'jam_buka'  => 'string',
         'jam_tutup' => 'string',
     ];
+
+    protected $appends = ['foto_url'];
+
+    public function getFotoUrlAttribute(): ?string
+    {
+        if (! $this->foto) {
+            return null;
+        }
+
+        return asset('storage/' . $this->foto);
+    }
+
 
     public function aktivitas(): HasMany
     {

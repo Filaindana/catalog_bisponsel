@@ -34,35 +34,6 @@ class PromoSeeder extends Seeder
             ['Gaming Gear Rush', 'Diskon keyboard, mouse, headset gaming.'],
         ];
 
-        // foreach ($data as $i => $item) {
-
-        //     // Random status
-        //     $statusList = ['aktif', 'segera', 'berakhir'];
-        //     $status = $statusList[array_rand($statusList)];
-
-        //     // Atur tanggal berdasarkan status
-        //     if ($status === 'aktif') {
-        //         $start = $now->copy()->subDays(rand(1, 10));
-        //         $end   = $now->copy()->addDays(rand(1, 10));
-        //     } elseif ($status === 'segera') {
-        //         $start = $now->copy()->addDays(rand(5, 20));
-        //         $end   = $start->copy()->addDays(rand(1, 10));
-        //     } else {
-        //         $start = $now->copy()->subDays(rand(20, 40));
-        //         $end   = $now->copy()->subDays(rand(1, 10));
-        //     }
-
-        //     $promo[] = [
-        //         'nama'            => $item[0],
-        //         'deskripsi'       => $item[1],
-        //         'tanggal_mulai'   => $start,
-        //         'tanggal_selesai' => $end,
-        //         'status'          => $status,
-        //         'banner'          => 'https://source.unsplash.com/1200x600/?technology,' . ($i + 1),
-        //         'dibuat_pada'     => $start->copy()->subDays(rand(5, 15)),
-        //         'diperbarui_pada' => $start,
-        //     ];
-        // }
         foreach ($data as $i => $item) {
 
             if ($i < 7) {
@@ -85,7 +56,7 @@ class PromoSeeder extends Seeder
                 'tanggal_mulai' => $start,
                 'tanggal_selesai' => $end,
                 'status' => $status,
-                'banner' => 'https://source.unsplash.com/1200x600/?technology,' . ($i + 1),
+                'banner' => 'https://i0.wp.com/pemmztechie.id/wp-content/uploads/2022/05/Desain-Banner-Web-Pemmztechie-Promo-MEI_.jpg?ssl=1' . $i . '/1200/600',
                 'dibuat_pada' => $start->copy()->subDays(rand(5, 15)),
                 'diperbarui_pada' => $start,
             ];

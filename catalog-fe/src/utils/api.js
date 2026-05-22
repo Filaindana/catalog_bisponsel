@@ -7,12 +7,13 @@ const getToken = () => localStorage.getItem("token");
 const api = async (endpoint, options = {}) => {
   const token = getToken();
 
+  const isFormData = options.body instanceof FormData;
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
+      Accept: "application/json",
       ...(token && { Authorization: `Bearer ${token}` }),
+      ...(!isFormData && { "Content-Type": "application/json" }),
       ...(options.headers || {}),
     },
   });

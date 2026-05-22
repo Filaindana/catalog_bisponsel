@@ -205,7 +205,7 @@ export default function Pengaturan() {
   return (
     <div className="pengaturan-admin">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col justify-between gap-4 mb-8 sm:flex-row sm:items-center">
         <div>
           <h1
             className="text-[22px] font-extrabold m-0 tracking-tight"
@@ -221,7 +221,7 @@ export default function Pengaturan() {
 
       <div className="flex flex-col gap-6">
         {/* ── PROFIL ADMIN ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <User size={14} color={NAVY} />
@@ -229,7 +229,7 @@ export default function Pengaturan() {
                 className="text-[12.5px] font-bold uppercase tracking-wider"
                 style={{ color: NAVY }}
               >
-                Profil Admin
+                Profil CEO
               </span>
             </div>
             <span className="text-[11px] text-gray-400">
@@ -237,11 +237,11 @@ export default function Pengaturan() {
             </span>
           </div>
 
-          <div className="p-6 flex flex-col gap-6">
+          <div className="flex flex-col gap-6 p-6">
             {/* Avatar */}
-            <div className="flex items-center gap-5 p-5 rounded-xl bg-gray-50 border border-gray-100">
+            <div className="flex items-center gap-5 p-5 border border-gray-100 rounded-xl bg-gray-50">
               <div
-                className="w-16 h-16 rounded-2xl border-2 flex items-center justify-center text-3xl shrink-0"
+                className="flex items-center justify-center w-16 h-16 text-3xl border-2 rounded-2xl shrink-0"
                 style={{
                   background: "rgba(7,43,80,0.08)",
                   borderColor: "rgba(7,43,80,0.15)",
@@ -309,7 +309,7 @@ export default function Pengaturan() {
                 />
                 <button
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-transparent border-none cursor-pointer p-0"
+                  className="absolute p-0 text-gray-400 -translate-y-1/2 bg-transparent border-none cursor-pointer right-3 top-1/2 hover:text-gray-600"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
@@ -334,7 +334,7 @@ export default function Pengaturan() {
         </div>
 
         {/* ── KONTAK WEBSITE ── */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="overflow-hidden bg-white border border-gray-100 shadow-sm rounded-2xl">
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100" style={{ background: "#FDFDFD" }}>
             <div className="flex items-center gap-2">
               <Building2 size={14} color={NAVY} />
@@ -345,7 +345,7 @@ export default function Pengaturan() {
             <span className="text-[11px] text-gray-400">Ditampilkan di footer dan halaman kontak</span>
           </div>
 
-          <div className="p-6 flex flex-col gap-5">
+          <div className="flex flex-col gap-5 p-6">
             <div className="grid grid-cols-2 gap-4">
               <Field label="Nomor WhatsApp">
                 <div className="relative">
@@ -384,7 +384,7 @@ export default function Pengaturan() {
             </Field>
 
             {/* ── JAM OPERASIONAL ── */}
-            <div className="rounded-xl border border-gray-200 overflow-hidden">
+            <div className="overflow-hidden border border-gray-200 rounded-xl">
               <button
                 onClick={() => setJamOpen(!jamOpen)}
                 className="w-full flex items-center justify-between px-4 py-3.5 bg-gray-50 hover:bg-gray-100 transition-colors border-none cursor-pointer"
@@ -420,7 +420,7 @@ export default function Pengaturan() {
               </button>
 
               {jamOpen && (
-                <div className="jam-accordion-body p-5 flex flex-col gap-6 border-t border-gray-100">
+                <div className="flex flex-col gap-6 p-5 border-t border-gray-100 jam-accordion-body">
 
                   {/* Jam Kerja Pusat */}
                   <div>
@@ -480,7 +480,7 @@ export default function Pengaturan() {
                             />
                             <button
                               onClick={() => removeCabang(c.id)}
-                              className="ml-auto text-red-400 hover:text-red-600 bg-transparent border-none cursor-pointer p-0 transition-colors"
+                              className="p-0 ml-auto text-red-400 transition-colors bg-transparent border-none cursor-pointer hover:text-red-600"
                               title="Hapus cabang"
                             >
                               <X size={13} />
@@ -511,7 +511,7 @@ export default function Pengaturan() {
                                 {c.shifts.length > 1 && (
                                   <button
                                     onClick={() => removeShift(c.id, idx)}
-                                    className="text-red-400 hover:text-red-600 bg-transparent border-none cursor-pointer p-0 transition-colors shrink-0"
+                                    className="p-0 text-red-400 transition-colors bg-transparent border-none cursor-pointer hover:text-red-600 shrink-0"
                                     title="Hapus shift"
                                   >
                                     <X size={13} />

@@ -5,6 +5,7 @@ import {
   updatePromo,
   deletePromo,
 } from "../../utils/services/promoService";
+import productService from "../../utils/services/productService";
 import {
   Eye,
   Pencil,
@@ -48,18 +49,18 @@ if (
   document.head.appendChild(s);
 }
 
-const ITEMS_PER_PAGE = 5;
+// const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
 const produkOptions = [
-  "PC Gaming",
-  "Hp Samsung",
-  "iPhone 15",
-  "iPad Air",
-  "Laptop Asus",
-  "Samsung S24",
-  "Xiaomi 14",
-  "ASUS ROG",
-  "MacBook Pro",
+  { id: 1, name: "PC Gaming" },
+  { id: 2, name: "Hp Samsung" },
+  { id: 3, name: "iPhone 15" },
+  { id: 4, name: "iPad Air" },
+  { id: 5, name: "Laptop Asus" },
+  { id: 6, name: "Samsung S24" },
+  { id: 7, name: "Xiaomi 14" },
+  { id: 8, name: "ASUS ROG" },
+  { id: 9, name: "MacBook Pro" },
 ];
 const presetColors = [
   NAVY,
@@ -93,6 +94,8 @@ const fmt = (date) => {
     month: "short",
   });
 };
+
+const getImageUrl = (path) => (path ? `/storage/${path}` : null);
 
 const inputCls =
   "input-field w-full px-3.5 py-3 rounded-xl border border-gray-200 text-[13.5px] outline-none text-gray-800 bg-gray-50 transition-all";
@@ -137,7 +140,7 @@ const Overlay = ({ onClose, children }) => (
 );
 
 function StatusBadge({ status }) {
-  const cfg = statusConfig[status] || statusConfig.Berakhir;
+  const cfg = statusConfig[String(status).toLowerCase()] || statusConfig.berakhir;
   return (
     <span
       className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11.5px] font-bold"
@@ -246,7 +249,7 @@ function ViewModal({ promo, onClose }) {
   );
 }
 
-function AddModal({ onClose, onSave }) {
+function AddModal({ onClose, onSave, productOptions = produkOptions }) {
   const [form, setForm] = useState({
     name: "",
     startDate: "",
@@ -256,23 +259,32 @@ function AddModal({ onClose, onSave }) {
     bannerColor: NAVY,
   });
   const [produkSearch, setProdukSearch] = useState("");
-  const [selectedProduk, setSelectedProduk] = useState([
-    "PC Gaming",
-    "Hp Samsung",
-  ]);
+  const [selectedProduk, setSelectedProduk] = useState([]);
   const [dragOver, setDragOver] = useState(false);
+  const [bannerFile, setBannerFile] = useState(null);
+  const [bannerPreview, setBannerPreview] = useState(null);
 
-  const filteredProduk = produkOptions.filter(
+  const handleBannerFile = (file) => {
+    if (file && file.type?.startsWith("image/")) {
+      setBannerPreview(URL.createObjectURL(file));
+      setBannerFile(file);
+    }
+  };
+
+  const filteredProduk = productOptions.filter(
     (p) =>
-      p.toLowerCase().includes(produkSearch.toLowerCase()) &&
-      !selectedProduk.includes(p),
+      String(p?.name || "")
+        .toLowerCase()
+        .includes(produkSearch.toLowerCase()) &&
+      !selectedProduk.some((selected) => selected.id === p?.id),
   );
-  const addProduk = (p) => {
-    setSelectedProduk([...selectedProduk, p]);
+  const addProduk = (produk) => {
+    if (!produk?.id) return;
+    setSelectedProduk((prev) => [...prev, produk]);
     setProdukSearch("");
   };
-  const removeProduk = (p) =>
-    setSelectedProduk(selectedProduk.filter((s) => s !== p));
+  const removeProduk = (produk) =>
+    setSelectedProduk(selectedProduk.filter((s) => s.id !== produk.id));
 
   const durasi =
     form.startDate && form.endDate
@@ -411,7 +423,7 @@ function AddModal({ onClose, onSave }) {
               title="Banner Promo"
             />
             <div className="flex flex-col gap-3.5">
-              <div
+              <label
                 onDragOver={(e) => {
                   e.preventDefault();
                   setDragOver(true);
@@ -420,6 +432,8 @@ function AddModal({ onClose, onSave }) {
                 onDrop={(e) => {
                   e.preventDefault();
                   setDragOver(false);
+                  const file = e.dataTransfer?.files?.[0];
+                  handleBannerFile(file);
                 }}
                 className="flex flex-col items-center gap-2 p-5 transition-all duration-200 border-2 border-dashed cursor-pointer rounded-xl"
                 style={{
@@ -427,15 +441,44 @@ function AddModal({ onClose, onSave }) {
                   background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
                 }}
               >
-                <Upload size={18} color={dragOver ? NAVY : "#9ca3af"} />
-                <p className="text-[12.5px] font-semibold text-gray-700 m-0">
-                  Upload gambar banner{" "}
-                  <span style={{ color: NAVY }}>(opsional)</span>
-                </p>
-                <p className="text-[11px] text-gray-400 m-0">
-                  PNG, JPG — Maks. 2MB · 1200×400px
-                </p>
-              </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleBannerFile(e.target.files?.[0])}
+                />
+                {bannerPreview ? (
+                  <div className="relative w-full overflow-hidden rounded-xl">
+                    <img
+                      src={bannerPreview}
+                      alt="Banner Preview"
+                      className="object-cover w-full h-56"
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setBannerPreview(null);
+                        setBannerFile(null);
+                      }}
+                      className="absolute flex items-center justify-center w-8 h-8 text-gray-500 bg-white rounded-full shadow top-3 right-3"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Upload size={18} color={dragOver ? NAVY : "#9ca3af"} />
+                    <p className="text-[12.5px] font-semibold text-gray-700 m-0">
+                      Upload gambar banner{" "}
+                      <span style={{ color: NAVY }}>(opsional)</span>
+                    </p>
+                    <p className="text-[11px] text-gray-400 m-0">
+                      PNG, JPG — Maks. 2MB · 1200×400px
+                    </p>
+                  </>
+                )}
+              </label>
 
               {/* ── Color Picker ── 
               <ColorPicker
@@ -475,10 +518,11 @@ function AddModal({ onClose, onSave }) {
                   {produkSearch && filteredProduk.length > 0 && (
                     <div className="absolute left-0 right-0 z-10 mt-1 overflow-hidden bg-white border border-gray-100 shadow-xl top-full rounded-xl">
                       {filteredProduk.map((p, i) => (
-                        <div
-                          key={p}
+                        <button
+                          key={p.id}
+                          type="button"
                           onClick={() => addProduk(p)}
-                          className="px-4 py-2.5 text-[13px] text-gray-700 cursor-pointer font-medium hover:bg-gray-50 transition-colors"
+                          className="w-full px-4 py-2.5 text-[13px] text-gray-700 text-left font-medium hover:bg-gray-50 transition-colors"
                           style={{
                             borderBottom:
                               i < filteredProduk.length - 1
@@ -486,8 +530,8 @@ function AddModal({ onClose, onSave }) {
                                 : "none",
                           }}
                         >
-                          + {p}
-                        </div>
+                          + {p.name}
+                        </button>
                       ))}
                     </div>
                   )}
@@ -495,9 +539,9 @@ function AddModal({ onClose, onSave }) {
               </Field>
               {selectedProduk.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                  {selectedProduk.map((p) => (
+                  {selectedProduk.map((produk) => (
                     <span
-                      key={p}
+                      key={produk.id}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12.5px] font-semibold border"
                       style={{
                         background: "rgba(7,43,80,0.06)",
@@ -505,9 +549,9 @@ function AddModal({ onClose, onSave }) {
                         borderColor: "rgba(7,43,80,0.12)",
                       }}
                     >
-                      {p}
+                      {produk.name}
                       <button
-                        onClick={() => removeProduk(p)}
+                        onClick={() => removeProduk(produk)}
                         className="flex items-center justify-center w-4 h-4 border-none rounded cursor-pointer"
                         style={{
                           background: "rgba(7,43,80,0.12)",
@@ -533,14 +577,17 @@ function AddModal({ onClose, onSave }) {
             Batal
           </button>
           <button
-            onClick={() => {
-              onSave({
+            onClick={async () => {
+              await onSave({
                 name: form.name,
                 desc: form.desc,
                 startDate: form.startDate,
                 endDate: form.endDate,
-                status: form.isAktif ? "Aktif" : "Segera",
-                bannerColor: form.bannerColor,
+                status: form.isAktif ? "aktif" : "segera",
+                banner: bannerFile,
+                produk_terkait: selectedProduk
+                  .map((produk) => produk?.id)
+                  .filter((id) => id !== undefined && id !== null),
               });
               onClose();
             }}
@@ -565,6 +612,7 @@ export default function Promo() {
   const [promos, setPromos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
   const [viewPromo, setViewPromo] = useState(null);
   const [editPromo, setEditPromo] = useState(null);
@@ -574,17 +622,32 @@ export default function Promo() {
     desc: "",
     startDate: "",
     endDate: "",
-    status: "Aktif",
+    status: "aktif",
     bannerColor: NAVY,
   });
+  const [productOptions, setProductOptions] = useState([]);
+  const [editSelectedProduk, setEditSelectedProduk] = useState([]);
+  const [editProdukSearch, setEditProdukSearch] = useState("");
+  const [editBannerFile, setEditBannerFile] = useState(null);
+  const [editBannerPreview, setEditBannerPreview] = useState(null);
+  const [editDragOver, setEditDragOver] = useState(false);
+  
+  const [meta, setMeta] = useState({
+    aktif_count: 0,
+    segera_count: 0,
+    berakhir_count: 0,
+  });
 
-  // const totalPages = Math.ceil(promos.length / ITEMS_PER_PAGE);
-  const paginated = promos;
-  const aktifCount = promos.filter((p) => p.status === "aktif").length;
-  const segeraCount = promos.filter((p) => p.status === "segera").length;
-  const berakhirCount = promos.filter((p) => p.status === "berakhir").length;
+  const ITEMS_PER_PAGE = 10;
+  const visiblePromos = Array.isArray(promos) ? promos : [];
+
+  const aktifCount = meta.aktif_count;
+  const segeraCount = meta.segera_count;
+  const berakhirCount = meta.berakhir_count;
+
 
   const openEdit = (p) => {
+    console.log("openEdit promo:", p);
     setEditPromo(p);
     setEditForm({
       name: p.name,
@@ -594,16 +657,47 @@ export default function Promo() {
       status: p.status,
       bannerColor: p.bannerColor,
     });
+
+    const relatedProducts = Array.isArray(p.products)
+      ? p.products
+      : Array.isArray(p.produk)
+      ? p.produk
+      : [];
+
+    const selected = relatedProducts.map((item) => ({
+      id: item.id,
+      name: item.name || item.nama || "Produk"
+    }));
+
+    console.log("initial selected related products:", selected);
+
+    setEditSelectedProduk(selected);
+    setEditProdukSearch("");
   };
 
   const handleSaveEdit = async () => {
-    const updated = await updatePromo(editPromo.id, editForm);
+    const payload = {
+      ...editForm,
+      produk_terkait: editSelectedProduk
+        .map((produk) => produk?.id)
+        .filter((id) => id !== undefined && id !== null),
+      banner: editBannerFile || null,
+    };
+
+    console.log("handleSaveEdit payload:", payload);
+    console.log("editSelectedProduk:", editSelectedProduk);
+
+    const updated = await updatePromo(editPromo.id, payload);
 
     setPromos((prev) =>
       prev.map((p) => (editPromo && p.id === editPromo.id ? updated : p)),
     );
 
     setEditPromo(null);
+    setEditSelectedProduk([]);
+    setEditProdukSearch("");
+    setEditBannerFile(null);
+    setEditBannerPreview(null);
   };
 
   const handleDelete = async () => {
@@ -643,18 +737,57 @@ export default function Promo() {
       try {
         const res = await getPromos({
           page: currentPage,
-          limit: 10,
+          limit: ITEMS_PER_PAGE,
         });
 
-        setPromos(res.data);
-        setTotalPages(res.last_page);
+        setPromos(res.data || []);
+        setMeta(res.meta || {
+          aktif_count: 0,
+          segera_count: 0,
+          berakhir_count: 0,
+        });
+        setTotalPages(res.last_page || 1);
+        setTotalCount(res.total || 0);
       } catch (err) {
-        console.error(err);
+        console.error("Fetch promos failed:", err);
       }
     };
 
     fetchPromos();
   }, [currentPage]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await productService.getProducts({ page: 1, per_page: 100 });
+        const items = Array.isArray(res.data?.data) ? res.data.data : [];
+        setProductOptions(
+          items.map((item) => ({
+            id: item.id,
+            name: item.nama,
+          })),
+        );
+      } catch (err) {
+        console.error("Error fetching product options:", err);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    if (editPromo) {
+      setEditBannerPreview(
+        editPromo.banner && typeof editPromo.banner === "string"
+          ? getImageUrl(editPromo.banner)
+          : null,
+      );
+      setEditBannerFile(null);
+    } else {
+      setEditBannerPreview(null);
+      setEditBannerFile(null);
+    }
+  }, [editPromo]);
 
   return (
     <div className="promo-admin">
@@ -746,11 +879,11 @@ export default function Promo() {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(paginated) &&
-                paginated.map((promo, i) => (
+              {Array.isArray(visiblePromos) &&
+                visiblePromos.map((promo, i) => (
                   <tr
                     key={promo.id}
-                    className={`row-item ${i < paginated.length - 1 ? "border-b border-gray-50" : ""}`}
+                    className={`row-item ${i < visiblePromos.length - 1 ? "border-b border-gray-50" : ""}`}
                   >
                     <td className="px-5 py-4">
                       <BannerChip color={promo.bannerColor} />
@@ -812,8 +945,8 @@ export default function Promo() {
         <div className="flex flex-col justify-between gap-3 px-6 py-4 border-t border-gray-100 sm:flex-row sm:items-center bg-gray-50">
           <p className="text-[12.5px] text-gray-400 m-0">
             Menampilkan {(currentPage - 1) * ITEMS_PER_PAGE + 1}–
-            {Math.min(currentPage * ITEMS_PER_PAGE, promos.length)} dari{" "}
-            {promos.length} promo
+            {(currentPage - 1) * ITEMS_PER_PAGE + visiblePromos.length} dari{" "}
+            {totalCount} promo
           </p>
           <div className="flex gap-1.5">
             <button
@@ -865,6 +998,7 @@ export default function Promo() {
         <AddModal
           onClose={() => setShowAddModal(false)}
           onSave={handleAddSave}
+          productOptions={productOptions}
         />
       )}
 
@@ -945,9 +1079,9 @@ export default function Promo() {
                     }
                     className={`${inputCls} cursor-pointer`}
                   >
-                    <option>Aktif</option>
-                    <option>Segera</option>
-                    <option>Berakhir</option>
+                    <option value="aktif">Aktif</option>
+                    <option value="segera">Segera</option>
+                    <option value="berakhir">Berakhir</option>
                   </select>
                 </div>
                 <div>
@@ -961,12 +1095,150 @@ export default function Promo() {
                 </div>
               </div>
 
+              <div>
+                <ModalSection
+                  icon={<Zap size={11} style={{ color: NAVY }} />}
+                  title="Banner Promo"
+                />
+                <label
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setEditDragOver(true);
+                  }}
+                  onDragLeave={() => setEditDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setEditDragOver(false);
+                    const file = e.dataTransfer?.files?.[0];
+                    if (file && file.type?.startsWith("image/")) {
+                      setEditBannerFile(file);
+                      setEditBannerPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  className="flex flex-col items-center gap-2 p-5 transition-all duration-200 border-2 border-dashed cursor-pointer rounded-xl"
+                  style={{
+                    borderColor: editDragOver ? NAVY : "#e2e8f0",
+                    background: editDragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
+                  }}
+                >
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file && file.type?.startsWith("image/")) {
+                        setEditBannerFile(file);
+                        setEditBannerPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                  {editBannerPreview ? (
+                    <div className="relative w-full overflow-hidden rounded-xl">
+                      <img
+                        src={editBannerPreview}
+                        alt="Banner Preview"
+                        className="object-cover w-full h-56"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditBannerPreview(null);
+                          setEditBannerFile(null);
+                        }}
+                        className="absolute flex items-center justify-center w-8 h-8 text-gray-500 bg-white rounded-full shadow top-3 right-3"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload size={18} color={editDragOver ? NAVY : "#9ca3af"} />
+                      <p className="text-[12.5px] font-semibold text-gray-700 m-0">
+                        Upload gambar banner (opsional)
+                      </p>
+                      <p className="text-[11px] text-gray-400 m-0">
+                        PNG, JPG — Maks. 2MB · 1200×400px
+                      </p>
+                    </>
+                  )}
+                </label>
+              </div>
+
               {/* Preview */}
               <div className="flex items-center gap-3">
                 <BannerChip color={editForm.bannerColor} />
                 <p className="text-[12px] text-gray-400 m-0">
                   Preview warna banner
                 </p>
+              </div>
+
+              <div className="mt-6">
+                <label className={labelCls}>Produk Terkait</label>
+                <div className="relative">
+                  <input
+                    value={editProdukSearch}
+                    onChange={(e) => setEditProdukSearch(e.target.value)}
+                    placeholder="Cari produk..."
+                    className={`${inputCls} pl-4`}
+                  />
+                  {editProdukSearch && (
+                    <div className="absolute left-0 right-0 z-10 mt-1 overflow-hidden bg-white border border-gray-200 shadow-xl rounded-xl">
+                      {productOptions
+                        .filter(
+                          (produk) =>
+                            String(produk?.name || "")
+                              .toLowerCase()
+                              .includes(editProdukSearch.toLowerCase()) &&
+                            !editSelectedProduk.some(
+                              (selected) => selected?.id === produk?.id,
+                            ),
+                        )
+                        .slice(0, 8)
+                        .map((produk) => (
+                          <button
+                            key={produk.id}
+                            type="button"
+                            onClick={() => {
+                              if (!produk?.id) return;
+                              setEditSelectedProduk((prev) => [
+                                ...prev,
+                                produk,
+                              ]);
+                              setEditProdukSearch("");
+                            }}
+                            className="w-full px-4 py-3 text-left bg-white border-b border-gray-100 hover:bg-gray-50"
+                          >
+                            {produk.name}
+                          </button>
+                        ))}
+                    </div>
+                  )}
+                </div>
+                {editSelectedProduk.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {editSelectedProduk.map((produk) => (
+                      <span
+                        key={produk.id}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-[12px] font-semibold text-blue-900"
+                      >
+                        {produk.name}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditSelectedProduk((prev) =>
+                              prev.filter((item) => item.id !== produk.id),
+                            )
+                          }
+                          className="inline-flex items-center justify-center w-5 h-5 text-blue-700 bg-white rounded-full"
+                        >
+                          <X size={10} />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-2.5 mt-1">

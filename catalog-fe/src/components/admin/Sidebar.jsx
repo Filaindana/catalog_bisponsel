@@ -24,14 +24,20 @@ const menus = [
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
 
   return (
-    <div className="fixed top-0 left-0 w-[200px] h-screen bg-white border-r border-slate-100 flex flex-col z-50">
+    <div className="fixed top-0 left-0 z-50 flex flex-col h-screen bg-white border-r w-50 border-slate-100">
       {/* LOGO */}
       <div className="px-4 pt-5 pb-4 border-b border-slate-100">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0">
-            <img src={logoImg} alt="Logo" className="w-5 h-5 object-contain" />
+          <div className="flex items-center justify-center bg-white w-9 h-9 rounded-xl shrink-0">
+            <img src={logoImg} alt="Logo" className="object-contain w-5 h-5" />
           </div>
           <div>
             <h1 className="text-[13.5px] font-extrabold text-slate-900 m-0 leading-tight">
@@ -84,11 +90,13 @@ export default function Sidebar() {
 
       {/* LOG OUT */}
       <div className="px-2.5 pb-5 pt-2.5 border-t border-slate-100">
-        <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[13px] font-semibold text-red-500 hover:bg-red-50 transition-all duration-150 border-none bg-transparent text-left cursor-pointer">
+        <button 
+        onClick={handleLogout}
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] text-[13px] font-semibold text-red-500 hover:bg-red-50 transition-all duration-150 border-none bg-transparent text-left cursor-pointer">
           <LogOut size={16} />
           Log Out
         </button>
-      </div>
+      </div> 
     </div>
   );
 }

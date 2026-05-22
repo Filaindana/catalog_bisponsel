@@ -206,23 +206,61 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
   const isEdit = !!initial;
   const [form, setForm] = useState(
     initial ?? {
+      branchId: "",
       name: "",
       city: "",
       address: "",
+      phone: "",
+      email: "",
       mapsLink: "",
       jamBuka: "",
       jamTutup: "",
     },
   );
+  // keep form in sync if `initial` prop changes (edit flow)
+  useEffect(() => {
+    // normalize incoming `initial` which may be in backend (snake_case) or frontend shape
+    const normalized = {
+      branchId: initial?.kode ?? initial?.branchId ?? "",
+      name: initial?.nama ?? initial?.name ?? "",
+      city: initial?.kota ?? initial?.city ?? "",
+      address: initial?.alamat ?? initial?.address ?? "",
+      phone: initial?.telepon ?? initial?.phone ?? "",
+      email: initial?.email ?? initial?.email ?? "",
+      mapsLink: initial?.maps_link ?? initial?.mapsLink ?? "",
+      jamBuka: initial?.jam_buka ?? initial?.jamBuka ?? "",
+      jamTutup: initial?.jam_tutup ?? initial?.jamTutup ?? "",
+    };
+
+    setForm(initial ? normalized : {
+      branchId: "",
+      name: "",
+      city: "",
+      address: "",
+      phone: "",
+      email: "",
+      mapsLink: "",
+      jamBuka: "",
+      jamTutup: "",
+    });
+  }, [initial]);
   const [dragOver, setDragOver] = useState(false);
-  const [preview, setPreview] = useState(initial?.photo ?? null);
+  const [preview, setPreview] = useState(initial?.image ?? null);
+  const [photoFile, setPhotoFile] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setPreview(initial?.foto_url ?? initial?.image ?? initial?.foto ?? null);
+  }, [initial]);
 
   const handleFileDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
     const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0];
-    if (file && file.type.startsWith("image/"))
+    if (file && file.type.startsWith("image/")) {
       setPreview(URL.createObjectURL(file));
+      setPhotoFile(file);
+    }
   };
 
   return (
@@ -275,7 +313,10 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
                   className="object-cover w-full h-full"
                 />
                 <button
-                  onClick={() => setPreview(null)}
+                  onClick={() => {
+                    setPreview(null);
+                    setPhotoFile(null);
+                  }}
                   className="absolute flex items-center justify-center text-gray-500 border border-gray-200 rounded-lg cursor-pointer top-2 right-2 w-7 h-7 bg-white/90 hover:bg-white"
                 >
                   <X size={12} />
@@ -323,12 +364,39 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
               title="Informasi Cabang"
             />
             <div className="flex flex-col gap-4">
+              <Field label="Nama Cabang">
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Cabang Surabaya"
+                  className={inputCls}
+                />
+              </Field>
               <div className="grid grid-cols-2 gap-3">
-                <Field label="Nama Cabang">
+                <Field label="Kode Cabang">
                   <input
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Cabang Jakarta Pusat"
+                    value={form.branchId}
+                    onChange={(e) => setForm({ ...form, branchId: e.target.value })}
+                    placeholder="BIZ-JKT-001"
+                    className={inputCls}
+                  />
+                </Field>
+                <Field label="Telepon">
+                  <input
+                    value={form.phone}
+                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                    placeholder="+628112345678"
+                    className={inputCls}
+                  />
+                </Field>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <Field label="Email">
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="cabang@bizponsel.com"
                     className={inputCls}
                   />
                 </Field>
@@ -413,37 +481,39 @@ function CabangFormModal({ onClose, onSave, initial = null }) {
         <div className="flex justify-end gap-2.5 px-7 py-4 border-t border-gray-100 bg-gray-50">
           <button
             onClick={onClose}
+            disabled={isSaving}
             className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
           >
             Batal
           </button>
           <button
-            onClick={() => {
-              onSave({ ...form, photo: preview });
-              onClose();
+            onClick={async () => {
+              setIsSaving(true);
+              try {
+                // send frontend-shaped payload: service will map to backend keys
+                console.log("Submitting form:", form, "photoFile:", photoFile);
+                await onSave({ ...form, foto: photoFile });
+                onClose();
+              } catch (err) {
+                console.error(err);
+              } finally {
+                setIsSaving(false);
+              }
             }}
+            disabled={isSaving}
             className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
             style={{
               background: NAVY,
               boxShadow: `0 4px 14px rgba(7,43,80,0.3)`,
             }}
           >
-            {isEdit ? "Simpan Perubahan" : "Simpan Cabang"}
+            {isSaving ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Simpan Cabang"}
           </button>
         </div>
       </div>
     </Overlay>
   );
 }
-
-// const initialCabang = [
-//   { id: 1, name: "Cabang Jakarta Pusat", branchId: "BIZ-JKT-001", city: "Jakarta", address: "Jl. Jenderal Sudirman No. 123", jamBuka: "08:00", jamTutup: "17:00", mapsLink: "", photo: null },
-//   { id: 2, name: "Cabang Bandung", branchId: "BIZ-BDG-002", city: "Bandung", address: "Jl. Asia Afrika No. 45", jamBuka: "09:00", jamTutup: "18:00", mapsLink: "", photo: null },
-//   { id: 3, name: "Cabang Surabaya", branchId: "BIZ-SBY-003", city: "Surabaya", address: "Jl. Tunjungan No. 88", jamBuka: "08:30", jamTutup: "17:30", mapsLink: "", photo: null },
-//   { id: 4, name: "Cabang Yogyakarta", branchId: "BIZ-YGY-004", city: "Yogyakarta", address: "Jl. Malioboro No. 12", jamBuka: "09:00", jamTutup: "17:00", mapsLink: "", photo: null },
-//   { id: 5, name: "Cabang Medan", branchId: "BIZ-MDN-005", city: "Medan", address: "Jl. Imam Bonjol No. 7", jamBuka: "08:00", jamTutup: "16:00", mapsLink: "", photo: null },
-//   { id: 6, name: "Cabang Semarang", branchId: "BIZ-SMG-006", city: "Semarang", address: "Jl. Pandanaran No. 55", jamBuka: "08:30", jamTutup: "17:30", mapsLink: "", photo: null },
-// ];
 
 export default function CabangPage() {
   const [cabangs, setCabangs] = useState([]);
@@ -472,10 +542,12 @@ export default function CabangPage() {
           branchId: c.kode,
           city: c.kota,
           address: c.alamat,
+          phone: c.telepon || "",
+          email: c.email || "",
           jamBuka: c.jam_buka || "",
           jamTutup: c.jam_tutup || "",
-          mapsLink: "",
-          photo: null,
+          mapsLink: c.maps_link || "",
+          image: c.foto_url || null,
         }));
 
         setCabangs(mapped);
@@ -489,12 +561,9 @@ export default function CabangPage() {
 
   const handleAdd = async (data) => {
     try {
-      const payload = {
-        ...data,
-        branchId: `BIZ-${data.city.slice(0, 3).toUpperCase()}-${Date.now()}`,
-      };
-
-      const res = await createCabang(payload);
+      console.log("handleAdd data:", data);
+      const res = await createCabang(data);
+      console.log("handleAdd response:", res);
 
       const newCabang = {
         id: res.data.id,
@@ -502,19 +571,26 @@ export default function CabangPage() {
         branchId: res.data.kode,
         city: res.data.kota,
         address: res.data.alamat,
-        jamBuka: "",
-        jamTutup: "",
+        phone: res.data.telepon || "",
+        email: res.data.email || "",
+        jamBuka: res.data.jam_buka || "",
+        jamTutup: res.data.jam_tutup || "",
+        mapsLink: res.data.maps_link || "",
+        image: res.data.foto_url || null,
       };
 
       setCabangs((prev) => [...prev, newCabang]);
     } catch (err) {
       console.error(err);
+      throw err;
     }
   };
 
   const handleEdit = async (data) => {
     try {
+      console.log("handleEdit id:", editItem?.id, "data:", data);
       const res = await updateCabang(editItem.id, data);
+      console.log("handleEdit response:", res);
 
       setCabangs((prev) =>
         prev.map((c) =>
@@ -522,14 +598,22 @@ export default function CabangPage() {
             ? {
                 ...c,
                 name: res.data.nama,
+                branchId: res.data.kode,
                 city: res.data.kota,
                 address: res.data.alamat,
+                phone: res.data.telepon || "",
+                email: res.data.email || "",
+                jamBuka: res.data.jam_buka || "",
+                jamTutup: res.data.jam_tutup || "",
+                mapsLink: res.data.maps_link || "",
+                image: res.data.foto_url || null,
               }
             : c,
         ),
       );
     } catch (err) {
       console.error(err);
+      throw err;
     }
   };
 
@@ -784,8 +868,8 @@ export default function CabangPage() {
       {showAdd && (
         <CabangFormModal
           onClose={() => setShowAdd(false)}
-          onSave={(data) => {
-            handleAdd(data);
+          onSave={async (data) => {
+            await handleAdd(data);
             setShowAdd(false);
           }}
         />
@@ -794,8 +878,8 @@ export default function CabangPage() {
         <CabangFormModal
           initial={editItem}
           onClose={() => setEditItem(null)}
-          onSave={(data) => {
-            handleEdit(data);
+          onSave={async (data) => {
+            await handleEdit(data);
             setEditItem(null);
           }}
         />

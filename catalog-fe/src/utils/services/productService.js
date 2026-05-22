@@ -42,6 +42,20 @@ const productService = {
     }
   },
 
+  async uploadProductImages(formData) {
+    try {
+      const response = await api('/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      console.log('API Response uploadProductImages:', response);
+      return response;
+    } catch (error) {
+      console.error('Error in uploadProductImages:', error);
+      throw error;
+    }
+  },
+
   // Update product by slug
   async updateProduct(slug, data) {
     try {

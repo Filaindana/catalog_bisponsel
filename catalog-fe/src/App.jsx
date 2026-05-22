@@ -12,6 +12,7 @@ import AdminSidebar from "./components/admin/Sidebar.jsx";
 import Home from "./pages/home.jsx";
 import Product from "./pages/product.jsx";
 import Promo from "./pages/promo.jsx";
+import PromoDetail from "./pages/PromoDetail.jsx";
 import DetailProduct from "./pages/detailproduct.jsx";
 import Contact from "./pages/contact.jsx";
 import Login from "./pages/login.jsx";
@@ -80,6 +81,7 @@ function App() {
         <Route path="/" element={<PublicLayout />}>
           <Route index element={<Home />} />
           <Route path="promo" element={<Promo />} />
+          <Route path="promo/:id" element={<PromoDetail />} />
           <Route path="product" element={<Product />} />
           {/* <Route path="product/:id" element={<DetailProduct />} /> */}
           <Route path="product/:slug" element={<DetailProduct />} />

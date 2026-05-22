@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import productService from "../../utils/services/productService";
+import { getPromos } from "../../utils/services/promoService";
 import {
   Eye,
   Pencil,
@@ -43,7 +44,53 @@ if (
 
 const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
+const BASE_IMAGE_URL = "http://127.0.0.1:8000/storage/";
+
 const formatPrice = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
+
+const resolveImageUrl = (gambar) => {
+  if (!gambar) return "/fallback.jpg";
+  if (typeof gambar === "string") return gambar;
+
+  if (Array.isArray(gambar) && gambar.length > 0) {
+    const first = gambar[0];
+    if (!first) return "/fallback.jpg";
+    if (typeof first === "string") return first;
+    if (first.path) return `${BASE_IMAGE_URL}${first.path}`;
+    if (first.url) return first.url;
+  }
+
+  if (gambar.path) return `${BASE_IMAGE_URL}${gambar.path}`;
+  if (gambar.url) return gambar.url;
+  return "/fallback.jpg";
+};
+
+const renderDetailPreview = (text = "") => {
+  if (!text?.trim()) {
+    return (
+      <p className="text-[13px] text-gray-500 m-0">
+        Belum ada deskripsi detail.
+      </p>
+    );
+  }
+
+  return text.split(/\r?\n/).map((line, idx) => {
+    const trimmed = line.trim();
+    if (!trimmed) return null;
+
+    const isBullet = /^[-*•]\s+/.test(trimmed);
+    const content = trimmed.replace(/^[-*•]\s+/, "");
+
+    return (
+      <p
+        key={idx}
+        className="text-[13px] text-gray-700 leading-relaxed m-0"
+      >
+        {isBullet ? `• ${content}` : content}
+      </p>
+    );
+  });
+};
 
 const defaultKategoriOptions = [
   "Laptop & Komputer",
@@ -87,6 +134,26 @@ const warnaMap = {
   Green: "#10b981",
   Red: "#ef4444",
   Purple: "#8b5cf6",
+};
+
+const defaultProductForm = {
+  name: "",
+  slug: "",
+  category: "",
+  kategori_id: null,
+  brand: "",
+  description: "",
+  deskripsi: "",
+  deskripsi_detail: "",
+  price: "",
+  stock: "",
+  rating: "",
+  promo: false,
+  promoRelation: [],
+  warna: "",
+  colorLabel: "",
+  gambar: [],
+  spesifikasi: [],
 };
 
 const inputCls =
@@ -389,52 +456,223 @@ function ViewProductModal({ product, onClose }) {
   );
 }
 
-/* ══════════════════════════
-   ADD MODAL
-══════════════════════════ */
-function AddProductModal({ onClose, onSave, brandOptions, kategoriOptions }) {
-  const [form, setForm] = useState({
-    name: "",
-    category: "",
-    brand: "",
-    description: "",
-    price: "",
-    stock: "",
-    warna: "",
-    spesifikasi: "",
-  });
+function ProductFormModal({
+  mode = "create",
+  onClose,
+  onSave,
+  brandOptions,
+  kategoriOptions,
+  promoOptions = [],
+  initialData = null,
+}) {
+  const [step, setStep] = useState(1);
+  const [form, setForm] = useState(() => ({
+    ...defaultProductForm,
+    ...(initialData || {}),
+  }));
   const [dragOver, setDragOver] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState([
-    { name: "product-main.jpg", progress: 100, size: "1.2 MB" },
-    { name: "product-side.jpg", progress: 65, size: "0.9 MB" },
-  ]);
-
-  // ekstrak nama brand saja untuk dropdown (support format string & objek)
-  const brandNames = brandOptions.map((b) =>
-    typeof b === "string" ? b : b.nama
+  const [uploadedFiles, setUploadedFiles] = useState(() =>
+    (initialData?.gambar || []).map((url, idx) => ({
+      id: `existing-${idx}`,
+      name: url.split("/").pop() || "image",
+      size: "",
+      progress: 100,
+      preview: url,
+      url,
+      isExisting: true,
+    })),
   );
+  const [imageFiles, setImageFiles] = useState([]);
+  const [uploadError, setUploadError] = useState("");
+  const [promoSearch, setPromoSearch] = useState("");
+  const fileInputRef = useRef(null);
+  const progressTimers = useRef({});
+
+  useEffect(() => {
+    setForm({ ...defaultProductForm, ...(initialData || {}) });
+    setUploadedFiles(
+      (initialData?.gambar || []).map((url, idx) => ({
+        id: `existing-${idx}`,
+        name: url.split("/").pop() || "image",
+        size: "",
+        progress: 100,
+        preview: url,
+        url,
+        isExisting: true,
+      })),
+    );
+    setImageFiles([]);
+    setStep(1);
+  }, [initialData]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(progressTimers.current).forEach((timer) =>
+        clearInterval(timer),
+      );
+    };
+  }, []);
+
+  const stepLabels = [
+    "Informasi Dasar",
+    "Detail Produk",
+    "Media Produk",
+    "Spesifikasi",
+  ];
+
+  const startUploadSimulation = (fileId) => {
+    let currentProgress = 0;
+    if (progressTimers.current[fileId]) {
+      clearInterval(progressTimers.current[fileId]);
+    }
+
+    progressTimers.current[fileId] = setInterval(() => {
+      currentProgress = Math.min(
+        currentProgress + Math.floor(Math.random() * 16) + 10,
+        100,
+      );
+
+      setUploadedFiles((prev) =>
+        prev.map((file) =>
+          file.id === fileId ? { ...file, progress: currentProgress } : file,
+        ),
+      );
+
+      if (currentProgress >= 100) {
+        clearInterval(progressTimers.current[fileId]);
+        delete progressTimers.current[fileId];
+      }
+    }, 120);
+  };
+
+  const formatFileSize = (size) =>
+    size > 1024 * 1024
+      ? `${(size / (1024 * 1024)).toFixed(1)} MB`
+      : `${Math.round(size / 1024)} KB`;
+
+  const handleFiles = (fileList) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    const files = Array.from(fileList);
+    const validFiles = [];
+    let invalidFound = false;
+
+    files.forEach((file) => {
+      const isValidType = allowedTypes.includes(file.type);
+      const isValidSize = file.size <= 5 * 1024 * 1024;
+
+      if (!isValidType || !isValidSize) {
+        invalidFound = true;
+        return;
+      }
+
+      const fileId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      validFiles.push({
+        id: fileId,
+        name: file.name,
+        size: formatFileSize(file.size),
+        progress: 0,
+        file,
+        preview: URL.createObjectURL(file),
+      });
+    });
+
+    if (!validFiles.length) {
+      if (invalidFound) {
+        setUploadError("Hanya JPG/PNG/WEBP maksimal 5MB.");
+      }
+      return;
+    }
+
+    setUploadError("");
+    setUploadedFiles((prev) => [...prev, ...validFiles]);
+    setImageFiles((prev) => [...prev, ...validFiles.map((item) => ({ id: item.id, file: item.file }))]);
+    validFiles.forEach((item) => startUploadSimulation(item.id));
+  };
+
+  const removeFile = (id) => {
+    const target = uploadedFiles.find((file) => file.id === id);
+    if (target) {
+      if (!target.isExisting && target.preview) {
+        URL.revokeObjectURL(target.preview);
+      }
+      if (target.isExisting) {
+        setForm((prev) => ({
+          ...prev,
+          gambar: prev.gambar.filter((url) => url !== target.url),
+        }));
+      }
+    }
+    setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
+    setImageFiles((prev) => prev.filter((file) => file.id !== id));
+  };
+
+  const openFilePicker = () => fileInputRef.current?.click();
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setDragOver(false);
+    handleFiles(event.dataTransfer.files);
+  };
+
+  const updateSpec = (idx, key, value) => {
+    setForm((prev) => ({
+      ...prev,
+      spesifikasi: prev.spesifikasi.map((spec, index) =>
+        index === idx ? { ...spec, [key]: value } : spec,
+      ),
+    }));
+  };
+
+  const addSpec = () => {
+    setForm((prev) => ({
+      ...prev,
+      spesifikasi: [...prev.spesifikasi, { atribut: "", detail: "" }],
+    }));
+  };
+
+  const removeSpec = (idx) => {
+    setForm((prev) => ({
+      ...prev,
+      spesifikasi: prev.spesifikasi.filter((_, index) => index !== idx),
+    }));
+  };
+
+  const handleBack = () => setStep((prev) => Math.max(prev - 1, 1));
+  const handleNext = () => setStep((prev) => Math.min(prev + 1, 4));
+
+  const handleSubmit = async () => {
+    try {
+      await onSave({ ...form, imageFiles });
+      onClose();
+    } catch (err) {
+      console.error("Error saving product:", err);
+    }
+  };
+
+  const brandNames = brandOptions.map((b) => (typeof b === "string" ? b : b.nama));
 
   return (
     <Overlay onClose={onClose}>
       <div className="w-135 bg-white rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between py-5 border-b border-gray-100 px-7">
           <div className="flex items-center gap-3">
             <div
               className="flex items-center justify-center w-10 h-10 rounded-xl"
               style={{ background: "rgba(7,43,80,0.08)" }}
             >
-              <Sparkles size={18} style={{ color: NAVY }} />
+              {mode === "edit" ? (
+                <Pencil size={18} style={{ color: NAVY }} />
+              ) : (
+                <Sparkles size={18} style={{ color: NAVY }} />
+              )}
             </div>
             <div>
-              <h2
-                className="text-[16px] font-extrabold m-0 mb-0.5"
-                style={{ color: NAVY }}
-              >
-                Tambah Produk Baru
+              <h2 className="text-[16px] font-extrabold m-0 mb-0.5" style={{ color: NAVY }}>
+                {mode === "edit" ? "Edit Produk" : "Tambah Produk Baru"}
               </h2>
               <p className="text-[11.5px] text-gray-400 m-0">
-                Isi semua informasi produk di bawah ini
+                {mode === "edit"
+                  ? "Perbarui informasi produk dalam langkah yang terstruktur."
+                  : "Isi data produk secara bertahap untuk pengalaman terbaik."}
               </p>
             </div>
           </div>
@@ -446,396 +684,556 @@ function AddProductModal({ onClose, onSave, brandOptions, kategoriOptions }) {
           </button>
         </div>
 
-        {/* Body */}
-        <div className="flex flex-col flex-1 gap-6 py-6 overflow-y-auto px-7">
-          {/* SECTION 1 */}
-          <div>
-            <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100 mb-4">
-              <div
-                className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0"
-                style={{ background: NAVY }}
+        <div className="pt-5 pb-4 px-7">
+          <div className="flex gap-2 mb-3">
+            {stepLabels.map((label, index) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => setStep(index + 1)}
+                className={`flex-1 rounded-2xl border px-3 py-2 text-left transition-all ${
+                  step === index + 1
+                    ? "border-[#072B50] bg-[#e6eef6]"
+                    : "border-gray-200 bg-white"
+                }`}
               >
-                <Info size={13} color="#fff" />
-              </div>
-              <div>
-                <p
-                  className="text-[13px] font-bold m-0 mb-0.5"
-                  style={{ color: NAVY }}
-                >
-                  Informasi Dasar Produk
+                <p className={`text-[11px] font-bold ${step === index + 1 ? "text-[#072B50]" : "text-gray-500"}`}>
+                  {index + 1}. {label}
                 </p>
-                <p className="text-[12px] text-blue-500 m-0">
-                  Isi nama, kategori, brand, dan deskripsi produk Anda.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <Field label="Nama Produk">
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Contoh: iPhone 15 Pro Max 256GB"
-                  className={inputCls}
-                />
-                <p className={hintCls}>
-                  Gunakan nama yang jelas dan deskriptif
-                </p>
-              </Field>
-              <div className="grid grid-cols-2 gap-3">
-                <Field label="Kategori">
-                  <CustomSelect
-                    value={form.category}
-                    onChange={(e) =>
-                      setForm({ ...form, category: e.target.value })
-                    }
-                    options={kategoriOptions}
-                    placeholder="Pilih kategori..."
-                  />
-                </Field>
-                <Field label="Brand">
-                  <CustomSelect
-                    value={form.brand}
-                    onChange={(e) =>
-                      setForm({ ...form, brand: e.target.value })
-                    }
-                    options={brandNames}
-                    placeholder="Pilih brand..."
-                  />
-                </Field>
-              </div>
-              <Field label="Deskripsi Produk">
-                <textarea
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
-                  placeholder="Jelaskan fitur unggulan produk..."
-                  className={`${inputCls} h-24 resize-none`}
-                />
-                <p className={hintCls}>
-                  Min. 50 karakter untuk deskripsi yang baik
-                </p>
-              </Field>
-              <Field label="Spesifikasi">
-                <textarea
-                  value={form.spesifikasi}
-                  onChange={(e) =>
-                    setForm({ ...form, spesifikasi: e.target.value })
-                  }
-                  placeholder={
-                    "- Chipset: A17 Pro\n- RAM: 8GB\n- Storage: 256GB"
-                  }
-                  className={`${inputCls} h-20 resize-none font-mono text-xs`}
-                />
-              </Field>
-            </div>
+              </button>
+            ))}
           </div>
-
-          {/* SECTION 2 */}
-          <div>
-            <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-purple-50 border border-purple-100 mb-4">
-              <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0 bg-violet-600">
-                <Camera size={13} color="#fff" />
-              </div>
-              <div>
-                <p className="text-[13px] font-bold text-violet-800 m-0 mb-0.5">
-                  Foto & Media Produk
-                </p>
-                <p className="text-[12px] text-violet-500 m-0">
-                  Upload minimal 1 foto berkualitas tinggi.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <div
-                onDragOver={(e) => {
-                  e.preventDefault();
-                  setDragOver(true);
-                }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  setDragOver(false);
-                }}
-                className="flex flex-col items-center gap-3 p-8 transition-all duration-200 border-2 border-dashed cursor-pointer rounded-xl"
-                style={{
-                  borderColor: dragOver ? NAVY : "#e2e8f0",
-                  background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
-                }}
-              >
-                <div
-                  className="flex items-center justify-center transition-all duration-200 w-14 h-14 rounded-2xl"
-                  style={{ background: dragOver ? NAVY : "rgba(7,43,80,0.07)" }}
-                >
-                  <Upload size={24} color={dragOver ? "#fff" : NAVY} />
-                </div>
-                <div className="text-center">
-                  <p className="text-[14px] font-bold text-gray-800 m-0 mb-1">
-                    Drag & drop foto di sini
-                  </p>
-                  <p className="text-[12.5px] text-gray-400 m-0 mb-4">
-                    atau klik tombol di bawah
-                  </p>
-                  <div
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-[13px] font-bold"
-                    style={{ background: NAVY }}
-                  >
-                    <Upload size={13} /> Pilih File
-                  </div>
-                </div>
-                <p className="text-[11px] text-gray-400 m-0">
-                  PNG, JPG · Maks. 5MB · Min. 800×800px
-                </p>
-              </div>
-
-              {uploadedFiles.length > 0 && (
-                <div className="flex flex-col gap-2.5">
-                  <label className={labelCls}>
-                    File Terupload ({uploadedFiles.length})
-                  </label>
-                  {uploadedFiles.map((file, i) => (
-                    <div
-                      key={i}
-                      className="bg-gray-50 rounded-xl flex items-center gap-3 p-3.5 border border-gray-100"
-                    >
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${file.progress === 100 ? "bg-green-50" : "bg-gray-100"}`}
-                      >
-                        {file.progress === 100 ? (
-                          <Check
-                            size={16}
-                            className="text-emerald-600"
-                            strokeWidth={2.5}
-                          />
-                        ) : (
-                          <Info size={16} style={{ color: NAVY }} />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between mb-1.5">
-                          <p className="text-[13px] font-bold text-gray-800 m-0 truncate max-w-50">
-                            {file.name}
-                          </p>
-                          <span
-                            className={`text-[12px] font-bold shrink-0 ${file.progress === 100 ? "text-emerald-600" : ""}`}
-                            style={file.progress !== 100 ? { color: NAVY } : {}}
-                          >
-                            {file.progress === 100
-                              ? "✓ Selesai"
-                              : `${file.progress}%`}
-                          </span>
-                        </div>
-                        <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${file.progress === 100 ? "bg-emerald-500" : ""}`}
-                            style={{
-                              width: `${file.progress}%`,
-                              background:
-                                file.progress !== 100 ? NAVY : undefined,
-                            }}
-                          />
-                        </div>
-                        <p className="text-[11px] text-gray-400 mt-1 m-0">
-                          {file.size}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() =>
-                          setUploadedFiles(
-                            uploadedFiles.filter((_, idx) => idx !== i),
-                          )
-                        }
-                        className="flex items-center justify-center text-red-500 border-none rounded-lg cursor-pointer w-7 h-7 bg-red-50 shrink-0"
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* SECTION 3 */}
-          <div>
-            <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-green-50 border border-green-100 mb-4">
-              <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0 bg-emerald-600">
-                <DollarSign size={13} color="#fff" />
-              </div>
-              <div>
-                <p className="text-[13px] font-bold text-emerald-900 m-0 mb-0.5">
-                  Harga, Stok & Varian
-                </p>
-                <p className="text-[12px] text-emerald-600 m-0">
-                  Tetapkan harga jual, stok, dan pilihan warna.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>Harga Jual (Rp)</label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[13px] font-bold text-gray-400">
-                      Rp
-                    </span>
-                    <input
-                      type="number"
-                      value={form.price}
-                      onChange={(e) =>
-                        setForm({ ...form, price: e.target.value })
-                      }
-                      placeholder="0"
-                      className={`${inputCls} pl-9`}
-                    />
-                  </div>
-                  {form.price && (
-                    <div
-                      className="mt-2 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5"
-                      style={{ background: "rgba(7,43,80,0.06)" }}
-                    >
-                      <Layers size={11} style={{ color: NAVY }} />
-                      <span
-                        className="text-[12px] font-bold"
-                        style={{ color: NAVY }}
-                      >
-                        {formatPrice(Number(form.price))}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <label className={labelCls}>Jumlah Stok</label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={form.stock}
-                      onChange={(e) =>
-                        setForm({ ...form, stock: e.target.value })
-                      }
-                      placeholder="0"
-                      className={`${inputCls} pr-12`}
-                    />
-                    <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[12px] font-bold text-gray-400">
-                      Unit
-                    </span>
-                  </div>
-                  {form.stock && (
-                    <div
-                      className={`mt-2 px-3 py-1.5 rounded-lg inline-flex items-center gap-1.5 ${Number(form.stock) < 10 ? "bg-red-50" : "bg-emerald-50"}`}
-                    >
-                      {Number(form.stock) < 10 ? (
-                        <AlertTriangle size={11} className="text-red-500" />
-                      ) : (
-                        <Check size={11} className="text-emerald-500" />
-                      )}
-                      <span
-                        className={`text-[12px] font-bold ${Number(form.stock) < 10 ? "text-red-500" : "text-emerald-600"}`}
-                      >
-                        {Number(form.stock) < 10
-                          ? "Stok hampir habis"
-                          : "Stok aman"}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <Field label="Pilihan Warna">
-                <CustomSelect
-                  value={form.warna}
-                  onChange={(e) => setForm({ ...form, warna: e.target.value })}
-                  options={warnaOptions}
-                  placeholder="Pilih warna..."
-                />
-              </Field>
-
-              {form.warna && (
-                <div className="flex items-center gap-3 px-4 py-3 border border-gray-100 rounded-xl bg-gray-50">
-                  <div
-                    className="w-5 h-5 border-2 rounded-full shadow-sm border-black/10 shrink-0"
-                    style={{ background: warnaMap[form.warna] || "#e5e7eb" }}
-                  />
-                  <span className="text-[13px] font-bold text-gray-700">
-                    {form.warna}
-                  </span>
-                  <div className="ml-auto bg-green-100 px-2.5 py-0.5 rounded-full">
-                    <span className="text-[11px] font-bold text-green-700">
-                      ✓ Siap
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {(form.name || form.price || form.stock) && (
-                <div
-                  className="p-5 rounded-2xl"
-                  style={{
-                    background: `linear-gradient(135deg,#072B50,#0e4a8a)`,
-                  }}
-                >
-                  <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-3">
-                    Ringkasan Produk
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    {[
-                      { label: "Nama", value: form.name || "—" },
-                      { label: "Kategori", value: form.category || "—" },
-                      {
-                        label: "Harga",
-                        value: form.price
-                          ? formatPrice(Number(form.price))
-                          : "—",
-                      },
-                      {
-                        label: "Stok",
-                        value: form.stock ? `${form.stock} Unit` : "—",
-                      },
-                    ].map(({ label, value }) => (
-                      <div
-                        key={label}
-                        className="flex items-center justify-between"
-                      >
-                        <span className="text-[12px] text-white/50 font-medium">
-                          {label}
-                        </span>
-                        <span className="text-[12.5px] text-white font-bold truncate max-w-55 text-right">
-                          {value}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+          <div className="h-1.5 rounded-full bg-gray-200 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-[#072B50] transition-all"
+              style={{ width: `${(step / stepLabels.length) * 100}%` }}
+            />
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex justify-end gap-2.5 px-7 py-4 border-t border-gray-100 bg-gray-50">
+        <div className="flex flex-col flex-1 pb-6 overflow-y-auto px-7">
+          {step === 1 && (
+            <div className="flex flex-col gap-6 pb-2">
+              <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100">
+                <div
+                  className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0"
+                  style={{ background: NAVY }}
+                >
+                  <Info size={13} color="#fff" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-[#072B50] m-0 mb-0.5">
+                    Informasi Dasar Produk
+                  </p>
+                  <p className="text-[12px] text-blue-500 m-0">
+                    Lengkapi nama, kategori, harga, dan stok.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <Field label="Nama Produk">
+                  <input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Contoh: iPhone 15 Pro Max 256GB"
+                    className={inputCls}
+                  />
+                </Field>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Kategori">
+                    <CustomSelect
+                      value={form.category}
+                      onChange={(e) =>
+                        setForm({ ...form, category: e.target.value })
+                      }
+                      options={kategoriOptions}
+                      placeholder="Pilih kategori..."
+                    />
+                  </Field>
+                  <Field label="Brand">
+                    <CustomSelect
+                      value={form.brand}
+                      onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                      options={brandNames}
+                      placeholder="Pilih brand..."
+                    />
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Harga Jual (Rp)">
+                    <input
+                      type="number"
+                      value={form.price}
+                      onChange={(e) => setForm({ ...form, price: e.target.value })}
+                      placeholder="0"
+                      className={inputCls}
+                    />
+                  </Field>
+                  <Field label="Jumlah Stok">
+                    <input
+                      type="number"
+                      value={form.stock}
+                      onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                      placeholder="0"
+                      className={inputCls}
+                    />
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Rating">
+                    <input
+                      type="number"
+                      min="0"
+                      max="5"
+                      step="0.1"
+                      value={form.rating}
+                      onChange={(e) => setForm({ ...form, rating: e.target.value })}
+                      placeholder="0.0"
+                      className={inputCls}
+                    />
+                  </Field>
+                  <Field label="Status Promo">
+                    <label className="flex items-center gap-3 px-4 py-3 border border-gray-200 cursor-pointer rounded-xl bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={form.promo}
+                        onChange={(e) =>
+                          setForm({ ...form, promo: e.target.checked })
+                        }
+                        className="w-4 h-4"
+                        style={{ accentColor: NAVY }}
+                      />
+                      <span className="text-[13px] font-semibold text-gray-700">
+                        Tandai sebagai promo
+                      </span>
+                    </label>
+                  </Field>
+                </div>
+
+                <Field label="Deskripsi Singkat">
+                  <textarea
+                    value={form.description}
+                    onChange={(e) =>
+                      setForm({ ...form, description: e.target.value })
+                    }
+                    placeholder="Jelaskan fitur unggulan produk..."
+                    className={`${inputCls} h-24 resize-none`}
+                  />
+                  <p className={hintCls}>
+                    Ringkas, mudah dibaca, gunakan 1-2 kalimat.
+                  </p>
+                </Field>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="flex flex-col gap-6 pb-2">
+              <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-purple-50 border border-purple-100">
+                <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0 bg-violet-600">
+                  <Info size={13} color="#fff" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-violet-800 m-0 mb-0.5">
+                    Detail Produk
+                  </p>
+                  <p className="text-[12px] text-violet-500 m-0">
+                    Tambahkan deskripsi panjang dan informasi warna.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid lg:grid-cols-[1.4fr_0.9fr] gap-4">
+                <div className="flex flex-col gap-4">
+                  <Field label="Deskripsi Detail">
+                    <textarea
+                      value={form.deskripsi_detail}
+                      onChange={(e) =>
+                        setForm({ ...form, deskripsi_detail: e.target.value })
+                      }
+                      placeholder={
+                        "Tuliskan deskripsi panjang. Gunakan paragraf, bullet, dan enter untuk struktur yang baik."
+                      }
+                      className={`${inputCls} min-h-[220px] resize-vertical`}
+                    />
+                  </Field>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Warna Produk">
+                      <CustomSelect
+                        value={form.warna}
+                        onChange={(e) =>
+                          setForm({ ...form, warna: e.target.value })
+                        }
+                        options={warnaOptions}
+                        placeholder="Pilih warna..."
+                      />
+                    </Field>
+                    <Field label="Label Warna">
+                      <input
+                        value={form.colorLabel}
+                        onChange={(e) =>
+                          setForm({ ...form, colorLabel: e.target.value })
+                        }
+                        placeholder="Contoh: Midnight Black"
+                        className={inputCls}
+                      />
+                    </Field>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 min-h-[220px]">
+                  <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">
+                    Preview Deskripsi
+                  </p>
+                  <div className="space-y-2">
+                    {renderDetailPreview(form.deskripsi_detail)}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="flex flex-col gap-6 pb-2">
+              <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100">
+                <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0" style={{ background: NAVY }}>
+                  <Camera size={13} color="#fff" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-[#072B50] m-0 mb-0.5">
+                    Media Produk
+                  </p>
+                  <p className="text-[12px] text-blue-600 m-0">
+                    Upload gambar produk dengan preview dan progress.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => {
+                    handleFiles(e.target.files);
+                    e.target.value = null;
+                  }}
+                />
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOver(true);
+                  }}
+                  onDragLeave={() => setDragOver(false)}
+                  onDrop={handleDrop}
+                  className="flex flex-col items-center gap-3 p-8 transition-all duration-200 border-2 border-dashed cursor-pointer rounded-xl"
+                  style={{
+                    borderColor: dragOver ? NAVY : "#e2e8f0",
+                    background: dragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
+                  }}
+                >
+                  <div
+                    className="flex items-center justify-center transition-all duration-200 w-14 h-14 rounded-2xl"
+                    style={{ background: dragOver ? NAVY : "rgba(7,43,80,0.07)" }}
+                  >
+                    <Upload size={24} color={dragOver ? "#fff" : NAVY} />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[14px] font-bold text-gray-800 m-0 mb-1">
+                      Drag & drop foto di sini
+                    </p>
+                    <p className="text-[12.5px] text-gray-400 m-0 mb-4">
+                      atau klik tombol di bawah
+                    </p>
+                    <button
+                      type="button"
+                      onClick={openFilePicker}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white text-[13px] font-bold"
+                      style={{ background: NAVY }}
+                    >
+                      <Upload size={13} /> Pilih File
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-gray-400 m-0">
+                    PNG, JPG, WEBP · Maks. 5MB · Min. 800×800px
+                  </p>
+                  {uploadError && (
+                    <p className="text-[11px] text-red-500 mt-2 m-0">
+                      {uploadError}
+                    </p>
+                  )}
+                </div>
+
+                {uploadedFiles.length > 0 && (
+                  <div className="flex flex-col gap-2.5">
+                    <label className={labelCls}>
+                      File Terupload ({uploadedFiles.length})
+                    </label>
+                    {uploadedFiles.map((file) => (
+                      <div
+                        key={file.id}
+                        className="bg-gray-50 rounded-xl flex items-center gap-3 p-3.5 border border-gray-100"
+                      >
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                            file.progress === 100 ? "bg-green-50" : "bg-gray-100"
+                          }`}
+                        >
+                          {file.preview ? (
+                            <img
+                              src={file.preview}
+                              alt={file.name}
+                              className="object-cover w-full h-full rounded-lg"
+                            />
+                          ) : file.progress === 100 ? (
+                            <Check
+                              size={16}
+                              className="text-emerald-600"
+                              strokeWidth={2.5}
+                            />
+                          ) : (
+                            <Info size={16} style={{ color: NAVY }} />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between mb-1.5">
+                            <p className="text-[13px] font-bold text-gray-800 m-0 truncate max-w-50">
+                              {file.name}
+                            </p>
+                            <span
+                              className={`text-[12px] font-bold shrink-0 ${
+                                file.progress === 100 ? "text-emerald-600" : ""
+                              }`}
+                              style={file.progress !== 100 ? { color: NAVY } : {}}
+                            >
+                              {file.progress === 100
+                                ? "✓ Selesai"
+                                : `${file.progress}%`}
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                file.progress === 100 ? "bg-emerald-500" : ""
+                              }`}
+                              style={{
+                                width: `${file.progress}%`,
+                                background:
+                                  file.progress !== 100 ? NAVY : undefined,
+                              }}
+                            />
+                          </div>
+                          <p className="text-[11px] text-gray-400 mt-1 m-0">
+                            {file.size}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(file.id)}
+                          className="flex items-center justify-center text-red-500 border-none rounded-lg cursor-pointer w-7 h-7 bg-red-50 shrink-0"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="flex flex-col gap-6 pb-2">
+              <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-green-50 border border-green-100">
+                <div className="flex items-center justify-center rounded-lg w-7 h-7 shrink-0 bg-emerald-600">
+                  <Layers size={13} color="#fff" />
+                </div>
+                <div>
+                  <p className="text-[13px] font-bold text-emerald-900 m-0 mb-0.5">
+                    Spesifikasi & Relasi
+                  </p>
+                  <p className="text-[12px] text-emerald-600 m-0">
+                    Tambahkan detail spesifikasi dan relasi promo.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                {form.spesifikasi.map((spec, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 border border-gray-100 rounded-xl bg-gray-50"
+                  >
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className={labelCls}>Atribut</label>
+                        <input
+                          value={spec.atribut}
+                          onChange={(e) =>
+                            updateSpec(idx, "atribut", e.target.value)
+                          }
+                          placeholder="Contoh: Chipset"
+                          className={inputCls}
+                        />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Detail</label>
+                        <input
+                          value={spec.detail}
+                          onChange={(e) =>
+                            updateSpec(idx, "detail", e.target.value)
+                          }
+                          placeholder="Contoh: A17 Pro, 8GB RAM"
+                          className={inputCls}
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeSpec(idx)}
+                      className="mt-3 px-3 py-2 rounded-xl text-[12px] font-semibold text-red-500 bg-red-50 hover:bg-red-100"
+                    >
+                      Hapus Spesifikasi
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addSpec}
+                  className="inline-flex items-center justify-center w-full py-3 rounded-xl border border-dashed border-gray-200 bg-white text-[13px] font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  + Tambah Spesifikasi
+                </button>
+
+                <div>
+                  <label className={labelCls}>Promo Aktif (opsional)</label>
+                  <div className="relative">
+                    <input
+                      value={promoSearch}
+                      onChange={(e) => setPromoSearch(e.target.value)}
+                      placeholder="Cari promo..."
+                      className={`${inputCls} pl-4`}
+                    />
+                    {promoSearch && (
+                      <div className="absolute left-0 right-0 z-10 mt-1 overflow-hidden bg-white border border-gray-200 rounded-xl shadow-xl">
+                        {promoOptions
+                          .filter(
+                            (promo) =>
+                              promo.name
+                                .toLowerCase()
+                                .includes(promoSearch.toLowerCase()) &&
+                              !form.promoRelation.includes(promo.id),
+                          )
+                          .slice(0, 8)
+                          .map((promo) => (
+                            <button
+                              key={promo.id}
+                              type="button"
+                              onClick={() => {
+                                setForm((prev) => ({
+                                  ...prev,
+                                  promoRelation: [...prev.promoRelation, promo.id],
+                                  promo: true,
+                                }));
+                                setPromoSearch("");
+                              }}
+                              className="w-full px-4 py-3 text-left bg-white border-b border-gray-100 hover:bg-gray-50"
+                            >
+                              {promo.name}
+                            </button>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                  {form.promoRelation.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {form.promoRelation.map((promoId) => {
+                        const promo = promoOptions.find((p) => p.id === promoId);
+                        return (
+                          <span
+                            key={promoId}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-[12px] font-semibold text-blue-900"
+                          >
+                            {promo ? promo.name : `Promo #${promoId}`}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setForm((prev) => ({
+                                  ...prev,
+                                  promoRelation: prev.promoRelation.filter(
+                                    (id) => id !== promoId,
+                                  ),
+                                }))
+                              }
+                              className="inline-flex items-center justify-center w-5 h-5 rounded-full text-blue-700 bg-white"
+                            >
+                              <X size={10} />
+                            </button>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <p className={hintCls}>
+                    Pilih promo untuk menghubungkan produk ke kampanye.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-between gap-2.5 px-7 py-4 border-t border-gray-100 bg-gray-50">
           <button
-            onClick={onClose}
+            type="button"
+            onClick={step > 1 ? handleBack : onClose}
             className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
           >
-            Batal
+            {step > 1 ? "Kembali" : "Batal"}
           </button>
-          <button
-            onClick={() => {
-              onSave(form);
-              onClose();
-            }}
-            className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
-            style={{
-              background: NAVY,
-              boxShadow: `0 4px 14px rgba(7,43,80,0.3)`,
-            }}
-          >
-            Simpan Produk
-          </button>
+          <div className="flex gap-2.5">
+            {step < 4 && (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
+                style={{
+                  background: NAVY,
+                  boxShadow: `0 4px 14px rgba(7,43,80,0.3)`,
+                }}
+              >
+                Selanjutnya
+              </button>
+            )}
+            {step === 4 && (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
+                style={{
+                  background: NAVY,
+                  boxShadow: `0 4px 14px rgba(7,43,80,0.3)`,
+                }}
+              >
+                Simpan Produk
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </Overlay>
   );
+}
+
+function AddProductModal(props) {
+  return <ProductFormModal mode="create" {...props} />;
 }
 
 /* ══════════════════════════════════════════
@@ -1106,8 +1504,10 @@ export default function Produk() {
 
   const [brandOptions, setBrandOptions] = useState(defaultBrandOptions);
   const [kategoriOptions, setKategoriOptions] = useState(defaultKategoriOptions);
+  const [promoOptions, setPromoOptions] = useState([]);
 
   const [products, setProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [meta, setMeta] = useState({
@@ -1128,7 +1528,7 @@ export default function Produk() {
 
       const params = {
         page: currentPage,
-        per_page: 12,
+        per_page: 15,
       };
 
       const response = await productService.getProducts(params);
@@ -1144,15 +1544,28 @@ export default function Produk() {
         category: item.kategori?.nama || "-",
         price: item.harga,
         stock: item.stok,
-        promo: item.adalah_promo,
+        promo:
+          item.adalah_promo ||
+          (Array.isArray(item.promo) && item.promo.length > 0),
         image: "📦",
+        imageUrl: resolveImageUrl(item.gambar?.map((g) => g.url_gambar) || []),
         // Keep full data for editing
         fullData: item,
       }));
 
       setProducts(mapped);
+      // setTotalPages(response.data?.last_page || 1);
+      // setTotalProducts(response.data?.total || 0);
+      // setMeta(response.meta || {
+      //   promo_count: 0,
+      //   low_stock_count: 0,
+      // });
       setTotalPages(response.data?.last_page || 1);
+
+      setTotalProducts(response.data?.total || 0);
+
       setMeta(response.meta || {
+        total: 0,
         promo_count: 0,
         low_stock_count: 0,
       });
@@ -1169,23 +1582,40 @@ export default function Produk() {
     fetchProducts();
   }, [currentPage]);
 
+  useEffect(() => {
+    const fetchPromoOptions = async () => {
+      try {
+        const res = await getPromos({ page: 1, limit: 100 });
+        const options = Array.isArray(res.data)
+          ? res.data.map((promo) => ({ id: promo.id, name: promo.name }))
+          : [];
+        setPromoOptions(options);
+      } catch (error) {
+        console.error("Error fetching promo options:", error);
+      }
+    };
+
+    fetchPromoOptions();
+  }, []);
+
   const handleUpdate = async (slug, data) => {
     try {
       setLoading(true);
       setError("");
 
       const productData = {
-        kategori_id: data.kategori_id,
+        kategori_id: data.kategori_id || 1,
         nama: data.name,
-        slug: data.slug || undefined, // Don't send if empty
+        slug: data.slug || undefined,
         deskripsi: data.deskripsi || "",
         deskripsi_detail: data.deskripsi_detail || "",
         harga: Number(data.price),
         stok: Number(data.stock),
-        rating: data.rating || 0,
-        adalah_promo: data.promo || false,
-        gambar: data.gambar || [], // Array of image URLs
-        spesifikasi: data.spesifikasi || [], // Array of {atribut, detail}
+        rating: Number(data.rating) || 0,
+        adalah_promo: Boolean(data.promoRelation?.length || data.promo),
+        promo_ids: data.promoRelation || [],
+        gambar: data.gambar || [],
+        spesifikasi: data.spesifikasi || [],
       };
 
       await productService.updateProduct(slug, productData);
@@ -1210,6 +1640,7 @@ export default function Produk() {
       price: String(product.price),
       stock: String(product.stock),
       promo: product.promo,
+      promoRelation: product.fullData?.promo?.map((promo) => promo.id) || [],
       // Add more fields as needed
       slug: product.slug,
       deskripsi: product.fullData?.deskripsi || "",
@@ -1259,20 +1690,40 @@ export default function Produk() {
       setLoading(true);
       setError("");
 
-      // Map form data to backend format
       const productData = {
-        kategori_id: 1, // Default kategori, bisa diubah berdasarkan form.category
+        kategori_id: formData.kategori_id || 1,
         nama: formData.name,
-        slug: undefined, // Let backend generate
+        slug: undefined,
         deskripsi: formData.description,
-        deskripsi_detail: "",
+        deskripsi_detail: formData.deskripsi_detail || "",
         harga: Number(formData.price),
         stok: Number(formData.stock),
-        rating: 0,
-        adalah_promo: false,
-        gambar: [], // For now empty, can be updated later
-        spesifikasi: [], // For now empty, can be updated later
+        rating: Number(formData.rating) || 0,
+        adalah_promo: Boolean(formData.promoRelation?.length || formData.promo),
+        promo_ids: formData.promoRelation || [],
+        gambar: [],
+        spesifikasi: formData.spesifikasi || [],
       };
+
+      if (formData.imageFiles?.length) {
+        const formPayload = new FormData();
+        formData.imageFiles.forEach((item) => {
+          const fileObject = item?.file || item;
+          if (fileObject instanceof File) {
+            formPayload.append("images[]", fileObject);
+          }
+        });
+
+        const uploadResponse = await productService.uploadProductImages(formPayload);
+        const uploadedImages = Array.isArray(uploadResponse.data)
+          ? uploadResponse.data.map((item) => ({
+              path: item.path,
+              url: item.url,
+            }))
+          : [];
+
+        productData.gambar = uploadedImages.map((item) => item.url);
+      }
 
       await productService.createProduct(productData);
 
@@ -1303,7 +1754,7 @@ export default function Produk() {
   const STAT_CARDS = [
     {
       label: "Total Produk",
-      value: products.length,
+      value: totalProducts,
       icon: <Package size={18} color={NAVY} />,
       bg: "#e6eef6",
     },
@@ -1579,6 +2030,7 @@ export default function Produk() {
           onSave={handleCreate}
           brandOptions={brandOptions}
           kategoriOptions={kategoriOptions}
+          promoOptions={promoOptions}
         />
       )}
       {showBrandKategoriModal && (
@@ -1593,108 +2045,37 @@ export default function Produk() {
 
       {/* Edit Modal */}
       {editProduct && (
-        <Overlay onClose={() => setEditProduct(null)}>
-          <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-115">
-            <div
-              className="flex items-center gap-3 px-6 py-5"
-              style={{ background: NAVY }}
-            >
-              <div
-                className="flex items-center justify-center w-9 h-9 rounded-xl"
-                style={{ background: "rgba(255,255,255,0.15)" }}
-              >
-                <Pencil size={16} color="#fff" />
-              </div>
-              <div className="flex-1">
-                <h2 className="text-[15px] font-extrabold text-white m-0">
-                  Edit Produk
-                </h2>
-                <p className="text-[11px] text-white/60 m-0">
-                  {editProduct.name}
-                </p>
-              </div>
-              <button
-                onClick={() => setEditProduct(null)}
-                className="flex items-center justify-center w-8 h-8 border-none rounded-lg cursor-pointer"
-                style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="flex flex-col gap-4 p-6">
-              {[
-                { label: "Nama Produk", key: "name" },
-                { label: "Kategori", key: "category" },
-              ].map(({ label, key }) => (
-                <div key={key}>
-                  <label className={labelCls}>{label}</label>
-                  <input
-                    value={editForm[key]}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, [key]: e.target.value })
-                    }
-                    className={inputCls}
-                  />
-                </div>
-              ))}
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: "Harga (Rp)", key: "price" },
-                  { label: "Stok", key: "stock" },
-                ].map(({ label, key }) => (
-                  <div key={key}>
-                    <label className={labelCls}>{label}</label>
-                    <input
-                      type="number"
-                      value={editForm[key]}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, [key]: e.target.value })
-                      }
-                      className={inputCls}
-                    />
-                  </div>
-                ))}
-              </div>
-              <label className="flex items-center gap-2.5 cursor-pointer px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-100">
-                <input
-                  type="checkbox"
-                  checked={editForm.promo}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, promo: e.target.checked })
-                  }
-                  className="w-4 h-4"
-                  style={{ accentColor: NAVY }}
-                />
-                <div>
-                  <p className="text-[13px] font-bold text-gray-700 m-0">
-                    Tandai sebagai Promo
-                  </p>
-                  <p className="text-[11px] text-gray-400 m-0">
-                    Produk akan tampil dengan label promo
-                  </p>
-                </div>
-              </label>
-              <div className="flex gap-2.5 mt-1">
-                <button
-                  onClick={() => setEditProduct(null)}
-                  className="flex-1 py-3 rounded-xl border border-gray-200 bg-white cursor-pointer text-[13.5px] font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  Batal
-                </button>
-                <button
-                  onClick={handleSaveEdit}
-                  className="flex-2 py-3 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold hover:opacity-90 transition-all"
-                  style={{
-                    background: NAVY,
-                    boxShadow: `0 4px 14px rgba(7,43,80,0.28)`,
-                  }}
-                >
-                  Simpan Perubahan
-                </button>
-              </div>
-            </div>
-          </div>
-        </Overlay>
+        <ProductFormModal
+          mode="edit"
+          initialData={{
+            name: editProduct.name,
+            slug: editProduct.slug,
+            category: editProduct.category,
+            kategori_id: editProduct.fullData?.kategori?.id || 1,
+            brand: editProduct.fullData?.brand || "",
+            description: editProduct.fullData?.deskripsi || "",
+            deskripsi: editProduct.fullData?.deskripsi || "",
+            deskripsi_detail: editProduct.fullData?.deskripsi_detail || "",
+            price: String(editProduct.price),
+            stock: String(editProduct.stock),
+            rating: editProduct.fullData?.rating || 0,
+            promo: editProduct.promo,
+            promoRelation: editProduct.fullData?.promo?.map((promo) => promo.id) || [],
+            warna: editProduct.fullData?.warna || "",
+            colorLabel: editProduct.fullData?.colorLabel || "",
+            gambar: editProduct.fullData?.gambar?.map((g) => g.url_gambar) || [],
+            spesifikasi:
+              editProduct.fullData?.spesifikasi?.map((s) => ({
+                atribut: s.atribut,
+                detail: s.detail,
+              })) || [],
+          }}
+          onClose={() => setEditProduct(null)}
+          onSave={(data) => handleUpdate(editProduct.slug, data)}
+          brandOptions={brandOptions}
+          kategoriOptions={kategoriOptions}
+          promoOptions={promoOptions}
+        />
       )}
 
       {/* Delete Modal */}

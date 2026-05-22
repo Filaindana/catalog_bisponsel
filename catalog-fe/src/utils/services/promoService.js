@@ -3,10 +3,10 @@ import api from "../api";
 /* ================= HELPERS ================= */
 
 const formatRupiah = (num) =>
-  "Rp " + Number(num).toLocaleString("id-ID").replace(/,/g, ".");
+  "Rp " + Number(num || 0).toLocaleString("id-ID").replace(/,/g, ".");
 
 const getBannerColor = (status) => {
-  switch (status) {
+  switch (String(status).toLowerCase()) {
     case "aktif":
       return "#22c55e";
     case "segera":
@@ -21,49 +21,70 @@ const getBannerColor = (status) => {
 const getImageUrl = (path) =>
   path ? `/storage/${path}` : "/fallback.jpg";
 
+const normalizeMeta = (meta = {}) => ({
+  aktif_count: Number(meta.aktif_count ?? 0),
+  segera_count: Number(meta.segera_count ?? 0),
+  berakhir_count: Number(meta.berakhir_count ?? 0),
+});
+
+const normalizePromo = (item = {}) => ({
+  id: item.id,
+  name: item.nama,
+  desc: item.deskripsi,
+  startDate: item.tanggal_mulai,
+  endDate: item.tanggal_selesai,
+  status: item.status,
+  banner: item.banner,
+  bannerColor: getBannerColor(item.status),
+  produk: (item.produk || []).map((p) => ({
+    id: p.id,
+    name: p.nama,
+    category: p.kategori?.nama || "Produk",
+    price: formatRupiah(p.harga),
+    originalPrice: formatRupiah((p.harga || 0) * 1.2),
+    rating: p.rating || 4.5,
+    stock: p.stok,
+    image: getImageUrl(p.gambar),
+    spec: p.spesifikasi?.length
+      ? p.spesifikasi
+          .slice(0, 3)
+          .map((s) => s.detail)
+          .join(" • ")
+      : "Spesifikasi tidak tersedia",
+  })),
+  products: (item.produk || []).map((p) => ({
+    id: p.id,
+    name: p.nama,
+    category: p.kategori?.nama || "Produk",
+    price: formatRupiah(p.harga),
+    originalPrice: formatRupiah((p.harga || 0) * 1.2),
+    rating: p.rating || 4.5,
+    stock: p.stok,
+    image: getImageUrl(p.gambar),
+    spec: p.spesifikasi?.length
+      ? p.spesifikasi
+          .slice(0, 3)
+          .map((s) => s.detail)
+          .join(" • ")
+      : "Spesifikasi tidak tersedia",
+  })),
+});
+
 /* ================= GET PROMOS ================= */
 
 export const getPromos = async ({ page = 1, limit = 10 } = {}) => {
   try {
     const res = await api(`/promo?page=${page}&per_page=${limit}`);
-    const paginator = res.data;
+    const paginator = res.data || {};
+    const items = Array.isArray(paginator.data) ? paginator.data : [];
 
     return {
-      data: paginator.data.map((item) => ({
-        id: item.id,
-        name: item.nama,
-        desc: item.deskripsi,
-        startDate: item.tanggal_mulai,
-        endDate: item.tanggal_selesai,
-        status: item.status,
-        banner: item.banner,
-        bannerColor: getBannerColor(item.status),
-
-        // 🔥 PRODUK DI DALAM PROMO
-        products: (item.produk || []).map((p) => ({
-          id: p.id,
-          name: p.nama,
-          category: p.kategori?.nama || "Produk",
-
-          price: formatRupiah(p.harga),
-          originalPrice: formatRupiah(p.harga * 1.2), // dummy
-
-          rating: p.rating || 4.5,
-          stock: p.stok,
-
-          image: getImageUrl(p.gambar),
-
-          // 🔥 ambil dari relasi spesifikasi
-          spec: p.spesifikasi?.length
-            ? p.spesifikasi
-                .slice(0, 3)
-                .map((s) => s.detail)
-                .join(" • ")
-            : "Spesifikasi tidak tersedia",
-        })),
-      })),
-      current_page: paginator.current_page,
-      last_page: paginator.last_page,
+      data: items.map(normalizePromo),
+      current_page: paginator.current_page ?? 1,
+      last_page: paginator.last_page ?? 1,
+      per_page: paginator.per_page ?? limit,
+      total: paginator.total ?? items.length,
+      meta: normalizeMeta(res.meta),
     };
   } catch (err) {
     console.error("Error getPromos:", err);
@@ -133,7 +154,8 @@ export const getActivePromoProducts = async () => {
 export const getPromoById = async (id) => {
   try {
     const res = await api(`/promo/${id}`);
-    return res.data;
+    const payload = res.data?.data || res.data || res;
+    return normalizePromo(payload);
   } catch (err) {
     console.error("Error getPromoById:", err);
     throw err;
@@ -144,19 +166,35 @@ export const getPromoById = async (id) => {
 
 export const createPromo = async (payload) => {
   try {
+    console.log("createPromo payload:", payload);
+    const formData = new FormData();
+
+    formData.append("nama", payload.name || "");
+    formData.append("deskripsi", payload.desc || "");
+    formData.append("tanggal_mulai", payload.startDate || "");
+    formData.append("tanggal_selesai", payload.endDate || "");
+
+    if (payload.banner instanceof File) {
+      formData.append("banner", payload.banner);
+    }
+
+    const relatedIds = payload.produk_terkait || payload.produk_ids || [];
+    if (Array.isArray(relatedIds)) {
+      relatedIds
+        .filter((id) => id !== undefined && id !== null)
+        .forEach((id) => formData.append("produk_terkait[]", id));
+    }
+
+    for (const pair of formData.entries()) {
+      console.log("createPromo FormData:", pair[0], pair[1]);
+    }
+
     const res = await api("/promo", {
       method: "POST",
-      body: JSON.stringify({
-        nama: payload.name,
-        deskripsi: payload.desc,
-        tanggal_mulai: payload.startDate,
-        tanggal_selesai: payload.endDate,
-        banner: payload.banner || null,
-        produk_ids: payload.produk_ids || [],
-      }),
+      body: formData,
     });
 
-    return res.data;
+    return normalizePromo(res.data);
   } catch (err) {
     console.error("Error createPromo:", err);
     throw err;
@@ -167,19 +205,44 @@ export const createPromo = async (payload) => {
 
 export const updatePromo = async (id, payload) => {
   try {
+    console.log("updatePromo payload:", payload);
+    const formData = new FormData();
+    formData.append("_method", "PUT");
+
+    if (payload.name !== undefined) {
+      formData.append("nama", payload.name);
+    }
+    if (payload.desc !== undefined) {
+      formData.append("deskripsi", payload.desc);
+    }
+    if (payload.startDate) {
+      formData.append("tanggal_mulai", payload.startDate);
+    }
+    if (payload.endDate) {
+      formData.append("tanggal_selesai", payload.endDate);
+    }
+
+    if (payload.banner instanceof File) {
+      formData.append("banner", payload.banner);
+    }
+
+    const relatedIds = payload.produk_terkait || payload.produk_ids || [];
+    if (Array.isArray(relatedIds)) {
+      relatedIds
+        .filter((id) => id !== undefined && id !== null)
+        .forEach((id) => formData.append("produk_terkait[]", id));
+    }
+
+    for (const pair of formData.entries()) {
+      console.log("updatePromo FormData:", pair[0], pair[1]);
+    }
+
     const res = await api(`/promo/${id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        nama: payload.name,
-        deskripsi: payload.desc,
-        tanggal_mulai: payload.startDate,
-        tanggal_selesai: payload.endDate,
-        banner: payload.banner || null,
-        produk_ids: payload.produk_ids || [],
-      }),
+      method: "POST",
+      body: formData,
     });
 
-    return res.data;
+    return normalizePromo(res.data);
   } catch (err) {
     console.error("Error updatePromo:", err);
     throw err;
@@ -197,6 +260,61 @@ export const deletePromo = async (id) => {
     return res;
   } catch (err) {
     console.error("Error deletePromo:", err);
+    throw err;
+  }
+};
+
+
+
+/* ================= GET PUBLIC PROMOS ================= */
+
+// export const getPublicPromos = async () => {
+//   try {
+//     const res = await api("/promo");
+
+//     console.log("FULL API RESPONSE:", res.data);
+
+//     // ambil array promo
+//     const promos = res.data.data.data;
+
+//     console.log("PROMOS ARRAY:", promos);
+
+//     return promos.map(normalizePromo);
+
+//   } catch (err) {
+//     console.error("Error getPublicPromos:", err);
+//     throw err;
+//   }
+// };
+
+export const getPublicPromos = async () => {
+  try {
+    const res = await api("/promo");
+
+    console.log("FULL API RESPONSE:", res.data);
+
+    // langsung ambil array data
+    const promos = res.data.data;
+
+    console.log("PROMOS ARRAY:", promos);
+
+    return promos.map(normalizePromo);
+
+  } catch (err) {
+    console.error("Error getPublicPromos:", err);
+    throw err;
+  }
+};
+
+/* ================= GET PROMO DETAIL ================= */
+
+export const getPublicPromoDetail = async (id) => {
+  try {
+    const res = await api(`/promo/${id}`);
+
+    return normalizePromo(res?.data?.data);
+  } catch (err) {
+    console.error("Error getPublicPromoDetail:", err);
     throw err;
   }
 };

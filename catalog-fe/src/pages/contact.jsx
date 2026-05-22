@@ -161,6 +161,7 @@ function BranchCard({ branch, index, onClick }) {
           {[
             { icon:<MapPin size={11}/>,  value:branch.address },
             { icon:<Phone  size={11}/>,  value:branch.phone   },
+            { icon:<Mail   size={11}/>,  value:branch.email   },
             { icon:<Clock  size={11}/>,  value:branch.hours   },
           ].map((row,j) => (
             <div key={j} className="flex gap-2.5 items-start">
@@ -240,12 +241,8 @@ export default function Contact() {
     const fetchCabang = async () => {
       try {
         const res = await getCabangs();
-        console.log("CABANG RES:", res);
 
-        // const data = res.data?.data || [];
-        const data = Array.isArray(res) ? res : [];
-
-        const mapped = data.map((item) => ({
+        const mapped = res.map((item) => ({
           id: item.id,
           name: item.nama,
           city: item.kota,
@@ -255,9 +252,9 @@ export default function Contact() {
             item.jam_buka && item.jam_tutup
               ? `${item.jam_buka} - ${item.jam_tutup}`
               : "Jam belum tersedia",
-          email: "-",
+          email: item.email || "-",
           maps: item.maps_link || null,
-          image: null,
+          image: item.foto_url || null,
         }));
 
         setCabangList(mapped);

@@ -193,6 +193,7 @@ export default function DetailProduct() {
           colors: data.colors || [],
           colorLabels: data.color_labels || [],
 
+          spec: data.deskripsi, // 🔥 TAMBAH INI
           description: data.deskripsi,
           detailDescription: data.deskripsi_detail,
 
@@ -338,13 +339,20 @@ export default function DetailProduct() {
               {/* Category + badge */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-[#8a9bb0]">{product.category}</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100">In Stock</span>
+                {/* <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100">In Stock</span> */}
               </div>
 
               {/* Name */}
               <h1 className="text-[28px] font-black text-[#072B50] leading-tight tracking-tight m-0">
                 {product.name}
               </h1>
+              
+              {/* Short Description */}
+              {product.spec && (
+                <p className="text-[13.5px] text-gray-500 leading-[1.7] m-0">
+                  {product.spec}
+                </p>
+              )}
 
               {/* Rating */}
               <div className="flex items-center gap-2">
@@ -363,10 +371,10 @@ export default function DetailProduct() {
               <div>
                 <p className="text-[10px] font-bold tracking-widest uppercase text-[#8a9bb0] mb-1">Harga</p>
                 <p className="text-[24px] font-black m-0 leading-none text-red-500">{fmt(product.price)}</p>
-                <p className="text-[11px] text-emerald-500 font-medium mt-1.5 flex items-center gap-1">
+                {/* <p className="text-[11px] text-emerald-500 font-medium mt-1.5 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"/>
                   Stok tersedia ({product.stock} unit)
-                </p>
+                </p> */}
               </div>
 
               {/* Color */}
@@ -388,8 +396,8 @@ export default function DetailProduct() {
                 </div>
               </div>
 
-              {/* Quantity 
-              <div>
+              {/* Quantity  */}
+              {/* <div>
                 <p className="text-[12px] font-semibold text-gray-600 mb-2">Jumlah</p>
                 <div className="flex items-center">
                   <button onClick={()=>setQuantity(q=>Math.max(1,q-1))}
@@ -401,8 +409,8 @@ export default function DetailProduct() {
                     className="w-9 h-9 border border-[#e8edf4] rounded-r-lg bg-[#f8fafc] cursor-pointer text-lg text-gray-600 hover:bg-[#f0f4f9] transition-colors font-bold">+</button>
                   <span className="ml-3 text-[11px] text-gray-400">maks. {product.stock}</span>
                 </div>
-              </div>
-              */}
+              </div> */}
+             
 
               {/* WhatsApp */}
               <a
@@ -450,7 +458,24 @@ export default function DetailProduct() {
           </div>
           <div className="p-6">
             {activeTab==="deskripsi" ? (
-              <p className="text-[13.5px] text-gray-600 leading-[1.85] m-0">{product.detailDescription || product.description}</p>
+              // <p className="text-[13.5px] text-gray-600 leading-[1.85] m-0">{product.detailDescription || product.description}</p>
+              <div className="space-y-5">
+                {(product.detailDescription || product.description)
+                  ?.split("\n\n")
+                  .filter((p) => p.trim() !== "")
+                  .map((paragraph, index) => (
+                    <p
+                      key={index}
+                      className={`text-[13.5px] leading-[1.85] m-0 ${
+                        index === 0
+                          ? "text-gray-800 font-medium"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {paragraph.trim()}
+                    </p>
+                  ))}
+              </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-[#e8edf4] overflow-hidden">
                 <table className="w-full border-collapse">

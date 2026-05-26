@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { sendKontak } from "../utils/services/contactService";
 import { getSettings } from "../utils/services/settingsService";
+import { getCabangs } from "../utils/services/cabangService";
 import { getStatusBuka } from "../utils/getStatusBuka";
 import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ExternalLink } from "lucide-react";
 import { getSocialIcon } from "../utils/getSocialIcon";
-import ceoImg from "../assets/ceo.jpg";
 
 if (typeof document !== "undefined" && !document.querySelector("[data-font-bismar]")) {
   const s = document.createElement("style");
@@ -30,18 +30,76 @@ if (typeof document !== "undefined" && !document.querySelector("[data-font-bisma
   document.head.appendChild(s);
 }
 
-/* ── Social Icons ── */
-const FacebookIcon  = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24"><path fill="#fff" d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/></svg>;
-const InstagramIcon = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24"><path fill="#fff" d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.336 3.608 1.311.975.975 1.249 2.242 1.311 3.608.058 1.265.07 1.645.07 4.849s-.012 3.584-.07 4.85c-.062 1.366-.336 2.633-1.311 3.608-.975.975-2.242 1.249-3.608 1.311-1.265.058-1.645.07-4.849.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.336-3.608-1.311-.975-.975-1.249-2.242-1.311-3.608C2.175 15.584 2.163 15.204 2.163 12s.012-3.584.07-4.85c.062-1.366.336-2.633 1.311-3.608.975-.975 2.242-1.249 3.608-1.311C8.416 2.175 8.796 2.163 12 2.163zm0-2.163C8.741 0 8.333.014 7.053.072 5.197.157 3.355.673 1.965 2.063.573 3.453.157 5.195.072 7.053.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.085 1.858.501 3.6 1.893 4.99 1.39 1.39 3.132 1.808 4.99 1.893C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 1.858-.085 3.6-.501 4.99-1.893 1.392-1.39 1.808-3.132 1.893-4.99.058-1.28.072-1.689.072-4.948 0-3.259-.014-3.667-.072-4.947-.085-1.858-.501-3.6-1.893-4.99C20.548.673 18.805.157 16.948.072 15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>;
-const TikTokIcon    = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24"><path fill="#fff" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>;
-const WhatsAppIcon  = ({ size = 20 }) => <svg width={size} height={size} viewBox="0 0 24 24"><path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a9.555 9.555 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12.05 0C5.495 0 .16 5.335.157 11.892a11.85 11.85 0 0 0 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005C18.555 23.794 24 18.459 24 11.893A11.817 11.817 0 0 0 12.05 0zm0 21.785a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.825 9.825 0 0 1 6.988 2.898 9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.889 9.884z"/></svg>;
+const DEFAULT_PROFILE = {
+  nama: "",
+  email: "",
+  avatar: null,
+  jabatan: "",
+  quote: "",
+};
 
-const socialLinks = [
-  { label:"Facebook",  username:"@BizPonselOfficial", desc:"Ikuti kami di Facebook untuk info terbaru",   href:"https://facebook.com/BizPonselOfficial",  bg:"#1877f2",                                                                                                              icon:(s)=><FacebookIcon size={s}/> },
-  { label:"Instagram", username:"@bizponsel.id",      desc:"Lihat foto & promo terbaru kami",             href:"https://instagram.com/bizponsel.id",      bg:"radial-gradient(circle at 30% 110%, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)", bgSolid:"#dc2743", icon:(s)=><InstagramIcon size={s}/> },
-  { label:"TikTok",    username:"@bizponsel",         desc:"Tonton konten & review produk kami",          href:"https://tiktok.com/@bizponsel",           bg:"#010101",                                                                                                              icon:(s)=><TikTokIcon size={s}/> },
-  { label:"WhatsApp",  username:"+62 811-3077-5195",  desc:"Chat langsung dengan tim kami",               href:"https://wa.me/6281130775195",             bg:"#25d366",                                                                                                              icon:(s)=><WhatsAppIcon size={s}/> },
-];
+const DEFAULT_KONTAK = {
+  whatsapp: "",
+  email: "",
+  alamat: "",
+  telepon: "",
+  maps_embed: "",
+};
+
+const normalizeSocialLinks = (socialMedia = []) => {
+  if (!Array.isArray(socialMedia)) {
+    return [];
+  }
+
+  return socialMedia.map((item, index) => {
+    const label = item?.label || item?.platform || item?.name || "Social Media";
+    const href = item?.url || item?.href || "";
+    const iconKey = item?.icon || label;
+    const Icon = getSocialIcon(iconKey);
+
+    const normalizedLabel = String(label).toLowerCase();
+    const bg = normalizedLabel.includes("instagram")
+      ? "radial-gradient(circle at 30% 110%, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)"
+      : normalizedLabel.includes("facebook")
+        ? "#1877f2"
+        : normalizedLabel.includes("whatsapp")
+          ? "#25d366"
+          : normalizedLabel.includes("tiktok")
+            ? "#010101"
+            : "#072B50";
+
+    return {
+      key: href || `${label}-${index}`,
+      label,
+      href,
+      username: item?.username || label,
+      desc: item?.desc || `${label} resmi BizPonsel`,
+      bg,
+      bgSolid: normalizedLabel.includes("instagram") ? "#dc2743" : bg,
+      icon: (size) => <Icon size={size} />,
+    };
+  });
+};
+
+const normalizeBranch = (branch = {}) => ({
+  id: branch.id ?? null,
+  name: branch.nama || branch.name || "Cabang",
+  city: branch.kota || branch.city || "Lokasi belum disetel",
+  address: branch.alamat || branch.address || "Alamat belum disetel",
+  phone: branch.telepon || branch.phone || "Telepon belum disetel",
+  email: branch.email || "-",
+  hours: [branch.jam_buka || branch.jamBuka, branch.jam_tutup || branch.jamTutup].filter(Boolean).join(" – ") || "Jam belum disetel",
+  image: branch.foto_url || branch.image || null,
+  maps: branch.maps_link || branch.maps || "",
+});
+
+const normalizeBranchList = (branches = []) => {
+  if (!Array.isArray(branches)) {
+    return [];
+  }
+
+  return branches.map(normalizeBranch);
+};
 
 /* ── SocialIcon with popup ── */
 function SocialIcon({ sl, size = 44, iconSize = 22 }) {
@@ -179,10 +237,11 @@ function BranchCard({ branch, index, onClick }) {
 export default function Contact() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [settings, setSettings] = useState(null);
-  const [loadingSettings, setLoadingSettings] = useState(true);
-  const [loadingError, setLoadingError] = useState(null);
-  const [now, setNow] = useState(new Date());
+  const [branches, setBranches] = useState([]);
+  const [loadingBranches, setLoadingBranches] = useState(true);
+  const [branchesError, setBranchesError] = useState(null);
   const [jamOpen, setJamOpen] = useState(false);
+  const [profileImageError, setProfileImageError] = useState(false);
 
   const [form, setForm] = useState({
     nama: "",
@@ -190,18 +249,44 @@ export default function Contact() {
     telepon: "",
     pesan: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState(null);
 
   const handleChange = (e) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
+
+    if (submitMessage) {
+      setSubmitMessage(null);
+    }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    if (event?.preventDefault) {
+      event.preventDefault();
+    }
+
+    if (isSubmitting) {
+      return;
+    }
+
+    if (!form.nama.trim() || !form.email.trim() || !form.pesan.trim()) {
+      const message = "Nama, email, dan pesan wajib diisi.";
+      setSubmitMessage({ type: "error", message });
+      alert(message);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage(null);
+
     try {
       const res = await sendKontak(form);
-      alert("Pesan berhasil dikirim!");
+      const successMessage = "Pesan berhasil dikirim!";
+      setSubmitMessage({ type: "success", message: successMessage });
+      alert(successMessage);
 
       setForm({
         nama: "",
@@ -209,63 +294,101 @@ export default function Contact() {
         telepon: "",
         pesan: "",
       });
+
       console.log(res);
     } catch (err) {
+      const message = err?.message || "Gagal kirim pesan. Silakan coba lagi.";
+      setSubmitMessage({ type: "error", message });
+      alert(message);
       console.error(err);
-      alert("Gagal kirim pesan");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
+  const profile = settings?.profile ?? DEFAULT_PROFILE;
+  const kontak = settings?.kontak ?? DEFAULT_KONTAK;
   const bukaStatus = getStatusBuka(settings?.jam_operasional);
-  const branchList = settings?.cabang ?? [];
-  const socialLinksFromSettings = (settings?.social_media || []).map((item) => ({
-    ...item,
-    icon: (size) => {
-      const Icon = getSocialIcon(item.label || item.platform || item.name);
-      return <Icon size={size} />;
-    },
-  }));
+  const branchList = branches;
+  const socialLinksFromSettings = normalizeSocialLinks(settings?.social_media);
+  const profileName = profile.nama || "BizPonsel";
+  const profileJob = profile.jabatan || "Jabatan belum disetel";
+  const profileEmail = profile.email || kontak.email || "Email belum disetel";
+  const profileQuote = profile.quote || "Profil CEO belum diatur.";
+  const showProfileImage = Boolean(profile.avatar) && !profileImageError;
+
   const contactCards = [
     {
       icon: <MapPin size={16} />,
       label: "Alamat",
-      value: settings?.kontak?.alamat || "Alamat belum disetel",
+      value: kontak.alamat || "Alamat belum disetel",
     },
     {
       icon: <Phone size={16} />,
       label: "Telepon",
-      value: settings?.kontak?.telepon || "Telepon belum disetel",
+      value: kontak.telepon || "Telepon belum disetel",
     },
     {
       icon: <Mail size={16} />,
       label: "Email",
-      value: settings?.kontak?.email || "Email belum disetel",
+      value: kontak.email || profileEmail,
     },
   ];
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      setLoadingSettings(true);
-      setLoadingError(null);
+    setProfileImageError(false);
+  }, [profile.avatar]);
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchSettings = async () => {
       try {
         const res = await getSettings();
+
+        if (!isMounted) {
+          return;
+        }
+
         setSettings(res);
-        setSelectedBranch(res?.cabang?.[0] ?? null);
       } catch (err) {
         console.error("Error fetch settings:", err);
-        setLoadingError(err?.message || "Gagal memuat pengaturan.");
+      }
+    };
+
+    const fetchBranches = async () => {
+      setLoadingBranches(true);
+      setBranchesError(null);
+
+      try {
+        const res = await getCabangs();
+
+        if (!isMounted) {
+          return;
+        }
+
+        const normalizedBranches = normalizeBranchList(res);
+        setBranches(normalizedBranches);
+      } catch (err) {
+        console.error("Error fetch cabang:", err);
+
+        if (isMounted) {
+          setBranches([]);
+          setBranchesError(err?.message || "Gagal memuat daftar cabang.");
+        }
       } finally {
-        setLoadingSettings(false);
+        if (isMounted) {
+          setLoadingBranches(false);
+        }
       }
     };
 
     fetchSettings();
+    fetchBranches();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const inp = "w-full px-3 py-2.5 rounded-lg text-[13px] text-gray-900 outline-none transition-all duration-200 focus:ring-2 focus:ring-[#072B50]/10 focus:border-[#072B50]";
@@ -374,19 +497,39 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* CEO Photo */}
+          {/* CEO Profile */}
           <div className="relative overflow-hidden rounded-2xl min-h-80 lg:min-h-100" style={{ border:"1px solid #dce6f0" }}>
-            <img src={ceoImg} alt="CEO" className="absolute inset-0 object-contain object-top w-full h-full" />
+            {showProfileImage ? (
+              <img
+                src={profile.avatar}
+                alt={profileName}
+                onError={() => setProfileImageError(true)}
+                className="absolute inset-0 object-cover object-top w-full h-full"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #072B50 0%, #0f4d90 100%)" }}>
+                <div className="flex flex-col items-center gap-3 text-center px-6">
+                  <div className="flex items-center justify-center w-16 h-16 rounded-full border border-white/25 bg-white/10 text-white text-2xl font-black">
+                    {profileName.charAt(0).toUpperCase() || "B"}
+                  </div>
+                  <div className="text-white">
+                    <p className="text-[13px] font-semibold">Foto profil belum tersedia</p>
+                    <p className="text-[11px] text-white/70 mt-1">Unggah foto melalui halaman admin</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="absolute inset-0" style={{ background:"linear-gradient(to top, #072B50 38%, transparent 100%)" }} />
             <div className="absolute bottom-6 left-6 right-6">
               <p className="text-[13px] italic font-light leading-[1.8] mb-3.5" style={{ color:"rgba(255,255,255,0.8)" }}>
-                &ldquo; Kami berkomitmen untuk menghadirkan produk teknologi terbaik dengan pelayanan yang profesional dan terpercaya. &rdquo;
+                &ldquo; {profileQuote} &rdquo;
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-0.5 h-8 rounded-full" style={{ background:"rgba(255,255,255,0.4)" }} />
                 <div>
-                  <p className="text-[14px] font-bold text-white mb-0.5">Jeon Jungkook</p>
-                  <p className="text-[11px] font-medium m-0" style={{ color:"rgba(255,255,255,0.5)" }}>CEO & Founder PT. Indo Bismar</p>
+                  <p className="text-[14px] font-bold text-white mb-0.5">{profileName}</p>
+                  <p className="text-[11px] font-medium m-0" style={{ color:"rgba(255,255,255,0.5)" }}>{profileJob}</p>
+                  <p className="text-[11px] font-medium m-0 mt-1" style={{ color:"rgba(255,255,255,0.7)" }}>{profileEmail}</p>
                 </div>
               </div>
             </div>
@@ -413,6 +556,7 @@ export default function Contact() {
                       placeholder={f.placeholder}
                       className={inp}
                       style={inpStyle}
+                      required
                       onFocus={e=>(e.currentTarget.style.border="1px solid #072B50")}
                       onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")}
                     />
@@ -443,12 +587,28 @@ export default function Contact() {
                   rows={5}
                   className={inp + " resize-y"}
                   style={{ ...inpStyle, fontFamily:"inherit" }}
+                  required
                   onFocus={e=>(e.currentTarget.style.border="1px solid #072B50")}
                   onBlur={e=>(e.currentTarget.style.border="1px solid #dce6f0")}
                 />
               </div>
-              <button onClick={handleSubmit} className="w-full py-3 rounded-[9px] text-white text-[13px] font-bold border-none cursor-pointer transition-colors duration-200 bg-[#072B50] hover:bg-[#0a3460]">
-                Kirim Pesan
+              {submitMessage && (
+                <div
+                  className={`rounded-xl px-4 py-3 text-sm border ${submitMessage.type === "success"
+                    ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : "border-rose-200 bg-rose-50 text-rose-800"
+                  }`}
+                >
+                  {submitMessage.message}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+                className="w-full py-3 rounded-[9px] text-white text-[13px] font-bold border-none cursor-pointer transition-colors duration-200 bg-[#072B50] hover:bg-[#0a3460] disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Mengirim pesan..." : "Kirim Pesan"}
               </button>
             </div>
           </div>
@@ -458,8 +618,12 @@ export default function Contact() {
             <div className="px-6 py-5 bg-white rounded-2xl" style={{ border:"1px solid #dce6f0" }}>
               <h3 className="mb-1 text-xl font-bold" style={{ color:"#072B50" }}>Follow Us</h3>
               <p className="text-xs text-gray-400 mb-3.5">Klik icon untuk melihat info akun</p>
-              <div className="flex gap-2.5">
-                {socialLinks.map(sl => <SocialIcon key={sl.label} sl={sl} size={44} iconSize={22} />)}
+              <div className="flex gap-2.5 flex-wrap">
+                {socialLinksFromSettings.length > 0 ? (
+                  socialLinksFromSettings.map((sl) => <SocialIcon key={sl.key} sl={sl} size={44} iconSize={22} />)
+                ) : (
+                  <p className="text-xs text-gray-500">Belum ada sosial media yang diatur.</p>
+                )}
               </div>
             </div>
             <div className="flex-1 overflow-hidden rounded-2xl" style={{ border:"1px solid #dce6f0" }}>
@@ -482,8 +646,16 @@ export default function Contact() {
               <span className="text-xs font-semibold text-gray-700">{branchList.length} Cabang Aktif</span>
             </div>
           </div>
-          {loadingSettings ? (
+          {loadingBranches ? (
             <p className="text-sm text-gray-500">Loading cabang...</p>
+          ) : branchesError ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {branchesError}
+            </div>
+          ) : branchList.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-[#dce6f0] bg-white px-4 py-6 text-sm text-gray-500">
+              Belum ada cabang tersedia saat ini.
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {branchList.map((branch,i) => (
@@ -577,10 +749,14 @@ export default function Contact() {
                     <p className="text-[11px] font-bold text-[#072B50] mb-0.5">Ikuti Kami</p>
                     <p className="text-[10px] text-[#94a3b8] m-0">Klik untuk info akun</p>
                   </div>
-                  <div className="flex gap-1.5">
-                    {(socialLinksFromSettings.length ? socialLinksFromSettings : socialLinks).map((sl) => (
-                      <SocialIcon key={sl.label || sl.name || sl.platform} sl={sl} size={34} iconSize={17} />
-                    ))}
+                  <div className="flex gap-1.5 flex-wrap justify-end">
+                    {socialLinksFromSettings.length > 0 ? (
+                      socialLinksFromSettings.map((sl) => (
+                        <SocialIcon key={sl.key} sl={sl} size={34} iconSize={17} />
+                      ))
+                    ) : (
+                      <span className="text-[11px] text-gray-500">Belum ada sosial media yang diatur.</span>
+                    )}
                   </div>
                 </div>
               </div>

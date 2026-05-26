@@ -93,23 +93,23 @@ function useReveal() {
 }
 
 /* ── Countdown ── */
-function useCountdown(end) {
-  const [t, setT] = useState({ h:"00", m:"00", s:"00" });
-  useEffect(() => {
-    const tick = () => {
-      const d = Math.max(0, end - Date.now());
-      setT({
-        h: String(Math.floor(d / 3600000)).padStart(2,"0"),
-        m: String(Math.floor((d % 3600000) / 60000)).padStart(2,"0"),
-        s: String(Math.floor((d % 60000) / 1000)).padStart(2,"0"),
-      });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [end]);
-  return t;
-}
+// function useCountdown(end) {
+//   const [t, setT] = useState({ h:"00", m:"00", s:"00" });
+//   useEffect(() => {
+//     const tick = () => {
+//       const d = Math.max(0, end - Date.now());
+//       setT({
+//         h: String(Math.floor(d / 3600000)).padStart(2,"0"),
+//         m: String(Math.floor((d % 3600000) / 60000)).padStart(2,"0"),
+//         s: String(Math.floor((d % 60000) / 1000)).padStart(2,"0"),
+//       });
+//     };
+//     tick();
+//     const id = setInterval(tick, 1000);
+//     return () => clearInterval(id);
+//   }, [end]);
+//   return t;
+// }
 
 // const BANNERS = [
 //   {
@@ -656,8 +656,6 @@ export default function PromoPage() {
         {/* Empty */}
         {!loading && filtered.length === 0 && (
           <div className="py-24 text-center">
-            <div className="mb-4 text-6xl">🔍</div>
-
             <p className="text-[15px] font-semibold text-[#072B50] mb-1">
               Tidak ada promo
             </p>

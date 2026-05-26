@@ -17,6 +17,7 @@ class Produk extends Model
 
     protected $fillable = [
         'kategori_id',
+        'brand_id',
         'nama',
         'slug',
         'deskripsi',
@@ -32,7 +33,6 @@ class Produk extends Model
         'stok'        => 'integer',
         'rating'      => 'float',
         'adalah_promo' => 'boolean',
-         // 🔥 TAMBAHAN WAJIB
         'colors'       => 'array',
         'color_labels' => 'array',
         'images'       => 'array',
@@ -44,15 +44,15 @@ class Produk extends Model
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }
 
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
     public function gambar(): HasMany
     {
         return $this->hasMany(GambarProduk::class, 'produk_id');
     }
-
-    // public function gambarProduk()
-    // {
-    //     return $this->hasMany(GambarProduk::class, 'produk_id');
-    // }
 
     public function spesifikasi(): HasMany
     {

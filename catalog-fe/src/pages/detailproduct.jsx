@@ -185,10 +185,20 @@ export default function DetailProduct() {
           reviews: data.reviews || 0,
 
           category: data.kategori?.nama || "Produk",
+          brand: data.brand?.nama || "-",
 
-          images: data.images?.length
-            ? data.images.map(getImageUrl)
-            : [getImageUrl(data.gambar)],
+          // images: data.images?.length
+          //   ? data.images.map(getImageUrl)
+          //   : [getImageUrl(data.gambar)],
+          images: data.gambar?.length
+          ? data.gambar.map((img) => {
+              if (img.url_gambar.startsWith("http")) {
+                return img.url_gambar;
+              }
+
+              return `/images/${img.url_gambar}`;
+            })
+          : ["/fallback.jpg"],
 
           colors: data.colors || [],
           colorLabels: data.color_labels || [],
@@ -212,14 +222,21 @@ export default function DetailProduct() {
 
         if (data.kategori_id) {
           const related = await getProdukTerkait(data.kategori_id, data.id);
+          console.log("RELATED RAW:", related);
+          console.log("RELATED FIRST:", related[0]);
+          console.log("RELATED GAMBAR:", related[0]?.gambar);
           setRelatedProducts(related.map((p) => ({
             id: p.id,
             slug: p.slug,
             name: p.nama,
             category: p.kategori?.nama || "",
+            brand: p.brand?.nama || "-",
             price: fmt(p.harga),
             rating: p.rating || 4.5,
-            image: getImageUrl(p.gambar),
+            // image: getImageUrl(p.gambar),
+            image: p.images?.length
+            ? getImageUrl(p.images[0])
+            : "/fallback.jpg",
           })));
         }
       } catch (err) {
@@ -339,6 +356,11 @@ export default function DetailProduct() {
               {/* Category + badge */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-[10px] font-bold tracking-widest uppercase text-[#8a9bb0]">{product.category}</span>
+                {product.brand && (
+                  <span className="text-[10px] font-bold tracking-widest uppercase text-[#8a9bb0]">
+                    {product.brand}
+                  </span>
+                )}
                 {/* <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-600 border border-green-100">In Stock</span> */}
               </div>
 

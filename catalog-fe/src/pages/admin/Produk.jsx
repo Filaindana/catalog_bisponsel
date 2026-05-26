@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import api from "../../utils/api";
 import productService from "../../utils/services/productService";
 import { getPromos } from "../../utils/services/promoService";
 import {
@@ -93,26 +94,40 @@ const renderDetailPreview = (text = "") => {
 };
 
 const defaultKategoriOptions = [
-  "Laptop & Komputer",
-  "Smartphone",
-  "Tablet",
-  "Monitor",
-  "Aksesoris",
-  "Printer",
-  "Kamera",
+  { id: 1, nama: "Laptop & Komputer" },
+  { id: 2, nama: "Smartphone" },
+  { id: 3, nama: "Tablet" },
+  { id: 4, nama: "Monitor" },
+  { id: 5, nama: "Aksesoris" },
+  { id: 6, nama: "Printer" },
+  { id: 7, nama: "Kamera" },
 ];
 const defaultBrandOptions = [
-  "ASUS",
-  "Samsung",
-  "Apple",
-  "Lenovo",
-  "HP",
-  "Dell",
-  "Acer",
-  "Xiaomi",
-  "Oppo",
-  "Vivo",
+  { id: 1, nama: "ASUS" },
+  { id: 2, nama: "Samsung" },
+  { id: 3, nama: "Apple" },
+  { id: 4, nama: "Lenovo" },
+  { id: 5, nama: "HP" },
+  { id: 6, nama: "Dell" },
+  { id: 7, nama: "Acer" },
+  { id: 8, nama: "Xiaomi" },
+  { id: 9, nama: "Oppo" },
+  { id: 10, nama: "Vivo" },
 ];
+const normalizeOption = (option) => {
+  if (typeof option === "string") {
+    return { value: option, label: option };
+  }
+
+  if (option && typeof option === "object") {
+    const value = option.value ?? option.id ?? option.nama ?? option.label;
+    const label = option.label ?? option.nama ?? option.name ?? String(value);
+
+    return { value, label };
+  }
+
+  return { value: option, label: String(option) };
+};
 const warnaOptions = [
   "Space Gray",
   "Silver",
@@ -141,6 +156,7 @@ const defaultProductForm = {
   slug: "",
   category: "",
   kategori_id: null,
+  brand_id: null,
   brand: "",
   description: "",
   deskripsi: "",
@@ -182,7 +198,10 @@ const CustomSelect = ({
   const [hoveredIdx, setHoveredIdx] = useState(-1);
   const containerRef = useRef(null);
 
-  const selected = options.find((o) => o === value);
+  const normalizedOptions = options.map(normalizeOption);
+  const selected = normalizedOptions.find(
+    (option) => String(option.value) === String(value),
+  );
 
   useEffect(() => {
     const handler = (e) => {
@@ -204,7 +223,7 @@ const CustomSelect = ({
   };
 
   const select = (opt) => {
-    onChange({ target: { value: opt } });
+    onChange({ target: { value: opt.value } });
     setOpen(false);
   };
 
@@ -242,7 +261,7 @@ const CustomSelect = ({
             whiteSpace: "nowrap",
           }}
         >
-          {selected || placeholder}
+          {selected?.label || placeholder}
         </span>
         <ChevronDown
           size={14}
@@ -280,12 +299,12 @@ const CustomSelect = ({
           overflowY: "auto",
         }}
       >
-        {options.map((opt, idx) => {
-          const isSelected = opt === value;
+        {normalizedOptions.map((opt, idx) => {
+          const isSelected = String(opt.value) === String(value);
           const isHovered = hoveredIdx === idx;
           return (
             <button
-              key={opt}
+              key={String(opt.value)}
               type="button"
               onClick={() => select(opt)}
               onMouseEnter={() => setHoveredIdx(idx)}
@@ -327,7 +346,7 @@ const CustomSelect = ({
                   color: isSelected ? NAVY : "#4a5568",
                 }}
               >
-                {opt}
+                {opt.label}
               </span>
               {isSelected && (
                 <Check
@@ -356,14 +375,28 @@ const Overlay = ({ onClose, children }) => (
   </div>
 );
 
-function ProductChip({ emoji, color = "#e6eef6" }) {
+// function ProductChip({ emoji, color = "#e6eef6" }) {
+function ProductChip({ image, color = "#e6eef6" }) {
   return (
+    // <div
+    //   className="w-21.5 h-13 rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
+    //   style={{ background: color, boxShadow: "0 2px 8px rgba(7,43,80,0.1)" }}
+    // >
+    //   <div className="absolute w-8 h-8 rounded-full -top-2 -right-2 bg-white/30" />
+    //   <span className="relative z-10 text-2xl">{emoji}</span>
+    // </div>
     <div
-      className="w-21.5 h-13 rounded-xl relative flex items-center justify-center overflow-hidden shrink-0"
-      style={{ background: color, boxShadow: "0 2px 8px rgba(7,43,80,0.1)" }}
+      className="flex items-center justify-center w-12 h-12 overflow-hidden rounded-xl"
+      style={{ background: color }}
     >
-      <div className="absolute w-8 h-8 rounded-full -top-2 -right-2 bg-white/30" />
-      <span className="relative z-10 text-2xl">{emoji}</span>
+      <img
+        src={image}
+        alt="product"
+        className="object-cover w-full h-full"
+        onError={(e) => {
+          e.target.src = "/fallback.jpg";
+        }}
+      />
     </div>
   );
 }
@@ -403,7 +436,10 @@ function ViewProductModal({ product, onClose }) {
           <h2 className="text-[18px] font-extrabold text-white m-0 mb-1">
             {product.name}
           </h2>
-          <p className="text-[12.5px] text-white/60 m-0">{product.category}</p>
+          <p className="text-[12.5px] text-white/60 m-0">
+            {product.category}
+            {product.brand && product.brand !== "-" ? ` • ${product.brand}` : ""}
+          </p>
           <button
             onClick={onClose}
             className="absolute flex items-center justify-center w-8 h-8 text-white transition-colors border-none rounded-lg cursor-pointer top-4 right-4 bg-white/10 hover:bg-white/20"
@@ -648,8 +684,6 @@ function ProductFormModal({
     }
   };
 
-  const brandNames = brandOptions.map((b) => (typeof b === "string" ? b : b.nama));
-
   return (
     <Overlay onClose={onClose}>
       <div className="w-135 bg-white rounded-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
@@ -744,19 +778,43 @@ function ProductFormModal({
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="Kategori">
                     <CustomSelect
-                      value={form.category}
-                      onChange={(e) =>
-                        setForm({ ...form, category: e.target.value })
-                      }
+                      value={form.kategori_id}
+                      onChange={(e) => {
+                        const selected = kategoriOptions.find(
+                          (option) =>
+                            String(option.value ?? option.id ?? option.nama) ===
+                            String(e.target.value),
+                        );
+
+                        setForm({
+                          ...form,
+                          kategori_id: e.target.value
+                            ? Number(e.target.value)
+                            : null,
+                          category: selected?.label || selected?.nama || "",
+                        });
+                      }}
                       options={kategoriOptions}
                       placeholder="Pilih kategori..."
                     />
                   </Field>
                   <Field label="Brand">
                     <CustomSelect
-                      value={form.brand}
-                      onChange={(e) => setForm({ ...form, brand: e.target.value })}
-                      options={brandNames}
+                      value={form.brand_id}
+                      onChange={(e) => {
+                        const selected = brandOptions.find(
+                          (option) =>
+                            String(option.value ?? option.id ?? option.nama) ===
+                            String(e.target.value),
+                        );
+
+                        setForm({
+                          ...form,
+                          brand_id: e.target.value ? Number(e.target.value) : null,
+                          brand: selected?.label || selected?.nama || "",
+                        });
+                      }}
+                      options={brandOptions}
                       placeholder="Pilih brand..."
                     />
                   </Field>
@@ -1122,7 +1180,7 @@ function ProductFormModal({
                       className={`${inputCls} pl-4`}
                     />
                     {promoSearch && (
-                      <div className="absolute left-0 right-0 z-10 mt-1 overflow-hidden bg-white border border-gray-200 rounded-xl shadow-xl">
+                      <div className="absolute left-0 right-0 z-10 mt-1 overflow-hidden bg-white border border-gray-200 shadow-xl rounded-xl">
                         {promoOptions
                           .filter(
                             (promo) =>
@@ -1172,7 +1230,7 @@ function ProductFormModal({
                                   ),
                                 }))
                               }
-                              className="inline-flex items-center justify-center w-5 h-5 rounded-full text-blue-700 bg-white"
+                              className="inline-flex items-center justify-center w-5 h-5 text-blue-700 bg-white rounded-full"
                             >
                               <X size={10} />
                             </button>
@@ -1266,7 +1324,10 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
 
   const addKategori = () => {
     if (!inputKategori.trim()) return;
-    setKategoris([...kategoris, inputKategori.trim()]);
+    setKategoris([
+      ...kategoris,
+      { id: Date.now(), nama: inputKategori.trim() },
+    ]);
     setInputKategori("");
   };
 
@@ -1457,18 +1518,22 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
               </div>
               <label className={labelCls}>Daftar Kategori ({kategoris.length})</label>
               <div className="flex flex-col gap-2">
-                {kategoris.map((k, i) => (
-                  <div key={i} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9]">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: NAVY }} />
-                      <span className="text-[13px] font-semibold" style={{ color: NAVY }}>{k}</span>
+                {kategoris.map((k, i) => {
+                  const nama = typeof k === "string" ? k : k?.nama || "";
+
+                  return (
+                    <div key={i} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9]">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: NAVY }} />
+                        <span className="text-[13px] font-semibold" style={{ color: NAVY }}>{nama}</span>
+                      </div>
+                      <button onClick={() => setKategoris(kategoris.filter((_, idx) => idx !== i))}
+                        className="flex items-center justify-center w-6 h-6 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100">
+                        <X size={10} />
+                      </button>
                     </div>
-                    <button onClick={() => setKategoris(kategoris.filter((_, idx) => idx !== i))}
-                      className="flex items-center justify-center w-6 h-6 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100">
-                      <X size={10} />
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
@@ -1542,6 +1607,7 @@ export default function Produk() {
         slug: item.slug,
         name: item.nama,
         category: item.kategori?.nama || "-",
+        brand: item.brand?.nama || "-",
         price: item.harga,
         stock: item.stok,
         promo:
@@ -1549,7 +1615,6 @@ export default function Produk() {
           (Array.isArray(item.promo) && item.promo.length > 0),
         image: "📦",
         imageUrl: resolveImageUrl(item.gambar?.map((g) => g.url_gambar) || []),
-        // Keep full data for editing
         fullData: item,
       }));
 
@@ -1595,7 +1660,31 @@ export default function Produk() {
       }
     };
 
+    const fetchSelectOptions = async () => {
+      try {
+        const [kategoriRes, brandRes] = await Promise.allSettled([
+          api("/kategori"),
+          api("/brand"),
+        ]);
+
+        if (kategoriRes.status === "fulfilled") {
+          const items = kategoriRes.value?.data || [];
+          setKategoriOptions(
+            items.map((item) => ({ id: item.id, nama: item.nama })),
+          );
+        }
+
+        if (brandRes.status === "fulfilled") {
+          const items = brandRes.value?.data || [];
+          setBrandOptions(items.map((item) => ({ id: item.id, nama: item.nama })));
+        }
+      } catch (error) {
+        console.error("Error fetching brand/category options:", error);
+      }
+    };
+
     fetchPromoOptions();
+    fetchSelectOptions();
   }, []);
 
   const handleUpdate = async (slug, data) => {
@@ -1604,7 +1693,8 @@ export default function Produk() {
       setError("");
 
       const productData = {
-        kategori_id: data.kategori_id || 1,
+        kategori_id: data.kategori_id ?? null,
+        brand_id: data.brand_id ?? null,
         nama: data.name,
         slug: data.slug || undefined,
         deskripsi: data.deskripsi || "",
@@ -1618,11 +1708,10 @@ export default function Produk() {
         spesifikasi: data.spesifikasi || [],
       };
 
+      console.log("[Produk admin] update payload", productData);
       await productService.updateProduct(slug, productData);
 
-      // Refresh products after update
       await fetchProducts();
-
       setEditProduct(null);
     } catch (error) {
       console.error("Error updating product:", error);
@@ -1641,16 +1730,18 @@ export default function Produk() {
       stock: String(product.stock),
       promo: product.promo,
       promoRelation: product.fullData?.promo?.map((promo) => promo.id) || [],
-      // Add more fields as needed
       slug: product.slug,
       deskripsi: product.fullData?.deskripsi || "",
       deskripsi_detail: product.fullData?.deskripsi_detail || "",
       rating: product.fullData?.rating || 0,
-      gambar: product.fullData?.gambar?.map(g => g.url_gambar) || [],
-      spesifikasi: product.fullData?.spesifikasi?.map(s => ({
+      gambar: product.fullData?.gambar?.map((g) => g.url_gambar) || [],
+      spesifikasi: product.fullData?.spesifikasi?.map((s) => ({
         atribut: s.atribut,
-        detail: s.detail
+        detail: s.detail,
       })) || [],
+      kategori_id: product.fullData?.kategori?.id ?? null,
+      brand_id: product.fullData?.brand?.id ?? null,
+      brand: product.fullData?.brand?.nama || "",
     });
   };
 
@@ -1691,7 +1782,8 @@ export default function Produk() {
       setError("");
 
       const productData = {
-        kategori_id: formData.kategori_id || 1,
+        kategori_id: formData.kategori_id ?? null,
+        brand_id: formData.brand_id ?? null,
         nama: formData.name,
         slug: undefined,
         deskripsi: formData.description,
@@ -1704,6 +1796,8 @@ export default function Produk() {
         gambar: [],
         spesifikasi: formData.spesifikasi || [],
       };
+
+      console.log("[Produk admin] create payload", productData);
 
       if (formData.imageFiles?.length) {
         const formPayload = new FormData();
@@ -1726,10 +1820,7 @@ export default function Produk() {
       }
 
       await productService.createProduct(productData);
-
-      // Refresh products after create
       await fetchProducts();
-
       setShowAddModal(false);
     } catch (error) {
       console.error("Error creating product:", error);
@@ -1771,6 +1862,20 @@ export default function Produk() {
       bg: "#e6eef6",
     },
   ];
+
+  const getImageUrl = (product) => {
+    // ambil gambar pertama dari relasi gambar
+    const firstImage = product?.gambar?.[0]?.url_gambar;
+
+    if (!firstImage) return "/fallback.jpg";
+
+    // kalau sudah full url
+    if (firstImage.startsWith("http")) {
+      return firstImage;
+    }
+
+    return `/images/${firstImage}`;
+  };
 
   return (
     <div className="produk-admin">
@@ -1902,7 +2007,17 @@ export default function Produk() {
                 >
                   <td className="px-5 py-4">
                     <ProductChip
-                      emoji={product.image}
+                      image={
+                        product.fullData?.images?.length
+                          ? `/images/${product.fullData.images[0]}`
+                          : product.fullData?.gambar?.length
+                            ? (
+                                product.fullData.gambar[0].url_gambar.startsWith("http")
+                                  ? product.fullData.gambar[0].url_gambar
+                                  : `/images/${product.fullData.gambar[0].url_gambar}`
+                              )
+                            : "/fallback.jpg"
+                      }
                       color={chipColors[product.id % chipColors.length]}
                     />
                   </td>
@@ -1915,6 +2030,7 @@ export default function Produk() {
                     </p>
                     <p className="text-[11.5px] text-gray-400 m-0">
                       {product.category}
+                      {product.brand && product.brand !== "-" ? ` • ${product.brand}` : ""}
                     </p>
                   </td>
                   <td className="px-5 py-4">

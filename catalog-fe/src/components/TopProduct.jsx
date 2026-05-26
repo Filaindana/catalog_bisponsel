@@ -81,6 +81,7 @@ export default function TopProduct() {
           slug: p.slug, 
           name: p.nama,
           category: p.kategori?.nama || "-",
+          brand: p.brand?.nama || "-",
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),
           rating: p.rating || 0,

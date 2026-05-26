@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // 📦 CONTROLLERS
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PromoController;
@@ -18,7 +19,6 @@ use App\Http\Controllers\FavoritController;
 use App\Http\Controllers\PenjualanProdukController;
 use App\Http\Controllers\GambarProdukController;
 use App\Http\Controllers\SpesifikasiProdukController;
-use App\Http\Controllers\PengaturanController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UsersController;
@@ -51,6 +51,8 @@ Route::prefix('auth')->group(function () {
 // Route::apiResource('produk', ProdukController::class)->only(['index', 'show']);
 Route::apiResource('kategori', KategoriController::class)->only(['index', 'show']);
 Route::apiResource('promo', PromoController::class)->only(['index', 'show']);
+Route::get('/brand', [BrandController::class, 'index']);
+Route::get('/brand/{id}', [BrandController::class, 'show']);
 
 // Relasi tambahan
 // Route::get('/produk/{id}', [GambarProdukController::class, 'show']);
@@ -83,7 +85,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // 📁 Kategori
     Route::apiResource('kategori', KategoriController::class)->except(['index', 'show']);
 
-    // 🎁 Promo
+    // �️ Brand
+    Route::post('/brand', [BrandController::class, 'store']);
+    Route::put('/brand/{id}', [BrandController::class, 'update']);
+    Route::delete('/brand/{id}', [BrandController::class, 'destroy']);
+
+    // �🎁 Promo
     Route::apiResource('promo', PromoController::class)->except(['index', 'show']);
 
     // 🔗 Promo Produk

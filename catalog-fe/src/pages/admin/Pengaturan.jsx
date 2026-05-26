@@ -1,12 +1,9 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import {
-  Eye,
-  EyeOff,
   User,
   Phone,
   MapPin,
   Mail,
-  Lock,
   Upload,
   Trash2,
   Check,
@@ -115,37 +112,51 @@ export default function Pengaturan() {
 
     try {
       const data = await getSettings();
+      const safeData = data ?? {
+        profile: {},
+        kontak: {},
+        jam_operasional: {
+          pusat: {
+            senin_jumat: { buka: "08:30", tutup: "17:00", libur: false },
+            sabtu: { buka: "08:00", tutup: "15:00", libur: false },
+            minggu: { libur: true },
+          },
+          cabang: [],
+        },
+        social_media: [],
+      };
+
       setProfile({
-        nama: data.profile?.nama || "",
-        email: data.profile?.email || "",
-        avatar: data.profile?.avatar || null,
-        jabatan: data.profile?.jabatan || "",
-        quote: data.profile?.quote || "",
+        nama: safeData.profile?.nama || "",
+        email: safeData.profile?.email || "",
+        avatar: safeData.profile?.avatar || null,
+        jabatan: safeData.profile?.jabatan || "",
+        quote: safeData.profile?.quote || "",
       });
       setKontak({
-        whatsapp: data.kontak?.whatsapp || "",
-        email: data.kontak?.email || "",
-        alamat: data.kontak?.alamat || "",
-        telepon: data.kontak?.telepon || "",
-        maps_embed: data.kontak?.maps_embed || "",
+        whatsapp: safeData.kontak?.whatsapp || "",
+        email: safeData.kontak?.email || "",
+        alamat: safeData.kontak?.alamat || "",
+        telepon: safeData.kontak?.telepon || "",
+        maps_embed: safeData.kontak?.maps_embed || "",
       });
       setJamKerja({
         senin_jumat: {
-          buka: data.jam_operasional?.pusat?.senin_jumat?.buka || "08:30",
-          tutup: data.jam_operasional?.pusat?.senin_jumat?.tutup || "17:00",
-          libur: data.jam_operasional?.pusat?.senin_jumat?.libur ?? false,
+          buka: safeData.jam_operasional?.pusat?.senin_jumat?.buka || "08:30",
+          tutup: safeData.jam_operasional?.pusat?.senin_jumat?.tutup || "17:00",
+          libur: safeData.jam_operasional?.pusat?.senin_jumat?.libur ?? false,
         },
         sabtu: {
-          buka: data.jam_operasional?.pusat?.sabtu?.buka || "08:00",
-          tutup: data.jam_operasional?.pusat?.sabtu?.tutup || "15:00",
-          libur: data.jam_operasional?.pusat?.sabtu?.libur ?? false,
+          buka: safeData.jam_operasional?.pusat?.sabtu?.buka || "08:00",
+          tutup: safeData.jam_operasional?.pusat?.sabtu?.tutup || "15:00",
+          libur: safeData.jam_operasional?.pusat?.sabtu?.libur ?? false,
         },
         minggu: {
-          libur: data.jam_operasional?.pusat?.minggu?.libur ?? true,
+          libur: safeData.jam_operasional?.pusat?.minggu?.libur ?? true,
         },
       });
-      setCabang(Array.isArray(data.jam_operasional?.cabang) ? data.jam_operasional.cabang : []);
-      setSocialMedia(Array.isArray(data.social_media) ? data.social_media : []);
+      setCabang(Array.isArray(safeData.jam_operasional?.cabang) ? safeData.jam_operasional.cabang : []);
+      setSocialMedia(Array.isArray(safeData.social_media) ? safeData.social_media : []);
     } catch (err) {
       console.error(err);
       setError(err?.message || "Gagal memuat pengaturan.");
@@ -164,20 +175,6 @@ export default function Pengaturan() {
     if (file) {
       setAvatarFile(file);
     }
-  };
-
-  const handleAddSocial = () => {
-    setSocialMedia((prev) => [...prev, { label: "", url: "", icon: "" }]);
-  };
-
-  const handleUpdateSocial = (index, field, value) => {
-    setSocialMedia((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
-  };
-
-  const handleRemoveSocial = (index) => {
-    setSocialMedia((prev) => prev.filter((_, i) => i !== index));
   };
 
   const updateJamKerja = (key, field, val) =>

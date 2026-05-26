@@ -533,8 +533,9 @@ export default function Product() {
                 key={product.id}
                 product={{
                   id: product.id,
-                  slug: product.slug, // 🔥 TAMBAH INI
+                  slug: product.slug,
                   category: product.kategori?.nama || "-",
+                  brand: product.brand?.nama || "-",
                   name: product.nama,
                   spec: product.deskripsi || "-",
                   price: formatPrice(product.harga),

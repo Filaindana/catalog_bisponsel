@@ -1,10 +1,20 @@
 import api from "../api";
 
+const unwrapCabangResponse = (response) => {
+  if (response?.data !== undefined) {
+    return response.data;
+  }
+
+  return response;
+};
+
 /* GET ALL CABANG */
 export const getCabangs = async () => {
   try {
     const res = await api("/cabang");
-    return res.data;
+    const payload = unwrapCabangResponse(res);
+
+    return Array.isArray(payload) ? payload : [];
   } catch (err) {
     console.error("Error getCabangs:", err.message);
     throw err;
@@ -39,10 +49,12 @@ export const createCabang = async (payload) => {
     console.log("createCabang: unable to iterate formData", e);
   }
 
-  return await api("/cabang", {
+  const res = await api("/cabang", {
     method: "POST",
     body: formData,
   });
+
+  return { data: unwrapCabangResponse(res) };
 };
 
 /* UPDATE */
@@ -76,15 +88,19 @@ export const updateCabang = async (id, payload) => {
   // some servers (Laravel) handle multipart form-data updates better when using POST + _method=PUT
   formData.append("_method", "PUT");
 
-  return await api(`/cabang/${id}`, {
+  const res = await api(`/cabang/${id}`, {
     method: "POST",
     body: formData,
   });
+
+  return { data: unwrapCabangResponse(res) };
 };
 
 /* DELETE */
 export const deleteCabang = async (id) => {
-  return await api(`/cabang/${id}`, {
+  const res = await api(`/cabang/${id}`, {
     method: "DELETE",
   });
+
+  return unwrapCabangResponse(res);
 };

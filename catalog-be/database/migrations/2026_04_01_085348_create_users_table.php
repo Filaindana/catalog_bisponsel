@@ -13,7 +13,8 @@ return new class extends Migration
             $table->string('nama');
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('peran', ['admin', 'user'])->default('user');
+            $table->enum('peran', ['superadmin', 'admin', 'user'])->default('user');
+            $table->boolean('is_active')->default(true);
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrentOnUpdate()->nullable();
         });

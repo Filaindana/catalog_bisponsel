@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Laravel\Sanctum\HasApiTokens;
 
-class Users extends Authenticatable
+class User extends Authenticatable
 {
     use HasApiTokens;
 
@@ -20,6 +20,7 @@ class Users extends Authenticatable
         'email',
         'password',
         'peran',
+        'is_active',
     ];
 
     protected $hidden = [
@@ -27,7 +28,8 @@ class Users extends Authenticatable
     ];
 
     protected $casts = [
-        'peran' => 'string',
+        'peran'     => 'string',
+        'is_active' => 'boolean',
     ];
 
     public function favorit(): HasMany

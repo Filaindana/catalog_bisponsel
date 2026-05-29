@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +14,7 @@ class UsersController
     public function index(): JsonResponse
     {
         try {
-            $users = Users::select('id', 'nama', 'email', 'peran', 'dibuat_pada')->get();
+            $users = User::select('id', 'nama', 'email', 'peran', 'dibuat_pada')->get();
 
             return response()->json([
                 'status' => true,
@@ -41,7 +41,7 @@ class UsersController
     public function show(int $id): JsonResponse
     {
         try {
-            $users = Users::findOrFail($id);
+            $users = User::findOrFail($id);
 
             return response()->json([
                 'status' => true,
@@ -78,7 +78,7 @@ class UsersController
 
             $validated['password'] = Hash::make($validated['password']);
 
-            $users = Users::create($validated);
+            $users = User::create($validated);
 
             return response()->json([
                 'status'  => true,
@@ -106,7 +106,7 @@ class UsersController
     public function update(Request $request, int $id): JsonResponse
     {
         try {
-            $users = Users::findOrFail($id);
+            $users = User::findOrFail($id);
 
             $validated = $request->validate([
                 'nama'     => 'sometimes|string|max:255',
@@ -148,7 +148,7 @@ class UsersController
     public function destroy(int $id): JsonResponse
     {
         try {
-            $users = Users::findOrFail($id);
+            $users = User::findOrFail($id);
             $users->delete();
 
             return response()->json([

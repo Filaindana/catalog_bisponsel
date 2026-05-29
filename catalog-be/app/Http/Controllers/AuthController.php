@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Users;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +25,7 @@ class AuthController
             $validated['password'] = Hash::make($validated['password']);
             $validated['peran']    = $validated['peran'] ?? 'user';
 
-            $user  = Users::create($validated);
+            $user  = User::create($validated);
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -62,12 +62,19 @@ class AuthController
                 'password' => 'required|string',
             ]);
 
-            $user = Users::where('email', $validated['email'])->first();
+            $user = User::where('email', $validated['email'])->first();
 
             if (! $user || ! Hash::check($validated['password'], $user->password)) {
                 throw ValidationException::withMessages([
                     'email' => ['Email atau password salah.'],
                 ]);
+            }
+
+            if (isset($user->is_active) && $user->is_active === false) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Akun Anda telah dinonaktifkan.'
+                ], 403);
             }
 
             $token = $user->createToken('auth_token')->plainTextToken;

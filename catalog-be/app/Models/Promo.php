@@ -19,6 +19,7 @@ class Promo extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'banner',
+        'status',
     ];
 
     protected $casts = [

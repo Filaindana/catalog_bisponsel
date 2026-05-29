@@ -11,6 +11,10 @@ return new class extends Migration
         Schema::create('produk', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kategori_id')->constrained('kategori')->cascadeOnDelete();
+            $table->foreignId('brand_id')
+                ->nullable()
+                ->constrained('brands')
+                ->nullOnDelete();
             $table->string('nama');
             $table->string('slug')->unique();
             $table->text('deskripsi')->nullable();
@@ -20,6 +24,11 @@ return new class extends Migration
             $table->float('rating')->default(0);
             $table->boolean('adalah_promo')->default(false);
             $table->string('gambar')->nullable();
+            $table->json('colors')->nullable();
+            $table->json('color_labels')->nullable();
+            $table->json('images')->nullable();
+            $table->json('specs')->nullable();
+            $table->integer('reviews')->default(0);
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrentOnUpdate()->nullable();
         });

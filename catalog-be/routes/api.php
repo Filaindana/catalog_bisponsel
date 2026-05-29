@@ -118,3 +118,21 @@ Route::middleware('auth:sanctum')->group(function () {
     // 📩 Kontak (admin lihat pesan)
     Route::get('/kontak', [KontakController::class, 'index']);
 });
+
+// =======================
+// 🔒 SUPERADMIN ROUTES
+// =======================
+Route::prefix('superadmin')->middleware(['auth:sanctum', \App\Http\Middleware\EnsureSuperAdmin::class])->group(function () {
+    // Users
+    Route::get('/users', [\App\Http\Controllers\SuperAdminController::class, 'users']);
+    Route::get('/users/{id}', [\App\Http\Controllers\SuperAdminController::class, 'showUser']);
+    Route::patch('/users/{id}/toggle-status', [\App\Http\Controllers\SuperAdminController::class, 'toggleStatus']);
+
+    // Admins
+    Route::post('/admins', [\App\Http\Controllers\SuperAdminController::class, 'storeAdmin']);
+    Route::put('/admins/{id}', [\App\Http\Controllers\SuperAdminController::class, 'updateAdmin']);
+    Route::delete('/admins/{id}', [\App\Http\Controllers\SuperAdminController::class, 'deleteAdmin']);
+
+    // Stats
+    Route::get('/stats', [\App\Http\Controllers\SuperAdminController::class, 'stats']);
+});

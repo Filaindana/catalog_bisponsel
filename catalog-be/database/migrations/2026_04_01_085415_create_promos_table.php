@@ -15,6 +15,8 @@ return new class extends Migration
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
             $table->string('banner')->nullable();
+            $table->enum('status', ['aktif', 'segera', 'berakhir'])
+                ->default('segera');
 
             $table->timestamp('dibuat_pada')->useCurrent();
             $table->timestamp('diperbarui_pada')->useCurrent()->useCurrentOnUpdate();

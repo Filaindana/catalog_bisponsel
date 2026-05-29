@@ -54,17 +54,6 @@ export default function Login() {
 
   const isReady = email.trim() !== "" && password.trim() !== "";
 
-  // const handleLogin = async () => {
-  //   try {
-  //     setLoading(true);
-  //     await login(email, password);
-  //     navigate("/");
-  //   } catch (err) {
-  //     alert(err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const handleLogin = async () => {
     try {
       setLoading(true);

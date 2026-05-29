@@ -26,6 +26,12 @@ class Produk extends Model
         'stok',
         'rating',
         'adalah_promo',
+        'gambar',
+        'colors',
+        'color_labels',
+        'images',
+        'specs',
+        'reviews',
     ];
 
     protected $casts = [
@@ -37,6 +43,7 @@ class Produk extends Model
         'color_labels' => 'array',
         'images'       => 'array',
         'specs'        => 'array',
+        'reviews'      => 'integer',
     ];
 
     public function kategori(): BelongsTo

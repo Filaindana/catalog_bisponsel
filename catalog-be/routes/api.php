@@ -11,7 +11,6 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\PromoController;
-use App\Http\Controllers\PromoProdukController;
 use App\Http\Controllers\CabangController;
 use App\Http\Controllers\AktivitasController;
 use App\Http\Controllers\KontakController;
@@ -120,19 +119,37 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // =======================
-// 🔒 SUPERADMIN ROUTES
+// 🔒 ADMIN ROUTES
 // =======================
-Route::prefix('superadmin')->middleware(['auth:sanctum', \App\Http\Middleware\EnsureSuperAdmin::class])->group(function () {
-    // Users
-    Route::get('/users', [\App\Http\Controllers\SuperAdminController::class, 'users']);
-    Route::get('/users/{id}', [\App\Http\Controllers\SuperAdminController::class, 'showUser']);
-    Route::patch('/users/{id}/toggle-status', [\App\Http\Controllers\SuperAdminController::class, 'toggleStatus']);
+Route::prefix('admin')->middleware(['auth:sanctum', 'check.role:admin,superadmin'])->group(function () {
+    // Product management (same for admin & superadmin)
+    Route::apiResource('produk', ProdukController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
-    // Admins
-    Route::post('/admins', [\App\Http\Controllers\SuperAdminController::class, 'storeAdmin']);
-    Route::put('/admins/{id}', [\App\Http\Controllers\SuperAdminController::class, 'updateAdmin']);
-    Route::delete('/admins/{id}', [\App\Http\Controllers\SuperAdminController::class, 'deleteAdmin']);
+    // Promo management
+    Route::apiResource('promo', PromoController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
-    // Stats
-    Route::get('/stats', [\App\Http\Controllers\SuperAdminController::class, 'stats']);
+    // Category management
+    Route::apiResource('kategori', KategoriController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+
+    // Brand management
+    Route::apiResource('brand', BrandController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+
+    // Cabang management
+    Route::apiResource('cabang', CabangController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+
+    // Settings
+    Route::get('/settings', [SettingsController::class, 'show']);
+    Route::put('/settings', [SettingsController::class, 'update']);
+
+    // Kontak
+    Route::get('/kontak', [KontakController::class, 'index']);
+
+    // =======================
+    // 🔒 SUPERADMIN ONLY
+    // =======================
+    Route::middleware('check.role:superadmin')->group(function () {
+        // User Management
+        Route::apiResource('users', UsersController::class);
+        Route::post('users/{id}/toggle-status', [UsersController::class, 'toggleStatus']);
+    });
 });

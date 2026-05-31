@@ -64,7 +64,8 @@ export default function Login() {
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
 
-      const redirectPath = res.user?.peran === "admin" ? "/admin" : "/";
+      // Redirect berdasarkan role
+      const redirectPath = (res.user?.peran === "admin" || res.user?.peran === "superadmin") ? "/admin" : "/";
       navigate(redirectPath);
     } catch (err) {
       setErrorMsg(err.message || "Email atau password salah.");

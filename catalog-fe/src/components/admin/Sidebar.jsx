@@ -7,10 +7,24 @@ import {
   Building2,
   Settings,
   LogOut,
+  Users,
 } from "lucide-react";
 
-const menus = [
+const baseMenus = [
   { label: "Dashboard", icon: <LayoutDashboard size={16} />, path: "/admin" },
+  { label: "Produk", icon: <Package size={16} />, path: "/admin/produk" },
+  { label: "Promo", icon: <Tag size={16} />, path: "/admin/promo" },
+  { label: "Cabang", icon: <Building2 size={16} />, path: "/admin/cabang" },
+  {
+    label: "Pengaturan",
+    icon: <Settings size={16} />,
+    path: "/admin/pengaturan",
+  },
+];
+
+const superadminMenus = [
+  { label: "Dashboard", icon: <LayoutDashboard size={16} />, path: "/admin" },
+  { label: "User", icon: <Users size={16} />, path: "/admin/users" },
   { label: "Produk", icon: <Package size={16} />, path: "/admin/produk" },
   { label: "Promo", icon: <Tag size={16} />, path: "/admin/promo" },
   { label: "Cabang", icon: <Building2 size={16} />, path: "/admin/cabang" },
@@ -24,6 +38,18 @@ const menus = [
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Get user from localStorage
+  const getUser = () => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  };
+
+  const user = getUser();
+  const menus = user?.peran === "superadmin" ? superadminMenus : baseMenus;
   
   const handleLogout = () => {
     localStorage.removeItem("token");

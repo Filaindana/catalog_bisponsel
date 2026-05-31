@@ -24,6 +24,7 @@ import Produk from "./pages/admin/Produk.jsx";
 import PromoAdmin from "./pages/admin/Promo.jsx";
 import Cabang from "./pages/admin/Cabang.jsx";
 import Pengaturan from "./pages/admin/Pengaturan.jsx";
+import Users from "./pages/admin/Users.jsx";
 import Profile from "./pages/Profile.jsx";
 
 /* ── Auth helpers ── */
@@ -40,7 +41,15 @@ function AdminRoute() {
   const token = localStorage.getItem("token");
   const user  = getUser();
   if (!token || !user) return <Navigate to="/login" replace />;
-  if (user.peran !== "admin") return <Navigate to="/" replace />;
+  if (user.peran !== "admin" && user.peran !== "superadmin") return <Navigate to="/" replace />;
+  return <Outlet />;
+}
+
+function SuperadminRoute() {
+  const token = localStorage.getItem("token");
+  const user  = getUser();
+  if (!token || !user) return <Navigate to="/login" replace />;
+  if (user.peran !== "superadmin") return <Navigate to="/admin" replace />;
   return <Outlet />;
 }
 
@@ -95,6 +104,9 @@ function App() {
         <Route element={<AdminRoute />}>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
+            <Route element={<SuperadminRoute />}>
+              <Route path="users" element={<Users />} />
+            </Route>
             <Route path="produk" element={<Produk />} />
             <Route path="promo" element={<PromoAdmin />} />
             <Route path="cabang" element={<Cabang />} />

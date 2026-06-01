@@ -3,18 +3,10 @@ import { useSearchParams } from "react-router-dom";
 import { Search, ChevronDown } from "lucide-react";
 import ProductCard from "../components/ProductCard.jsx";
 import productService from "../utils/services/productService.js";
+import kategoriService from "../utils/services/kategoriService.js";
 import { useFavorit } from "../context/FavoritContext.jsx";
+import api from "../utils/api.js";
 
-const categories = [
-  "Laptop & Komputer",
-  "Smartphone & Tablet",
-  "Aksesoris Elektronik",
-  "Audio & Headphone",
-  "Kamera & Fotografi",
-  "Peralatan Rumah",
-  "Gaming",
-  "Networking",
-];
 const discounts = ["Diskon"];
 
 function FilterSection({ title, children, defaultOpen = true }) {
@@ -64,12 +56,19 @@ function FilterSection({ title, children, defaultOpen = true }) {
 export default function Product() {
   const { savedMap, toggleSave } = useFavorit();
 
-  // ── baca query param ?category=xxx dari URL ──
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
+  const [dbCategories, setDbCategories] = useState([]);
+  const [dbBrands, setDbBrands] = useState([]);
+  const [selectedBrands, setSelectedBrands] = useState(() => {
+    const br = searchParams.get("brand");
+    return br ? br.split(",") : [];
+  });
+  
+  // ── baca query param ?kategori=xxx atau ?category=xxx dari URL ──
   const [selectedCategories, setSelectedCategories] = useState(() => {
-    const cat = searchParams.get("category");
-    return cat ? [cat] : [];
+    const cat = searchParams.get("kategori") || searchParams.get("category");
+    return cat ? cat.split(",") : [];
   });
   const [selectedDiscounts, setSelectedDiscounts] = useState([]);
   const [sortBy, setSortBy] = useState("Terbaru");
@@ -83,31 +82,71 @@ export default function Product() {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
+  // Fetch categories and brands dynamically on component mount
+  useEffect(() => {
+    const fetchDbCategories = async () => {
+      try {
+        const res = await kategoriService.getCategories();
+        setDbCategories(res?.data || []);
+      } catch (err) {
+        console.error("Gagal memuat kategori:", err);
+      }
+    };
+    const fetchDbBrands = async () => {
+      try {
+        const res = await api("/brand");
+        setDbBrands(res?.data || []);
+      } catch (err) {
+        console.error("Gagal memuat brand:", err);
+      }
+    };
+    fetchDbCategories();
+    fetchDbBrands();
+  }, []);
+
+  // Normalize initial/URL category parameter from name to slug if needed
+  useEffect(() => {
+    if (dbCategories.length > 0 && selectedCategories.length > 0) {
+      const normalized = selectedCategories.map(item => {
+        const found = dbCategories.find(c => c.nama.toLowerCase() === item.toLowerCase() || c.slug.toLowerCase() === item.toLowerCase());
+        return found ? found.slug : item;
+      });
+      const uniqueNormalized = [...new Set(normalized)];
+      if (JSON.stringify(uniqueNormalized) !== JSON.stringify(selectedCategories)) {
+        setSelectedCategories(uniqueNormalized);
+      }
+    }
+  }, [dbCategories, selectedCategories]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
 
+      const sortMap = {
+        "Terbaru": "latest",
+        "Harga Terendah": "price_asc",
+        "Harga Tertinggi": "price_desc",
+        "Rating": "rating"
+      };
+
       const res = await productService.getProducts({
         page: currentPage,
         search: searchQuery,
-        sortBy: sortBy,
-        categories: selectedCategories.join(","),
+        sort: sortMap[sortBy] || "latest",
+        kategori: selectedCategories.join(","),
+        brand: selectedBrands.join(","),
         discounts: selectedDiscounts.join(","),
         maxPrice: priceRange < 50000000 ? priceRange : undefined,
       });
 
       console.log("RES:", res);
 
-      // 🔥 FIX FLEXIBLE RESPONSE
-      // const list = res?.products || res?.data || [];
       const list = res?.data?.data || [];
       
-      // 🔥 INI YANG KAMU TAMBAH
       console.log("🔥 ALL PRODUCTS:", list);
       console.log("🔥 FIRST PRODUCT:", list?.[0]);
 
       setProducts(list);
-      // setTotalPages(res?.totalPages || 1);
       setTotalPages(res?.data?.last_page || 1);
 
     } catch (err) {
@@ -126,13 +165,14 @@ export default function Product() {
     searchQuery,
     sortBy,
     selectedCategories,
+    selectedBrands,
     selectedDiscounts,
     priceRange,
   ]);
 
   // ── scroll ke konten saat ada category di URL ──
   useEffect(() => {
-    if (searchParams.get("category")) {
+    if (searchParams.get("category") || searchParams.get("kategori")) {
       setTimeout(() => {
         document.getElementById("product-content")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
@@ -159,6 +199,7 @@ export default function Product() {
   const hasActiveFilters = Boolean(
     searchQuery ||
     selectedCategories.length > 0 ||
+    selectedBrands.length > 0 ||
     selectedDiscounts.length > 0 ||
     priceRange !== 50000000,
   );
@@ -358,9 +399,18 @@ export default function Product() {
           </h3>
 
           <FilterSection title="Category">
-            {categories.map((cat) =>
-              checkboxLabel(cat, selectedCategories.includes(cat), () =>
-                toggleItem(selectedCategories, setSelectedCategories, cat),
+            {dbCategories.map((cat) =>
+              checkboxLabel(cat.nama, selectedCategories.includes(cat.slug), () =>
+                toggleItem(selectedCategories, setSelectedCategories, cat.slug),
+              ),
+            )}
+          </FilterSection>
+          <hr style={{ border: "none", borderTop: "1px solid #f3f4f6", margin: "0 0 20px 0" }} />
+
+          <FilterSection title="Brand">
+            {dbBrands.map((brand) =>
+              checkboxLabel(brand.nama, selectedBrands.includes(brand.nama), () =>
+                toggleItem(selectedBrands, setSelectedBrands, brand.nama),
               ),
             )}
           </FilterSection>
@@ -415,6 +465,7 @@ export default function Product() {
                 <span
                   onClick={() => {
                     setSelectedCategories([]);
+                    setSelectedBrands([]);
                     setSelectedDiscounts([]);
                     setSearchQuery("");
                     setSearchInput("");
@@ -535,7 +586,7 @@ export default function Product() {
                   id: product.id,
                   slug: product.slug,
                   category: product.kategori?.nama || "-",
-                  brand: product.brand?.nama || "-",
+                  brand: product.brand,
                   name: product.nama,
                   spec: product.deskripsi || "-",
                   price: formatPrice(product.harga),

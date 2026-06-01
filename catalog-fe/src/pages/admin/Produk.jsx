@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import api from "../../utils/api";
 import productService from "../../utils/services/productService";
 import { getPromos } from "../../utils/services/promoService";
-import { errorAlert, toastSuccess } from "../../utils/swal";
+import { errorAlert, toastSuccess, confirmAlert } from "../../utils/swal";
 import {
   Eye,
   Pencil,
@@ -1311,16 +1311,55 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
   const [tab, setTab] = useState("brand");
   const [inputBrand, setInputBrand] = useState("");
   const [inputKategori, setInputKategori] = useState("");
+  
+  // Brand Logo States
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
+
+  // Kategori Gambar States
+  const [kategoriPreview, setKategoriPreview] = useState(null);
+  const [kategoriFile, setKategoriFile] = useState(null);
+  const [kategoriDragOver, setKategoriDragOver] = useState(false);
+  const kategoriFileInputRef = useRef(null);
+
+  // Editing State
+  const [editingKategori, setEditingKategori] = useState(null);
+
+  // Local Category list (with detailed attributes like gambar_url and produk_count)
+  const [localKategoris, setLocalKategoris] = useState([]);
+
+  // Fetch full category details from backend
+  const fetchKategoriDetails = async () => {
+    try {
+      const res = await api("/kategori");
+      const items = res?.data || [];
+      setLocalKategoris(items);
+      // Keep parent dropdown synchronized with basic list format
+      setKategoris(items.map(item => ({ id: item.id, nama: item.nama })));
+    } catch (err) {
+      console.error("Gagal mengambil detail kategori:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchKategoriDetails();
+  }, []);
 
   const handleLogoChange = (file) => {
     if (!file) return;
     setLogoFile(file);
     const reader = new FileReader();
     reader.onload = (e) => setLogoPreview(e.target.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleKategoriImageChange = (file) => {
+    if (!file) return;
+    setKategoriFile(file);
+    const reader = new FileReader();
+    reader.onload = (e) => setKategoriPreview(e.target.result);
     reader.readAsDataURL(file);
   };
 
@@ -1353,17 +1392,98 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
       const res = await api("/kategori", {
         method: "POST",
         body: JSON.stringify({
-          nama: inputKategori.trim()
+          nama: inputKategori.trim(),
+          gambar: kategoriPreview || null
         })
       });
       console.log("KATEGORI API POST RESPONSE", res);
       const newKategori = res.data;
-      setKategoris([...kategoris, newKategori]);
+      
+      const updated = [...localKategoris, newKategori];
+      setLocalKategoris(updated);
+      setKategoris(updated.map(item => ({ id: item.id, nama: item.nama })));
+
       setInputKategori("");
+      setKategoriPreview(null);
+      setKategoriFile(null);
       toastSuccess("Kategori berhasil ditambahkan");
     } catch (err) {
       console.error("Error creating kategori:", err);
       errorAlert("Gagal Menyimpan Kategori", err.message || "Gagal menyimpan kategori.");
+    }
+  };
+
+  const startEditKategori = (kategori) => {
+    setEditingKategori(kategori);
+    setInputKategori(kategori.nama);
+    setKategoriPreview(kategori.gambar_url);
+    setKategoriFile(null);
+  };
+
+  const cancelEditKategori = () => {
+    setEditingKategori(null);
+    setInputKategori("");
+    setKategoriPreview(null);
+    setKategoriFile(null);
+  };
+
+  const updateKategori = async () => {
+    if (!inputKategori.trim() || !editingKategori) return;
+    try {
+      const res = await api(`/kategori/${editingKategori.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          nama: inputKategori.trim(),
+          gambar: kategoriPreview || null
+        })
+      });
+      console.log("KATEGORI API PUT RESPONSE", res);
+      const updatedKategori = res.data;
+
+      const updated = localKategoris.map(item => 
+        item.id === editingKategori.id ? { ...item, ...updatedKategori } : item
+      );
+      setLocalKategoris(updated);
+      setKategoris(updated.map(item => ({ id: item.id, nama: item.nama })));
+
+      setEditingKategori(null);
+      setInputKategori("");
+      setKategoriPreview(null);
+      setKategoriFile(null);
+      toastSuccess("Kategori berhasil diperbarui");
+    } catch (err) {
+      console.error("Error updating kategori:", err);
+      errorAlert("Gagal Memperbarui Kategori", err.message || "Gagal memperbarui kategori.");
+    }
+  };
+
+  const deleteKategori = async (id, name, productCount = 0) => {
+    const message = productCount > 0 
+      ? `Kategori "${name}" memiliki ${productCount} produk aktif. Menghapus kategori ini juga akan MENGHAPUS SEMUA PRODUK di dalamnya (Cascade Delete)! Apakah Anda yakin?`
+      : `Apakah Anda yakin ingin menghapus kategori "${name}"?`;
+
+    const confirm = await confirmAlert({
+      title: "Hapus Kategori?",
+      text: message,
+      confirmText: "Ya, Hapus Kategori",
+      cancelText: "Batal",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      await api(`/kategori/${id}`, {
+        method: "DELETE"
+      });
+
+      const updated = localKategoris.filter(item => item.id !== id);
+      setLocalKategoris(updated);
+      setKategoris(updated.map(item => ({ id: item.id, nama: item.nama })));
+
+      toastSuccess("Kategori berhasil dihapus");
+    } catch (err) {
+      console.error("Error deleting kategori:", err);
+      errorAlert("Gagal Menghapus Kategori", err.message || "Gagal menghapus kategori.");
     }
   };
 
@@ -1544,32 +1664,162 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
             </>
           ) : (
             <>
-              <div className="flex gap-2">
-                <input value={inputKategori} onChange={(e) => setInputKategori(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addKategori()}
-                  placeholder="Nama kategori baru..." className={`${inputCls} flex-1`} />
-                <button onClick={addKategori} className="px-4 py-2.5 rounded-xl border-none text-white text-[12.5px] font-bold cursor-pointer shrink-0" style={{ background: NAVY }}>
-                  + Tambah
+              {/* Form Input Nama Kategori */}
+              <div>
+                <label className={labelCls}>
+                  {editingKategori ? "Ubah Nama Kategori" : "Nama Kategori Baru"}
+                </label>
+                <input
+                  value={inputKategori}
+                  onChange={(e) => setInputKategori(e.target.value)}
+                  placeholder="Contoh: Laptop, Smartwatch, Aksesoris..."
+                  className={inputCls}
+                />
+              </div>
+
+              {/* Upload Gambar Kategori */}
+              <div>
+                <label className={labelCls}>Gambar Kategori</label>
+                <input
+                  ref={kategoriFileInputRef}
+                  type="file"
+                  accept="image/png,image/svg+xml,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={(e) => handleKategoriImageChange(e.target.files[0])}
+                />
+
+                {!kategoriPreview ? (
+                  /* Drop zone */
+                  <div
+                    onClick={() => kategoriFileInputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setKategoriDragOver(true); }}
+                    onDragLeave={() => setKategoriDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setKategoriDragOver(false);
+                      handleKategoriImageChange(e.dataTransfer.files[0]);
+                    }}
+                    className="flex flex-col items-center gap-2 py-6 transition-all border-2 border-dashed cursor-pointer rounded-xl"
+                    style={{
+                      borderColor: kategoriDragOver ? NAVY : "#e2e8f0",
+                      background: kategoriDragOver ? "rgba(7,43,80,0.04)" : "#fafaff",
+                    }}
+                  >
+                    <div
+                      className="flex items-center justify-center transition-all w-11 h-11 rounded-xl"
+                      style={{ background: kategoriDragOver ? NAVY : "rgba(7,43,80,0.07)" }}
+                    >
+                      <Upload size={20} color={kategoriDragOver ? "#fff" : NAVY} />
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[13px] font-bold text-gray-700 m-0 mb-0.5">
+                        Drag & drop gambar di sini
+                      </p>
+                      <p className="text-[11.5px] text-gray-400 m-0">
+                        PNG, SVG, JPG · Maks. 2MB
+                      </p>
+                    </div>
+                    <div className="px-4 py-2 rounded-lg text-white text-[12px] font-bold" style={{ background: NAVY }}>
+                      Pilih File
+                    </div>
+                  </div>
+                ) : (
+                  /* Preview Gambar */
+                  <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
+                    <div
+                      className="flex items-center justify-center w-16 h-16 border border-gray-200 rounded-xl shrink-0 overflow-hidden bg-white"
+                      style={{ background: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 10px 10px" }}
+                    >
+                      <img src={kategoriPreview} alt="preview" className="object-cover w-full h-full" onError={(e) => { e.target.src = "/fallback-category.jpg"; }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-bold text-gray-800 m-0 mb-0.5 truncate">
+                        {kategoriFile ? kategoriFile.name : (editingKategori ? "Gambar Kategori Saat Ini" : "Gambar Terpilih")}
+                      </p>
+                      <p className="text-[11.5px] text-gray-400 m-0">
+                        {kategoriFile ? (kategoriFile.size / 1024).toFixed(1) + " KB" : ""}
+                      </p>
+                      <span className="inline-flex items-center gap-1 mt-1.5 text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-50 text-green-700">
+                        <Check size={10} strokeWidth={3} /> Siap disimpan
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => { setKategoriPreview(null); setKategoriFile(null); }}
+                      className="flex items-center justify-center text-red-500 transition-colors border-none rounded-lg cursor-pointer w-7 h-7 bg-red-50 shrink-0 hover:bg-red-100"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Action buttons (Tambah / Update) */}
+              <div className="flex gap-2.5">
+                {editingKategori && (
+                  <button
+                    onClick={cancelEditKategori}
+                    className="flex-1 py-2.5 rounded-xl border border-gray-200 bg-white text-[13px] font-bold cursor-pointer text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    Batal Edit
+                  </button>
+                )}
+                <button
+                  onClick={editingKategori ? updateKategori : addKategori}
+                  className="flex-1 py-2.5 rounded-xl border-none text-white text-[13px] font-bold cursor-pointer transition-all hover:opacity-90"
+                  style={{
+                    background: NAVY,
+                    boxShadow: "0 4px 14px rgba(7,43,80,0.2)",
+                    opacity: inputKategori.trim() ? 1 : 0.45,
+                  }}
+                  disabled={!inputKategori.trim()}
+                >
+                  {editingKategori ? "Simpan Perubahan" : "Simpan Kategori"}
                 </button>
               </div>
-              <label className={labelCls}>Daftar Kategori ({kategoris.length})</label>
-              <div className="flex flex-col gap-2">
-                {kategoris.map((k, i) => {
-                  const nama = typeof k === "string" ? k : k?.nama || "";
 
-                  return (
-                    <div key={i} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9]">
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: NAVY }} />
-                        <span className="text-[13px] font-semibold" style={{ color: NAVY }}>{nama}</span>
+              {/* Daftar Kategori */}
+              <div>
+                <label className={labelCls}>Daftar Kategori ({localKategoris.length})</label>
+                <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
+                  {localKategoris.map((k) => {
+                    const id = k.id;
+                    const nama = k.nama || "";
+                    const imgUrl = k.gambar_url || "/fallback-category.jpg";
+                    const produkCount = k.produk_count || 0;
+
+                    return (
+                      <div key={id} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9] hover:bg-[#e4ecf5] transition-all">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full shrink-0 overflow-hidden bg-white shadow-sm animate-fade-in"
+                          >
+                            <img src={imgUrl} alt={nama} onError={(e) => { e.target.src = "/fallback-category.jpg"; }} className="object-cover w-full h-full" />
+                          </div>
+                          <div>
+                            <p className="text-[13px] font-bold m-0" style={{ color: NAVY }}>{nama}</p>
+                            <p className="text-[11px] text-gray-500 m-0">{produkCount} produk</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => startEditKategori(k)}
+                            className="flex items-center justify-center w-7 h-7 text-indigo-600 transition-colors border-none rounded-md cursor-pointer bg-indigo-50 hover:bg-indigo-100"
+                            title="Edit Kategori"
+                          >
+                            <Pencil size={11} />
+                          </button>
+                          <button
+                            onClick={() => deleteKategori(id, nama, produkCount)}
+                            className="flex items-center justify-center w-7 h-7 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100"
+                            title="Hapus Kategori"
+                          >
+                            <Trash2 size={11} />
+                          </button>
+                        </div>
                       </div>
-                      <button onClick={() => setKategoris(kategoris.filter((_, idx) => idx !== i))}
-                        className="flex items-center justify-center w-6 h-6 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100">
-                        <X size={10} />
-                      </button>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </>
           )}

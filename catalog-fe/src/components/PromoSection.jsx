@@ -37,23 +37,16 @@ export default function PromoSection() {
   if (loading) {
     return (
       <section
-        className="w-full px-4 py-6"
+        className="w-full px-4 py-12 md:py-20 md:px-10"
         style={{ backgroundColor: "#072B50", fontFamily: "'Inter', sans-serif" }}
       >
-        <div className="max-w-7xl mx-auto flex flex-col gap-4">
-          {/* Hero Slider Skeleton */}
-          <div className="w-full flex flex-col gap-3">
-            <div className="w-full aspect-[16/10] bg-white/10 animate-pulse rounded-2xl"></div>
-            <div className="flex justify-center gap-2 mt-1">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-2.5 h-2.5 rounded-full bg-white/20 animate-pulse"></div>
-              ))}
-            </div>
-          </div>
-          {/* Bottom 3 Banners Skeleton */}
-          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="w-full aspect-[16/8] bg-white/10 animate-pulse rounded-2xl"></div>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-5">
+          {/* Slider Skeleton */}
+          <div className="w-full aspect-[16/11] bg-white/10 animate-pulse rounded-2xl"></div>
+          {/* Thumbnails Skeleton */}
+          <div className="grid grid-cols-2 gap-3.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="w-full aspect-[16/11] bg-white/10 animate-pulse rounded-2xl"></div>
             ))}
           </div>
         </div>
@@ -74,18 +67,18 @@ export default function PromoSection() {
 
   return (
     <section
-      className="w-full px-4 py-6"
+      className="w-full px-4 py-12 md:py-16 md:px-10"
       style={{ backgroundColor: "#072B50", fontFamily: "'Inter', sans-serif" }}
     >
-      <div className="max-w-7xl mx-auto flex flex-col gap-4">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-5 items-stretch">
 
-        {/* Main Big Banner Slider */}
-        <div className="w-full flex flex-col gap-3">
-          <div className="w-full overflow-hidden rounded-2xl">
+        {/* LEFT COLUMN: Main Slider (Hero) */}
+        <div className="relative flex flex-col h-full min-h-[220px] lg:min-h-0">
+          <div className="w-full flex-1 relative overflow-hidden rounded-2xl aspect-[16/11] lg:aspect-auto">
             <img
               src={banners[activeSlide]?.banner_url}
               alt={banners[activeSlide]?.nama}
-              className="w-full object-cover object-center aspect-[16/10] rounded-2xl"
+              className="w-full h-full object-cover object-center rounded-2xl lg:absolute lg:inset-0"
               style={{ transition: "opacity 0.4s ease" }}
               onError={(e) => {
                 e.target.onerror = null;
@@ -94,15 +87,15 @@ export default function PromoSection() {
             />
           </div>
 
-          {/* Dots */}
-          <div className="flex justify-center gap-2 mt-1">
+          {/* Dots overlayed at the bottom center of the slider */}
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10 bg-black/30 px-3.5 py-1.5 rounded-full backdrop-blur-sm">
             {banners.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setActiveSlide(i)}
                 style={{
-                  width: i === activeSlide ? "24px" : "10px",
-                  height: "10px",
+                  width: i === activeSlide ? "16px" : "6px",
+                  height: "6px",
                   borderRadius: "9999px",
                   backgroundColor:
                     i === activeSlide ? "#ffffff" : "rgba(255,255,255,0.4)",
@@ -116,36 +109,46 @@ export default function PromoSection() {
           </div>
         </div>
 
-        {/* 3 Big Banner Landscape Cards */}
-        {banners.length > 0 && (
-          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4">
-            {banners.slice(0, 3).map((banner, i) => (
-              <div
-                key={banner.id}
-                onClick={() => setActiveSlide(i)}
-                className="overflow-hidden rounded-2xl cursor-pointer"
-                style={{
-                  border: i === activeSlide
-                    ? "2px solid rgba(255,255,255,0.9)"
-                    : "2px solid transparent",
-                  opacity: i === activeSlide ? 1 : 0.75,
-                  transition: "opacity 0.3s ease, border-color 0.3s ease",
-                  boxSizing: "border-box",
+        {/* RIGHT COLUMN: 4 Thumbnail Cards (2x2 Grid) */}
+        <div className="grid grid-cols-2 gap-3.5">
+          {banners.map((banner, i) => (
+            <div
+              key={banner.id}
+              onClick={() => setActiveSlide(i)}
+              className="overflow-hidden rounded-2xl cursor-pointer relative group"
+              style={{
+                border: i === activeSlide
+                  ? "2.5px solid rgba(255,255,255,0.95)"
+                  : "2.5px solid transparent",
+                opacity: i === activeSlide ? 1 : 0.7,
+                transition: "all 0.3s ease",
+                boxSizing: "border-box",
+              }}
+            >
+              <img
+                src={banner.banner_url}
+                alt={banner.nama}
+                className="w-full object-cover object-center aspect-[16/11] block group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/fallback-brand.png";
                 }}
-              >
-                <img
-                  src={banner.banner_url}
-                  alt={banner.nama}
-                  className="w-full h-full object-cover object-center aspect-[16/8] block"
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/fallback-brand.png";
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+              />
+              {/* Subtle overlay on hover/active */}
+              <div className="absolute inset-0 bg-[#072B50]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            </div>
+          ))}
+
+          {/* If there are less than 4 promos, pad with placeholders to maintain grid height perfectly */}
+          {banners.length < 4 && Array.from({ length: 4 - banners.length }).map((_, idx) => (
+            <div
+              key={`placeholder-${idx}`}
+              className="overflow-hidden rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center aspect-[16/11] opacity-30 select-none pointer-events-none"
+            >
+              <span className="text-white/40 text-[10px] uppercase font-bold tracking-wider">BizPonsel Promo</span>
+            </div>
+          ))}
+        </div>
 
       </div>
     </section>

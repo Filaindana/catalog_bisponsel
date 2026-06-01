@@ -13,8 +13,7 @@ class FavoritController
     public function index(Request $request): JsonResponse
     {
         try {
-            // $favorit = Favorit::with('produk.gambar')
-            $favorit = Favorit::with(['produk', 'produk.kategori'])
+            $favorit = Favorit::with(['produk', 'produk.kategori', 'produk.brand'])
                 ->where('user_id', $request->user()->id)
                 ->get();
 

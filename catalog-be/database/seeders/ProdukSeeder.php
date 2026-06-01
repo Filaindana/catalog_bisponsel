@@ -83,40 +83,116 @@ use Illuminate\Support\Str;
 
 
             $detailMap = DetailDeskripsiSeeder::get();
+            $brandMap = \App\Models\Brand::pluck('id', 'nama')
+                ->mapWithKeys(fn($id, $nama) => [strtolower($nama) => $id]);
+
+            $mappingRules = [
+                'macbook' => 'apple',
+                'iphone' => 'apple',
+                'ipad' => 'apple',
+                'airpods' => 'apple',
+                'rog ally' => 'rog',
+                'rog phone' => 'rog',
+                'thinkpad' => 'lenovo',
+                'aspire' => 'acer',
+                'xps' => 'dell',
+                'victus' => 'hp',
+                'katana' => 'msi',
+                'galaxy' => 'samsung',
+                't7 shield' => 'samsung',
+                'redmi' => 'xiaomi',
+                'mi smart' => 'xiaomi',
+                'ax3000' => 'xiaomi',
+                'keychron' => 'logitech',
+                'anker' => 'logitech',
+                'baseus' => 'logitech',
+                'sony' => 'samsung',
+                'playstation' => 'rog',
+                'nintendo' => 'rog',
+                'xbox' => 'microsoft',
+                'tp-link' => 'asus',
+                'ubiquiti' => 'asus',
+                'netgear' => 'asus',
+                'mikrotik' => 'asus',
+                'nest wifi' => 'pixel',
+                'razer' => 'fantech',
+                'steelseries' => 'fantech',
+                'bose' => 'logitech',
+                'jbl' => 'logitech',
+                'sennheiser' => 'logitech',
+                'marshall' => 'logitech',
+                'dji' => 'huawei',
+                'fujifilm' => 'hp',
+                'gopro' => 'hp',
+                'canon' => 'hp',
+                'roborock' => 'xiaomi',
+                'philips' => 'xiaomi',
+                'bardi' => 'xiaomi',
+                'ecobee' => 'xiaomi',
+            ];
 
              foreach ($produk as $item) {
+                 $colors = $this->randomColors();
+                 $colorLabels = $this->randomColorLabels(count($colors));
+                 $images = $this->randomImages($item['gambar']);
+                 $specs = $this->randomSpecs();
 
-                $colors = $this->randomColors();
-                $colorLabels = $this->randomColorLabels(count($colors));
-                $images = $this->randomImages($item['gambar']);
-                $specs = $this->randomSpecs();
+                 // 🔥 ambil berdasarkan nama
+                 $deskripsiDetail = $detailMap[$item['nama']] ?? 'Deskripsi produk belum tersedia.';
 
-                // 🔥 ambil berdasarkan nama
-                $deskripsiDetail = $detailMap[$item['nama']] ?? 'Deskripsi produk belum tersedia.';
+                 $brandId = null;
+                 $lowercaseName = strtolower($item['nama']);
 
-                // INSERT PRODUK
-                $produkId = DB::table('produk')->insertGetId([
-                    ...$item,
-                    'slug' => Str::slug($item['nama']),
-                    'deskripsi_detail' => $deskripsiDetail, // 🔥 INI DIA
-                    'colors' => json_encode($colors),
-                    'color_labels' => json_encode($colorLabels),
-                    'images' => json_encode($images),
-                    // 'specs' => json_encode($specs),
-                    'reviews' => 0,
-                    'dibuat_pada' => now(),
-                    'diperbarui_pada' => now(),
-                ]);
+                 // 1. Direct match with registered brands
+                 foreach ($brandMap as $brandName => $id) {
+                     if (str_contains($lowercaseName, $brandName)) {
+                         $brandId = $id;
+                         break;
+                     }
+                 }
 
-                // INSERT KE TABEL RELASI
-                foreach ($specs as $spec) {
-                    DB::table('spesifikasi_produk')->insert([
-                        'produk_id' => $produkId,
-                        'atribut' => $spec['attribute'],
-                        'detail' => $spec['detail'],
-                    ]);
-                }
-            }
+                 // 2. Fallback using custom mapping rules if not matched directly
+                 if (!$brandId) {
+                     foreach ($mappingRules as $keyword => $targetBrandName) {
+                         if (str_contains($lowercaseName, $keyword)) {
+                             $brandId = $brandMap[$targetBrandName] ?? null;
+                             if ($brandId) {
+                                 break;
+                             }
+                         }
+                     }
+                 }
+
+                 // INSERT PRODUK
+                 $produkId = DB::table('produk')->insertGetId([
+                     'kategori_id' => $item['kategori_id'],
+                     'brand_id' => $brandId,
+                     'nama' => $item['nama'],
+                     'slug' => Str::slug($item['nama']),
+                     'deskripsi' => $item['deskripsi'],
+                     'deskripsi_detail' => $deskripsiDetail,
+                     'harga' => $item['harga'],
+                     'stok' => $item['stok'],
+                     'rating' => $item['rating'],
+                     'adalah_promo' => $item['adalah_promo'],
+                     'gambar' => $item['gambar'],
+                     'colors' => json_encode($colors),
+                     'color_labels' => json_encode($colorLabels),
+                     'images' => json_encode($images),
+                     'reviews' => 0,
+                     'dibuat_pada' => $item['dibuat_pada'] ?? now(),
+                     'diperbarui_pada' => $item['diperbarui_pada'] ?? now(),
+                 ]);
+
+                 // INSERT KE TABEL RELASI
+                 foreach ($specs as $spec) {
+                     DB::table('spesifikasi_produk')->insert([
+                         'produk_id' => $produkId,
+                         'atribut' => $spec['attribute'],
+                         'detail' => $spec['detail'],
+                     ]);
+                 }
+             }
 
             $this->command->info('✅ Seeder berhasil! Data produk lengkap + relasi masuk.');
         }

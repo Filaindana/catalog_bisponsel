@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
 export default function BrandSection() {
+  const navigate = useNavigate();
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +45,7 @@ export default function BrandSection() {
         {brands.map((brand) => (
           <div
             key={brand.id}
+            onClick={() => navigate(`/product?brand=${encodeURIComponent(brand.nama)}`)}
             className="flex flex-col items-center justify-center transition-all duration-300 cursor-pointer opacity-90 hover:opacity-100 hover:scale-110 active:scale-95"
             title={brand.nama}
           >

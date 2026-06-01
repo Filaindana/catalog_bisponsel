@@ -289,11 +289,11 @@ function AddModal({ onClose, onSave, productOptions = produkOptions }) {
   const durasi =
     form.startDate && form.endDate
       ? Math.max(
-          0,
-          Math.ceil(
-            (new Date(form.endDate) - new Date(form.startDate)) / 86400000 + 1,
-          ),
-        )
+        0,
+        Math.ceil(
+          (new Date(form.endDate) - new Date(form.startDate)) / 86400000 + 1,
+        ),
+      )
       : null;
 
   return (
@@ -631,7 +631,7 @@ export default function Promo() {
   const [editBannerFile, setEditBannerFile] = useState(null);
   const [editBannerPreview, setEditBannerPreview] = useState(null);
   const [editDragOver, setEditDragOver] = useState(false);
-  
+
   const [meta, setMeta] = useState({
     aktif_count: 0,
     segera_count: 0,
@@ -661,8 +661,8 @@ export default function Promo() {
     const relatedProducts = Array.isArray(p.products)
       ? p.products
       : Array.isArray(p.produk)
-      ? p.produk
-      : [];
+        ? p.produk
+        : [];
 
     const selected = relatedProducts.map((item) => ({
       id: item.id,
@@ -890,7 +890,7 @@ export default function Promo() {
                         <img
                           src={promo.banner_url}
                           alt={promo.name || "Banner Promo"}
-                          className="w-24 h-14 object-cover rounded-lg border block shrink-0"
+                          className="w-24 h-14 object-cover rounded-lg shrink-0"
                           onError={(e) => {
                             e.target.onerror = null;
                             e.target.src = "/fallback-brand.png";
@@ -976,16 +976,16 @@ export default function Promo() {
                 style={
                   currentPage === page
                     ? {
-                        background: NAVY,
-                        color: "#fff",
-                        borderColor: NAVY,
-                        boxShadow: `0 4px 10px rgba(7,43,80,0.25)`,
-                      }
+                      background: NAVY,
+                      color: "#fff",
+                      borderColor: NAVY,
+                      boxShadow: `0 4px 10px rgba(7,43,80,0.25)`,
+                    }
                     : {
-                        background: "#fff",
-                        color: "#6b7280",
-                        borderColor: "#e5e7eb",
-                      }
+                      background: "#fff",
+                      color: "#6b7280",
+                      borderColor: "#e5e7eb",
+                    }
                 }
               >
                 {page}
@@ -1019,7 +1019,7 @@ export default function Promo() {
         <Overlay onClose={() => setEditPromo(null)}>
           {/* <div className="overflow-hidden bg-white shadow-2xl modal-wrap rounded-2xl w-115"> */}
           <div className="bg-white shadow-2xl modal-wrap rounded-2xl w-115 max-h-[90vh] flex flex-col overflow-hidden">
-            
+
             {/* Header */}
             <div
               className="flex items-center gap-3 px-6 py-5"

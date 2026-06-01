@@ -40,31 +40,22 @@ class BrandSeeder extends Seeder
             'xiaomi'    => 'Xiaomi',
         ];
 
-        // We check the 'public' disk
-        $files = Storage::disk('public')->files('brand');
+        foreach ($displayNames as $filename => $name) {
+            $possiblePath = 'brand/' . $filename . '.png';
+            $logo = null;
 
-        if (empty($files)) {
-            // Fallback: if public disk scan is empty, scan storage path directly
-            $logoPath = storage_path('app/public/brand');
-            if (file_exists($logoPath)) {
-                $scanned = glob($logoPath . '/*.png');
-                $files = array_map(fn($f) => 'brand/' . basename($f), $scanned);
+            if (Storage::disk('public')->exists($possiblePath)) {
+                $logo = $possiblePath;
+            } else {
+                $fullPath = storage_path('app/public/' . $possiblePath);
+                if (file_exists($fullPath)) {
+                    $logo = $possiblePath;
+                }
             }
-        }
-
-        foreach ($files as $file) {
-            $filename = pathinfo($file, PATHINFO_FILENAME); // e.g. 'apple'
-            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-
-            if ($extension !== 'png') {
-                continue;
-            }
-
-            $name = $displayNames[strtolower($filename)] ?? Str::title($filename);
 
             Brand::updateOrCreate(
                 ['nama' => $name],
-                ['logo' => $file]
+                ['logo' => $logo]
             );
         }
     }

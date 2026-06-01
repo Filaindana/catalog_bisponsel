@@ -316,7 +316,8 @@ export default function Contact() {
   const profileJob = profile.jabatan || "Jabatan belum disetel";
   const profileEmail = profile.email || kontak.email || "Email belum disetel";
   const profileQuote = profile.quote || "Profil CEO belum diatur.";
-  const showProfileImage = Boolean(profile.avatar) && !profileImageError;
+  const ceoAvatarUrl = profileImageError ? null : (profile.avatar || "/storage/profil/ceo.png");
+  const showProfileImage = Boolean(ceoAvatarUrl);
 
   const contactCards = [
     {
@@ -399,17 +400,68 @@ export default function Contact() {
     <div className="min-h-screen bg-[#f4f7fb]">
 
       {/* HERO */}
-      <div className="px-5 text-center bg-white md:px-10 py-14 md:py-16" style={{ borderBottom:"1px solid #dce6f0" }}>
-        <h1 className="text-2xl md:text-[32px] font-extrabold mb-3 tracking-tight" style={{ color:"#072B50" }}>Contact us</h1>
-        <p className="text-[15px] text-gray-500 mx-auto max-w-110 leading-[1.75]">
-          Ada pertanyaan atau butuh bantuan? Kami siap membantu Anda.
-        </p>
+      <div
+        className="relative px-5 py-14 md:px-10 md:py-16 overflow-hidden text-center"
+        style={{
+          background:
+            "linear-gradient(135deg, #061e38 0%, #0a2d52 50%, #0d3666 100%)",
+          borderBottom: "1px solid #0d3666"
+        }}
+      >
+        {/* decorative blobs */}
+        <div
+          style={{
+            position: "absolute",
+            top: -80,
+            right: -80,
+            width: 320,
+            height: 320,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(96,165,250,0.12) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            bottom: -60,
+            left: "10%",
+            width: 240,
+            height: 240,
+            borderRadius: "50%",
+            background:
+              "radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "radial-gradient(rgba(255,255,255,0.045) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+            pointerEvents: "none",
+          }}
+        />
+
+        <div className="relative z-10">
+          <h1 className="text-2xl md:text-[32px] font-extrabold mb-3 tracking-tight text-white">
+            Contact Us
+          </h1>
+          <p className="text-[14px] text-blue-200/80 mx-auto max-w-110 leading-[1.75]">
+            Ada pertanyaan atau butuh bantuan? Kami siap membantu Anda.
+          </p>
+        </div>
       </div>
 
       <div className="px-4 mx-auto max-w-350 md:px-10 py-7 pb-14">
 
         {/* BAGIAN 1 — Info Kontak + CEO */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 mb-9">
+        <div className="grid grid-cols-1 lg:grid-cols-[65%_35%] gap-7 mb-9 items-stretch">
 
           {/* Informasi Kontak */}
           <div className="p-6 bg-white rounded-2xl md:p-8" style={{ border:"1px solid #dce6f0" }}>
@@ -498,39 +550,51 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* CEO Profile */}
-          <div className="relative overflow-hidden rounded-2xl min-h-80 lg:min-h-100" style={{ border:"1px solid #dce6f0" }}>
+          {/* CEO Profile Card */}
+          <div className="relative overflow-hidden rounded-2xl flex flex-col justify-end p-6 border border-[#dce6f0] h-full min-h-[340px]" style={{ boxShadow: "0 4px 20px rgba(7,43,80,.04)" }}>
+            {/* Background Image / Gradient */}
             {showProfileImage ? (
               <img
-                src={profile.avatar}
+                src={ceoAvatarUrl}
                 alt={profileName}
                 onError={() => setProfileImageError(true)}
                 className="absolute inset-0 object-cover object-top w-full h-full"
               />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg, #072B50 0%, #0f4d90 100%)" }}>
-                <div className="flex flex-col items-center gap-3 text-center px-6">
-                  <div className="flex items-center justify-center w-16 h-16 rounded-full border border-white/25 bg-white/10 text-white text-2xl font-black">
-                    {profileName.charAt(0).toUpperCase() || "B"}
+                <div className="flex flex-col items-center gap-2.5 text-center px-6">
+                  <div className="flex items-center justify-center w-14 h-14 rounded-full border border-white/20 bg-white/10 text-white text-xl font-black">
+                    {profileName.split(" ").map(n => n[0]).join("").slice(0,2).toUpperCase() || "B"}
                   </div>
-                  <div className="text-white">
-                    <p className="text-[13px] font-semibold">Foto profil belum tersedia</p>
-                    <p className="text-[11px] text-white/70 mt-1">Unggah foto melalui halaman admin</p>
-                  </div>
+                  <span className="text-[10px] font-bold text-white/50 bg-white/10 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    Foto profil belum tersedia
+                  </span>
                 </div>
               </div>
             )}
-            <div className="absolute inset-0" style={{ background:"linear-gradient(to top, #072B50 38%, transparent 100%)" }} />
-            <div className="absolute bottom-6 left-6 right-6">
-              <p className="text-[13px] italic font-light leading-[1.8] mb-3.5" style={{ color:"rgba(255,255,255,0.8)" }}>
+            
+            {/* Dark Gradient Overlay for perfect text legibility */}
+            <div className="absolute inset-0 z-10" style={{ background: "linear-gradient(to top, rgba(7, 43, 80, 0.95) 0%, rgba(7, 43, 80, 0.7) 50%, transparent 100%)" }} />
+
+            {/* Content Layer */}
+            <div className="relative z-20 flex flex-col text-left">
+              <p className="text-xs italic leading-relaxed text-white/80 mb-4 font-light">
                 &ldquo; {profileQuote} &rdquo;
               </p>
+              
               <div className="flex items-center gap-3">
-                <div className="w-0.5 h-8 rounded-full" style={{ background:"rgba(255,255,255,0.4)" }} />
-                <div>
-                  <p className="text-[14px] font-bold text-white mb-0.5">{profileName}</p>
-                  <p className="text-[11px] font-medium m-0" style={{ color:"rgba(255,255,255,0.5)" }}>{profileJob}</p>
-                  <p className="text-[11px] font-medium m-0 mt-1" style={{ color:"rgba(255,255,255,0.7)" }}>{profileEmail}</p>
+                <div className="w-0.5 h-10 rounded-full bg-white/40 shrink-0" />
+                <div className="min-w-0">
+                  <h3 className="text-[15px] font-bold text-white leading-tight truncate">
+                    {profileName}
+                  </h3>
+                  <p className="text-[10px] font-semibold uppercase tracking-[1px] text-white/60 mt-0.5">
+                    {profileJob}
+                  </p>
+                  <a href={`mailto:${profileEmail}`} className="inline-flex items-center gap-1 text-[11px] font-medium text-white/80 hover:text-white transition-all mt-1">
+                    <Mail size={11} />
+                    <span className="truncate">{profileEmail}</span>
+                  </a>
                 </div>
               </div>
             </div>

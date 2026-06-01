@@ -443,6 +443,7 @@ export default function Profile() {
         return {
           id: p.id,
           category: p.kategori?.nama || categories[p.kategori_id] || "-",
+          brand: p.brand,
           name: p.nama,
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),

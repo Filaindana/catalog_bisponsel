@@ -69,11 +69,9 @@ export default function ProductCard({
             {product.category}
           </p>
 
-          {product.brand && (
-            <p className="text-[11px] text-gray-400 mb-1">
-              Brand: {product.brand}
-            </p>
-          )}
+          <p className="text-[11px] text-gray-400 mb-1">
+            Brand: {typeof product.brand === "object" ? (product.brand?.nama || "-") : (product.brand || "-")}
+          </p>
 
           <p className="text-[16px] font-extrabold text-gray-900 mb-1 leading-tight line-clamp-2 min-h-10">
             {product.name}

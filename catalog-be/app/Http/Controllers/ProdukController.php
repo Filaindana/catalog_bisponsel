@@ -21,9 +21,26 @@ class ProdukController extends BaseController
             $query->where('kategori_id', $request->kategori_id);
         }
 
+        if ($request->filled('kategori')) {
+            $kategoriInput = $request->input('kategori');
+            $kategoriList = is_array($kategoriInput) ? $kategoriInput : explode(',', $kategoriInput);
+            $query->whereHas('kategori', fn($q) => $q->whereIn('slug', $kategoriList)->orWhereIn('nama', $kategoriList));
+        }
+
         if ($request->filled('category')) {
-            $categories = (array) $request->input('category');
-            $query->whereHas('kategori', fn($q) => $q->whereIn('nama', $categories));
+            $categoryInput = $request->input('category');
+            $categoryList = is_array($categoryInput) ? $categoryInput : explode(',', $categoryInput);
+            $query->whereHas('kategori', fn($q) => $q->whereIn('slug', $categoryList)->orWhereIn('nama', $categoryList));
+        }
+
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->brand_id);
+        }
+
+        if ($request->filled('brand')) {
+            $brandInput = $request->input('brand');
+            $brandList = is_array($brandInput) ? $brandInput : explode(',', $brandInput);
+            $query->whereHas('brand', fn($q) => $q->whereIn('nama', $brandList));
         }
 
         if ($request->filled('adalah_promo')) {
@@ -57,7 +74,16 @@ class ProdukController extends BaseController
             });
         }
 
-        $sort = $request->input('sort', 'latest');
+        $sort = $request->input('sort', $request->input('sortBy', 'latest'));
+        if (in_array($sort, ['Terbaru', 'Harga Terendah', 'Harga Tertinggi', 'Rating'])) {
+            $sort = match ($sort) {
+                'Harga Terendah'  => 'price_asc',
+                'Harga Tertinggi' => 'price_desc',
+                'Rating'          => 'rating',
+                default           => 'latest',
+            };
+        }
+
         match ($sort) {
             'price_asc'  => $query->orderBy('harga', 'asc'),
             'price_desc' => $query->orderBy('harga', 'desc'),

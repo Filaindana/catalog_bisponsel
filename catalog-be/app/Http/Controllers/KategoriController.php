@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class KategoriController
 {
@@ -32,9 +34,36 @@ class KategoriController
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
+            'gambar' => 'nullable|string',
         ]);
 
-        $kategori = Kategori::create($validated);
+        $gambarPath = null;
+        if ($request->filled('gambar')) {
+            $gambarData = $request->input('gambar');
+            if (preg_match('/^data:image\/(\w+);base64,/', $gambarData, $type)) {
+                $gambarData = substr($gambarData, strpos($gambarData, ',') + 1);
+                $type = strtolower($type[1]);
+                if (in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
+                    $gambarData = base64_decode($gambarData);
+                    if ($gambarData !== false) {
+                        $fileName = 'kategori/' . Str::slug($request->input('nama')) . '_' . time() . '.' . $type;
+                        Storage::disk('public')->put($fileName, $gambarData);
+                        $gambarPath = $fileName;
+                    }
+                }
+            } else {
+                $cleanPath = $gambarData;
+                if (str_contains($cleanPath, '/storage/')) {
+                    $cleanPath = substr($cleanPath, strpos($cleanPath, '/storage/') + 9);
+                }
+                $gambarPath = $cleanPath;
+            }
+        }
+
+        $kategori = Kategori::create([
+            'nama' => $validated['nama'],
+            'gambar' => $gambarPath,
+        ]);
 
         return response()->json([
             'status'  => true,
@@ -49,9 +78,40 @@ class KategoriController
 
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
+            'gambar' => 'nullable|string',
         ]);
 
-        $kategori->update($validated);
+        $gambarPath = $kategori->getRawOriginal('gambar');
+        if ($request->filled('gambar')) {
+            $gambarData = $request->input('gambar');
+            if (preg_match('/^data:image\/(\w+);base64,/', $gambarData, $type)) {
+                $gambarData = substr($gambarData, strpos($gambarData, ',') + 1);
+                $type = strtolower($type[1]);
+                if (in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
+                    $gambarData = base64_decode($gambarData);
+                    if ($gambarData !== false) {
+                        // Delete old image if exists
+                        if ($gambarPath) {
+                            Storage::disk('public')->delete($gambarPath);
+                        }
+                        $fileName = 'kategori/' . Str::slug($request->input('nama')) . '_' . time() . '.' . $type;
+                        Storage::disk('public')->put($fileName, $gambarData);
+                        $gambarPath = $fileName;
+                    }
+                }
+            } else {
+                $cleanPath = $gambarData;
+                if (str_contains($cleanPath, '/storage/')) {
+                    $cleanPath = substr($cleanPath, strpos($cleanPath, '/storage/') + 9);
+                }
+                $gambarPath = $cleanPath;
+            }
+        }
+
+        $kategori->update([
+            'nama' => $validated['nama'],
+            'gambar' => $gambarPath,
+        ]);
 
         return response()->json([
             'status'  => true,
@@ -63,6 +123,13 @@ class KategoriController
     public function destroy(int $id): JsonResponse
     {
         $kategori = Kategori::findOrFail($id);
+
+        // Delete image from storage if exists
+        $gambarPath = $kategori->getRawOriginal('gambar');
+        if ($gambarPath) {
+            Storage::disk('public')->delete($gambarPath);
+        }
+
         $kategori->delete();
 
         return response()->json([
@@ -71,3 +138,4 @@ class KategoriController
         ]);
     }
 }
+

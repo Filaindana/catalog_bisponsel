@@ -5,6 +5,7 @@ import { getCabangs } from "../utils/services/cabangService";
 import { getStatusBuka } from "../utils/getStatusBuka";
 import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ExternalLink } from "lucide-react";
 import { getSocialIcon } from "../utils/getSocialIcon";
+import { successAlert, errorAlert } from "../utils/swal";
 
 if (typeof document !== "undefined" && !document.querySelector("[data-font-bismar]")) {
   const s = document.createElement("style");
@@ -275,7 +276,7 @@ export default function Contact() {
     if (!form.nama.trim() || !form.email.trim() || !form.pesan.trim()) {
       const message = "Nama, email, dan pesan wajib diisi.";
       setSubmitMessage({ type: "error", message });
-      alert(message);
+      errorAlert("Validasi Gagal", message);
       return;
     }
 
@@ -286,7 +287,7 @@ export default function Contact() {
       const res = await sendKontak(form);
       const successMessage = "Pesan berhasil dikirim!";
       setSubmitMessage({ type: "success", message: successMessage });
-      alert(successMessage);
+      successAlert("Terima Kasih", successMessage);
 
       setForm({
         nama: "",
@@ -299,7 +300,7 @@ export default function Contact() {
     } catch (err) {
       const message = err?.message || "Gagal kirim pesan. Silakan coba lagi.";
       setSubmitMessage({ type: "error", message });
-      alert(message);
+      errorAlert("Gagal Mengirim", message);
       console.error(err);
     } finally {
       setIsSubmitting(false);

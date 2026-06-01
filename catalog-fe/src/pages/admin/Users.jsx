@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Search, Plus, Edit2, Trash2, MoreVertical, ChevronLeft, ChevronRight } from "lucide-react";
 import apiClient from "../../utils/services/apiClient";
+import { errorAlert, confirmAlert, toastSuccess } from "../../utils/swal";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -15,7 +16,6 @@ export default function Users() {
   // Modals
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Form
@@ -49,7 +49,7 @@ export default function Users() {
       }
     } catch (error) {
       console.error("Error fetching users:", error);
-      alert("Gagal mengambil data user");
+      errorAlert("Error", "Gagal mengambil data user");
     } finally {
       setLoading(false);
     }
@@ -87,7 +87,7 @@ export default function Users() {
       const response = await apiClient.post("/admin/users", formData);
 
       if (response.data.status) {
-        alert("User berhasil ditambahkan");
+        toastSuccess("User berhasil ditambahkan");
         setShowAddModal(false);
         resetForm();
         fetchUsers(1);
@@ -95,9 +95,9 @@ export default function Users() {
     } catch (error) {
       console.error("Error adding user:", error);
       if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        errorAlert("Gagal Menambahkan", error.response.data.message);
       } else {
-        alert("Gagal menambahkan user");
+        errorAlert("Gagal Menambahkan", "Gagal menambahkan user");
       }
     }
   };
@@ -129,7 +129,7 @@ export default function Users() {
       );
 
       if (response.data.status) {
-        alert("User berhasil diperbarui");
+        toastSuccess("User berhasil diperbarui");
         setShowEditModal(false);
         resetForm();
         fetchUsers(currentPage);
@@ -137,27 +137,36 @@ export default function Users() {
     } catch (error) {
       console.error("Error updating user:", error);
       if (error.response?.data?.message) {
-        alert(error.response.data.message);
+        errorAlert("Gagal Memperbarui", error.response.data.message);
       } else {
-        alert("Gagal memperbarui user");
+        errorAlert("Gagal Memperbarui", "Gagal memperbarui user");
       }
     }
   };
 
   // Handle delete user
-  const handleDeleteUser = async () => {
-    try {
-      const response = await apiClient.delete(`/admin/users/${selectedUser.id}`);
+  const handleDeleteUser = async (user) => {
+    const result = await confirmAlert({
+      title: "Hapus User?",
+      text: `Apakah Anda yakin ingin menghapus user ${user.nama}? Tindakan ini tidak dapat dibatalkan.`,
+      confirmText: "Ya, Hapus",
+      cancelText: "Batal",
+      icon: "warning",
+    });
 
-      if (response.data.status) {
-        alert("User berhasil dihapus");
-        setShowDeleteModal(false);
-        setSelectedUser(null);
-        fetchUsers(currentPage > 1 ? currentPage : 1);
+    if (result.isConfirmed) {
+      try {
+        const response = await apiClient.delete(`/admin/users/${user.id}`);
+
+        if (response.data.status) {
+          toastSuccess("User berhasil dihapus");
+          setSelectedUser(null);
+          fetchUsers(currentPage > 1 ? currentPage : 1);
+        }
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        errorAlert("Gagal Menghapus", "Gagal menghapus user");
       }
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      alert("Gagal menghapus user");
     }
   };
 
@@ -169,11 +178,12 @@ export default function Users() {
       );
 
       if (response.data.status) {
+        toastSuccess(`Status ${user.nama} berhasil diubah`);
         fetchUsers(currentPage);
       }
     } catch (error) {
       console.error("Error toggling status:", error);
-      alert("Gagal mengubah status user");
+      errorAlert("Gagal Mengubah Status", "Gagal mengubah status user");
     }
   };
 
@@ -186,11 +196,6 @@ export default function Users() {
       peran: user.peran,
     });
     setShowEditModal(true);
-  };
-
-  const openDeleteModal = (user) => {
-    setSelectedUser(user);
-    setShowDeleteModal(true);
   };
 
   const resetForm = () => {
@@ -343,7 +348,7 @@ export default function Users() {
                           <Edit2 size={16} />
                         </button>
                         <button
-                          onClick={() => openDeleteModal(user)}
+                          onClick={() => handleDeleteUser(user)}
                           className="p-1.5 text-red-600 hover:bg-red-50 rounded transition"
                           title="Delete"
                         >
@@ -554,38 +559,7 @@ export default function Users() {
         </div>
       )}
 
-      {/* Modal Delete User */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-sm w-full mx-4">
-            <div className="px-6 py-4 border-b border-slate-200">
-              <h2 className="text-lg font-bold text-slate-900">Hapus User?</h2>
-            </div>
-            <div className="px-6 py-4">
-              <p className="text-slate-600">
-                Apakah Anda yakin ingin menghapus user <strong>{selectedUser?.nama}</strong>? Tindakan ini tidak dapat dibatalkan.
-              </p>
-            </div>
-            <div className="px-6 py-4 border-t border-slate-200 flex gap-3">
-              <button
-                onClick={() => {
-                  setShowDeleteModal(false);
-                  setSelectedUser(null);
-                }}
-                className="flex-1 px-4 py-2 border border-slate-300 rounded-lg font-semibold text-slate-900 hover:bg-slate-50 transition"
-              >
-                Batal
-              </button>
-              <button
-                onClick={handleDeleteUser}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
-              >
-                Hapus
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

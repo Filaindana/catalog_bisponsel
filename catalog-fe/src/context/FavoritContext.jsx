@@ -50,6 +50,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { getFavorit, addFavorit, removeFavorit } from "../utils/services/favoritService";
+import { toastSuccess, toastError } from "../utils/swal";
 
 // Ubah default dari null ke objek aman
 const FavoritContext = createContext({
@@ -90,12 +91,15 @@ export function FavoritProvider({ children }) {
     try {
       if (isSaved) {
         await removeFavorit(productId);
+        toastSuccess("Produk dihapus dari wishlist");
       } else {
         await addFavorit(productId);
+        toastSuccess("Produk ditambahkan ke wishlist");
       }
     } catch {
       // Rollback kalau gagal
       setSavedMap((prev) => ({ ...prev, [productId]: isSaved }));
+      toastError(isSaved ? "Gagal menghapus dari wishlist" : "Gagal menambahkan ke wishlist");
     }
   }, [savedMap]);
 

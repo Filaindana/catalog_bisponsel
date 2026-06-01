@@ -885,8 +885,20 @@ export default function Promo() {
                     key={promo.id}
                     className={`row-item ${i < visiblePromos.length - 1 ? "border-b border-gray-50" : ""}`}
                   >
-                    <td className="px-5 py-4">
-                      <BannerChip color={promo.bannerColor} />
+                    <td className="px-5 py-4 shrink-0">
+                      {promo.banner_url ? (
+                        <img
+                          src={promo.banner_url}
+                          alt={promo.name || "Banner Promo"}
+                          className="w-24 h-14 object-cover rounded-lg border block shrink-0"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = "/fallback-brand.png";
+                          }}
+                        />
+                      ) : (
+                        <BannerChip color={promo.bannerColor} />
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <p

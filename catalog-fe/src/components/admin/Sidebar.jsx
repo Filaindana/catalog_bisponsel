@@ -9,6 +9,7 @@ import {
   LogOut,
   Users,
 } from "lucide-react";
+import { confirmAlert } from "../../utils/swal";
 
 const baseMenus = [
   { label: "Dashboard", icon: <LayoutDashboard size={16} />, path: "/admin" },
@@ -51,10 +52,18 @@ export default function Sidebar() {
   const user = getUser();
   const menus = user?.peran === "superadmin" ? superadminMenus : baseMenus;
   
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
+  const handleLogout = async () => {
+    const result = await confirmAlert({
+      title: "Konfirmasi Logout",
+      text: "Apakah Anda yakin ingin keluar dari Admin Panel?",
+      confirmText: "Ya, Keluar",
+      cancelText: "Batal",
+    });
+    if (result.isConfirmed) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    }
   };
 
   return (

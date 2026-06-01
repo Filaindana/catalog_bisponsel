@@ -63,6 +63,25 @@ class PromoController
         ];
     }
 
+    public function promosIndex(): JsonResponse
+    {
+        $promos = Promo::orderBy('dibuat_pada', 'desc')->get();
+        $formatted = $promos->map(function ($promo) {
+            return [
+                'id' => $promo->id,
+                'nama' => $promo->nama,
+                'deskripsi' => $promo->deskripsi,
+                'banner' => $promo->banner,
+                'banner_url' => $promo->banner_url,
+                'status' => $this->getStatus($promo),
+            ];
+        });
+        return response()->json([
+            'status' => true,
+            'data' => $formatted,
+        ]);
+    }
+
     public function index(Request $request): JsonResponse
     {
         $query = Promo::with('produk.kategori', 'produk.spesifikasi');

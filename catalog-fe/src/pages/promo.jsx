@@ -189,9 +189,9 @@ function HeroCard({ p, onClick }) {
       >
 
         {/* IMAGE */}
-        <div className="relative w-full md:w-[42%] shrink-0 overflow-hidden bg-[#f0f4f9] min-h-60 md:min-h-95">
+        <div className="relative w-full md:w-[45%] shrink-0 overflow-hidden bg-[#f0f4f9] aspect-[16/10] md:aspect-auto md:min-h-[420px]">
           <img
-            className="absolute inset-0 object-cover w-full h-full promo-img"
+            className="absolute inset-0 object-cover object-center w-full h-full promo-img"
             src={p.image}
             alt={p.title}
             onError={(e) => {
@@ -313,9 +313,9 @@ function SmallCard({ p, delay = "", onClick }) {
       >
 
         {/* IMAGE */}
-        <div className="relative h-52 overflow-hidden bg-[#f0f4f9] shrink-0">
+        <div className="relative aspect-[16/8] overflow-hidden bg-[#f0f4f9] shrink-0">
           <img
-            className="absolute inset-0 object-cover w-full h-full promo-img"
+            className="absolute inset-0 object-cover object-center w-full h-full promo-img"
             src={p.image}
             alt={p.title}
             onError={(e) => {
@@ -641,7 +641,7 @@ export default function PromoPage() {
           </div>
         )} */}
         {!loading && smalls.length > 0 && (
-          <div className="grid grid-cols-1 gap-5 mb-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {smalls.map((promo, index) => (
               <SmallCard
                 key={promo.id}

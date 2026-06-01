@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import api from "../../utils/api";
 import productService from "../../utils/services/productService";
 import { getPromos } from "../../utils/services/promoService";
+import { errorAlert, toastSuccess } from "../../utils/swal";
 import {
   Eye,
   Pencil,
@@ -10,7 +11,6 @@ import {
   X,
   Upload,
   Info,
-  DollarSign,
   Package,
   AlertTriangle,
   Check,
@@ -167,7 +167,7 @@ const defaultProductForm = {
   promo: false,
   promoRelation: [],
   warna: "",
-  colorLabel: "",
+  colorLabel: [],
   gambar: [],
   spesifikasi: [],
 };
@@ -725,11 +725,10 @@ function ProductFormModal({
                 key={label}
                 type="button"
                 onClick={() => setStep(index + 1)}
-                className={`flex-1 rounded-2xl border px-3 py-2 text-left transition-all ${
-                  step === index + 1
-                    ? "border-[#072B50] bg-[#e6eef6]"
-                    : "border-gray-200 bg-white"
-                }`}
+                className={`flex-1 rounded-2xl border px-3 py-2 text-left transition-all ${step === index + 1
+                  ? "border-[#072B50] bg-[#e6eef6]"
+                  : "border-gray-200 bg-white"
+                  }`}
               >
                 <p className={`text-[11px] font-bold ${step === index + 1 ? "text-[#072B50]" : "text-gray-500"}`}>
                   {index + 1}. {label}
@@ -808,6 +807,9 @@ function ProductFormModal({
                             String(e.target.value),
                         );
 
+                        const selectedBrand = selected;
+                        console.log("SELECTED BRAND", selectedBrand);
+
                         setForm({
                           ...form,
                           brand_id: e.target.value ? Number(e.target.value) : null,
@@ -860,7 +862,11 @@ function ProductFormModal({
                         type="checkbox"
                         checked={form.promo}
                         onChange={(e) =>
-                          setForm({ ...form, promo: e.target.checked })
+                          setForm((prev) => ({
+                            ...prev,
+                            promo: e.target.checked,
+                            promoRelation: e.target.checked ? prev.promoRelation : [],
+                          }))
                         }
                         className="w-4 h-4"
                         style={{ accentColor: NAVY }}
@@ -916,34 +922,41 @@ function ProductFormModal({
                       placeholder={
                         "Tuliskan deskripsi panjang. Gunakan paragraf, bullet, dan enter untuk struktur yang baik."
                       }
-                      className={`${inputCls} min-h-[220px] resize-vertical`}
+                      className={`${inputCls} min-h-55 resize-vertical`}
                     />
                   </Field>
 
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="Warna Produk">
-                      <CustomSelect
-                        value={form.warna}
-                        onChange={(e) =>
-                          setForm({ ...form, warna: e.target.value })
-                        }
-                        options={warnaOptions}
-                        placeholder="Pilih warna..."
-                      />
-                    </Field>
-                    <Field label="Label Warna">
-                      <input
-                        value={form.colorLabel}
-                        onChange={(e) =>
-                          setForm({ ...form, colorLabel: e.target.value })
-                        }
-                        placeholder="Contoh: Midnight Black"
-                        className={inputCls}
-                      />
+                      <div className="flex flex-wrap gap-2">
+                        {warnaOptions.map((w) => {
+                          const selected = (form.colorLabel || []).includes(w);
+                          return (
+                            <button
+                              key={w}
+                              type="button"
+                              onClick={() => {
+                                setForm((prev) => {
+                                  const list = Array.isArray(prev.colorLabel) ? prev.colorLabel.slice() : [];
+                                  if (list.includes(w)) {
+                                    return { ...prev, colorLabel: list.filter((c) => c !== w) };
+                                  }
+                                  list.push(w);
+                                  return { ...prev, colorLabel: list };
+                                });
+                              }}
+                              className={`px-3 py-2 rounded-full border ${selected ? "bg-[#072B50] text-white" : "bg-white text-gray-700"}`}
+                            >
+                              {w}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className={hintCls}>Opsional — pilih satu atau lebih label warna.</p>
                     </Field>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 min-h-[220px]">
+                <div className="p-4 border border-gray-100 rounded-2xl bg-gray-50 min-h-55">
                   <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3">
                     Preview Deskripsi
                   </p>
@@ -1039,9 +1052,8 @@ function ProductFormModal({
                         className="bg-gray-50 rounded-xl flex items-center gap-3 p-3.5 border border-gray-100"
                       >
                         <div
-                          className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                            file.progress === 100 ? "bg-green-50" : "bg-gray-100"
-                          }`}
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${file.progress === 100 ? "bg-green-50" : "bg-gray-100"
+                            }`}
                         >
                           {file.preview ? (
                             <img
@@ -1065,9 +1077,8 @@ function ProductFormModal({
                               {file.name}
                             </p>
                             <span
-                              className={`text-[12px] font-bold shrink-0 ${
-                                file.progress === 100 ? "text-emerald-600" : ""
-                              }`}
+                              className={`text-[12px] font-bold shrink-0 ${file.progress === 100 ? "text-emerald-600" : ""
+                                }`}
                               style={file.progress !== 100 ? { color: NAVY } : {}}
                             >
                               {file.progress === 100
@@ -1077,9 +1088,8 @@ function ProductFormModal({
                           </div>
                           <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className={`h-full rounded-full transition-all duration-500 ${
-                                file.progress === 100 ? "bg-emerald-500" : ""
-                              }`}
+                              className={`h-full rounded-full transition-all duration-500 ${file.progress === 100 ? "bg-emerald-500" : ""
+                                }`}
                               style={{
                                 width: `${file.progress}%`,
                                 background:
@@ -1314,21 +1324,47 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
     reader.readAsDataURL(file);
   };
 
-  const addBrand = () => {
+  const addBrand = async () => {
     if (!inputBrand.trim()) return;
-    setBrands([...brands, { nama: inputBrand.trim(), logo: logoPreview || null }]);
-    setInputBrand("");
-    setLogoPreview(null);
-    setLogoFile(null);
+    try {
+      const res = await api("/brand", {
+        method: "POST",
+        body: JSON.stringify({
+          nama: inputBrand.trim(),
+          logo: logoPreview || null
+        })
+      });
+      console.log("BRANDS API POST RESPONSE", res);
+      const newBrand = res.data;
+      setBrands([...brands, newBrand]);
+      setInputBrand("");
+      setLogoPreview(null);
+      setLogoFile(null);
+      toastSuccess("Brand berhasil ditambahkan");
+    } catch (err) {
+      console.error("Error creating brand:", err);
+      errorAlert("Gagal Menyimpan Brand", err.message || "Gagal menyimpan brand.");
+    }
   };
 
-  const addKategori = () => {
+  const addKategori = async () => {
     if (!inputKategori.trim()) return;
-    setKategoris([
-      ...kategoris,
-      { id: Date.now(), nama: inputKategori.trim() },
-    ]);
-    setInputKategori("");
+    try {
+      const res = await api("/kategori", {
+        method: "POST",
+        body: JSON.stringify({
+          nama: inputKategori.trim()
+        })
+      });
+      console.log("KATEGORI API POST RESPONSE", res);
+      const newKategori = res.data;
+      setKategoris([...kategoris, newKategori]);
+      setInputKategori("");
+      toastSuccess("Kategori berhasil ditambahkan");
+    } catch (err) {
+      console.error("Error creating kategori:", err);
+      errorAlert("Gagal Menyimpan Kategori", err.message || "Gagal menyimpan kategori.");
+    }
   };
 
   return (
@@ -1665,17 +1701,22 @@ export default function Produk() {
         const [kategoriRes, brandRes] = await Promise.allSettled([
           api("/kategori"),
           api("/brand"),
+          api("/brands"),
         ]);
 
         if (kategoriRes.status === "fulfilled") {
-          const items = kategoriRes.value?.data || [];
+          const resData = kategoriRes.value;
+          const items = Array.isArray(resData) ? resData : (resData?.data?.data || resData?.data || []);
           setKategoriOptions(
             items.map((item) => ({ id: item.id, nama: item.nama })),
           );
         }
 
         if (brandRes.status === "fulfilled") {
-          const items = brandRes.value?.data || [];
+          const resData = brandRes.value;
+          const items = Array.isArray(resData) ? resData : (resData?.data?.data || resData?.data || []);
+          const brands = items;
+          console.log("BRANDS API", brands);
           setBrandOptions(items.map((item) => ({ id: item.id, nama: item.nama })));
         }
       } catch (error) {
@@ -1703,11 +1744,18 @@ export default function Produk() {
         stok: Number(data.stock),
         rating: Number(data.rating) || 0,
         adalah_promo: Boolean(data.promoRelation?.length || data.promo),
-        promo_ids: data.promoRelation || [],
         gambar: data.gambar || [],
         spesifikasi: data.spesifikasi || [],
+        colors: Array.isArray(data.colors)
+          ? data.colors
+          : data.warna
+            ? [data.warna]
+            : [],
+        color_labels: data.colorLabel || [],
       };
 
+      const payload = productData;
+      console.log("PRODUCT PAYLOAD", payload);
       console.log("[Produk admin] update payload", productData);
       await productService.updateProduct(slug, productData);
 
@@ -1792,11 +1840,18 @@ export default function Produk() {
         stok: Number(formData.stock),
         rating: Number(formData.rating) || 0,
         adalah_promo: Boolean(formData.promoRelation?.length || formData.promo),
-        promo_ids: formData.promoRelation || [],
         gambar: [],
         spesifikasi: formData.spesifikasi || [],
+        colors: Array.isArray(formData.colors)
+          ? formData.colors
+          : formData.warna
+            ? [formData.warna]
+            : [],
+        color_labels: formData.colorLabel || [],
       };
 
+      const payload = productData;
+      console.log("PRODUCT PAYLOAD", payload);
       console.log("[Produk admin] create payload", productData);
 
       if (formData.imageFiles?.length) {
@@ -1811,9 +1866,9 @@ export default function Produk() {
         const uploadResponse = await productService.uploadProductImages(formPayload);
         const uploadedImages = Array.isArray(uploadResponse.data)
           ? uploadResponse.data.map((item) => ({
-              path: item.path,
-              url: item.url,
-            }))
+            path: item.path,
+            url: item.url,
+          }))
           : [];
 
         productData.gambar = uploadedImages.map((item) => item.url);
@@ -2012,10 +2067,10 @@ export default function Produk() {
                           ? `/images/${product.fullData.images[0]}`
                           : product.fullData?.gambar?.length
                             ? (
-                                product.fullData.gambar[0].url_gambar.startsWith("http")
-                                  ? product.fullData.gambar[0].url_gambar
-                                  : `/images/${product.fullData.gambar[0].url_gambar}`
-                              )
+                              product.fullData.gambar[0].url_gambar.startsWith("http")
+                                ? product.fullData.gambar[0].url_gambar
+                                : `/images/${product.fullData.gambar[0].url_gambar}`
+                            )
                             : "/fallback.jpg"
                       }
                       color={chipColors[product.id % chipColors.length]}
@@ -2107,16 +2162,16 @@ export default function Produk() {
                 style={
                   currentPage === page
                     ? {
-                        background: NAVY,
-                        color: "#fff",
-                        borderColor: NAVY,
-                        boxShadow: `0 4px 10px rgba(7,43,80,0.25)`,
-                      }
+                      background: NAVY,
+                      color: "#fff",
+                      borderColor: NAVY,
+                      boxShadow: `0 4px 10px rgba(7,43,80,0.25)`,
+                    }
                     : {
-                        background: "#fff",
-                        color: "#6b7280",
-                        borderColor: "#e5e7eb",
-                      }
+                      background: "#fff",
+                      color: "#6b7280",
+                      borderColor: "#e5e7eb",
+                    }
                 }
               >
                 {page}
@@ -2168,7 +2223,8 @@ export default function Produk() {
             slug: editProduct.slug,
             category: editProduct.category,
             kategori_id: editProduct.fullData?.kategori?.id || 1,
-            brand: editProduct.fullData?.brand || "",
+            brand_id: editProduct.fullData?.brand?.id ?? null,
+            brand: editProduct.fullData?.brand?.nama || "",
             description: editProduct.fullData?.deskripsi || "",
             deskripsi: editProduct.fullData?.deskripsi || "",
             deskripsi_detail: editProduct.fullData?.deskripsi_detail || "",
@@ -2177,8 +2233,9 @@ export default function Produk() {
             rating: editProduct.fullData?.rating || 0,
             promo: editProduct.promo,
             promoRelation: editProduct.fullData?.promo?.map((promo) => promo.id) || [],
-            warna: editProduct.fullData?.warna || "",
-            colorLabel: editProduct.fullData?.colorLabel || "",
+            colors: editProduct.fullData?.colors || (editProduct.fullData?.warna ? [editProduct.fullData.warna] : []),
+            warna: Array.isArray(editProduct.fullData?.colors) ? (editProduct.fullData.colors[0] ?? "") : (editProduct.fullData?.warna || ""),
+            colorLabel: editProduct.fullData?.color_labels || [],
             gambar: editProduct.fullData?.gambar?.map((g) => g.url_gambar) || [],
             spesifikasi:
               editProduct.fullData?.spesifikasi?.map((s) => ({

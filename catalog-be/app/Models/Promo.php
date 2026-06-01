@@ -22,6 +22,21 @@ class Promo extends Model
         'status',
     ];
 
+    protected $appends = [
+        'banner_url',
+    ];
+
+    public function getBannerUrlAttribute()
+    {
+        if ($this->banner) {
+            if (\Illuminate\Support\Str::startsWith($this->banner, ['http://', 'https://', '/'])) {
+                return $this->banner;
+            }
+            return asset('storage/' . $this->banner);
+        }
+        return '/fallback-promo.png';
+    }
+
     protected $casts = [
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',

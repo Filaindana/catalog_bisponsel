@@ -36,6 +36,7 @@ const normalizePromo = (item = {}) => ({
   endDate: item.tanggal_selesai,
   status: item.status,
   banner: item.banner,
+  banner_url: item.banner_url || (item.banner ? `/storage/${item.banner}` : "/fallback-promo.png"),
   bannerColor: getBannerColor(item.status),
   produk: (item.produk || []).map((p) => ({
     id: p.id,
@@ -294,6 +295,18 @@ export const getPublicPromoDetail = async (id) => {
     return normalizePromo(res?.data?.data);
   } catch (err) {
     console.error("Error getPublicPromoDetail:", err);
+    throw err;
+  }
+};
+
+/* ================= GET HOME PROMOS LIST ================= */
+
+export const getPromosList = async () => {
+  try {
+    const res = await api("/promos");
+    return Array.isArray(res) ? res : (res?.data || []);
+  } catch (err) {
+    console.error("Error getPromosList:", err);
     throw err;
   }
 };

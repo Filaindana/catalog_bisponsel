@@ -50,7 +50,9 @@ Route::prefix('auth')->group(function () {
 // Route::apiResource('produk', ProdukController::class)->only(['index', 'show']);
 Route::apiResource('kategori', KategoriController::class)->only(['index', 'show']);
 Route::apiResource('promo', PromoController::class)->only(['index', 'show']);
+Route::get('/promos', [PromoController::class, 'promosIndex']);
 Route::get('/brand', [BrandController::class, 'index']);
+Route::get('/brands', [BrandController::class, 'brandsIndex']);
 Route::get('/brand/{id}', [BrandController::class, 'show']);
 
 // Relasi tambahan

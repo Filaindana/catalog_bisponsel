@@ -97,10 +97,18 @@ class ProdukController extends BaseController
 
     private function resolveBrandId(Request $request): ?int
     {
-        if ($request->filled('brand_id')) {
-            $brandId = (int) $request->input('brand_id');
+        Log::info('resolveBrandId request details', [
+            'brand_id_input' => $request->input('brand_id'),
+            'brand_input' => $request->input('brand'),
+            'brand_id_filled' => $request->filled('brand_id'),
+            'brand_filled' => $request->filled('brand'),
+        ]);
 
-            if (Brand::whereKey($brandId)->exists()) {
+        if ($request->has('brand_id') && !is_null($request->input('brand_id')) && $request->input('brand_id') !== '') {
+            $brandId = (int) $request->input('brand_id');
+            $exists = Brand::where('id', $brandId)->exists();
+            Log::info('brand_id existence check', ['brandId' => $brandId, 'exists' => $exists]);
+            if ($exists) {
                 return $brandId;
             }
         }
@@ -110,7 +118,7 @@ class ProdukController extends BaseController
 
             if ($brandName !== '') {
                 $brand = Brand::firstOrCreate(['nama' => $brandName]);
-
+                Log::info('brand resolved by name', ['brandName' => $brandName, 'id' => $brand->id]);
                 return $brand->id;
             }
         }
@@ -120,6 +128,7 @@ class ProdukController extends BaseController
 
     public function store(Request $request): JsonResponse
     {
+        Log::info('Create Product Payload', $request->all());
         Log::info('Produk store payload', ['payload' => $request->all()]);
 
         $validated = $request->validate([
@@ -136,6 +145,10 @@ class ProdukController extends BaseController
             'adalah_promo'          => 'boolean',
             'promo_ids'             => 'nullable|array',
             'promo_ids.*'           => 'integer|exists:promo,id',
+            'colors'                => 'nullable|array',
+            'colors.*'              => 'string',
+            'color_labels'          => 'nullable|array',
+            'color_labels.*'        => 'string',
             'gambar'                => 'nullable|array',
             'gambar.*'              => 'nullable|string',
             'spesifikasi'           => 'nullable|array',
@@ -178,6 +191,9 @@ class ProdukController extends BaseController
 
             if (array_key_exists('promo_ids', $validated)) {
                 $produk->promo()->sync($validated['promo_ids'] ?? []);
+            } elseif (array_key_exists('adalah_promo', $validated) && !$validated['adalah_promo']) {
+                // jika admin menandai produk bukan promo, hapus relasi promo
+                $produk->promo()->sync([]);
             }
 
             DB::commit();
@@ -207,6 +223,7 @@ class ProdukController extends BaseController
     {
         $produk = Produk::where('slug', $slug)->firstOrFail();
 
+        Log::info('Update Product Payload', $request->all());
         Log::info('Produk update payload', ['slug' => $slug, 'payload' => $request->all()]);
 
         $validated = $request->validate([
@@ -223,6 +240,10 @@ class ProdukController extends BaseController
             'adalah_promo'          => 'sometimes|boolean',
             'promo_ids'             => 'nullable|array',
             'promo_ids.*'           => 'integer|exists:promo,id',
+            'colors'                => 'nullable|array',
+            'colors.*'              => 'string',
+            'color_labels'          => 'nullable|array',
+            'color_labels.*'        => 'string',
             'gambar'                => 'nullable|array',
             'gambar.*'              => 'nullable|string',
             'spesifikasi'           => 'nullable|array',

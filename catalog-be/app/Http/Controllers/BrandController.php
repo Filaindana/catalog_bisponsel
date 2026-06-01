@@ -16,6 +16,13 @@ class BrandController
         ]);
     }
 
+    public function brandsIndex(): JsonResponse
+    {
+        $brands = Brand::orderBy('nama')->get();
+        \Illuminate\Support\Facades\Log::info('GET /api/brands response', ['data' => $brands->toArray()]);
+        return response()->json($brands);
+    }
+
     public function show(int $id): JsonResponse
     {
         $brand = Brand::findOrFail($id);
@@ -28,11 +35,39 @@ class BrandController
 
     public function store(Request $request): JsonResponse
     {
+        \Illuminate\Support\Facades\Log::info('Create Brand Payload', $request->all());
         $validated = $request->validate([
             'nama' => 'required|string|max:255|unique:brands,nama',
+            'logo' => 'nullable|string',
         ]);
 
-        $brand = Brand::create($validated);
+        $logoPath = null;
+        if ($request->filled('logo')) {
+            $logoData = $request->input('logo');
+            if (preg_match('/^data:image\/(\w+);base64,/', $logoData, $type)) {
+                $logoData = substr($logoData, strpos($logoData, ',') + 1);
+                $type = strtolower($type[1]);
+                if (in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
+                    $logoData = base64_decode($logoData);
+                    if ($logoData !== false) {
+                        $fileName = 'brand/' . \Illuminate\Support\Str::slug($request->input('nama')) . '_' . time() . '.' . $type;
+                        \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $logoData);
+                        $logoPath = $fileName;
+                    }
+                }
+            } else {
+                $cleanPath = $logoData;
+                if (str_contains($cleanPath, '/storage/')) {
+                    $cleanPath = substr($cleanPath, strpos($cleanPath, '/storage/') + 9);
+                }
+                $logoPath = $cleanPath;
+            }
+        }
+
+        $brand = Brand::create([
+            'nama' => $validated['nama'],
+            'logo' => $logoPath,
+        ]);
 
         return response()->json([
             'status'  => true,
@@ -47,9 +82,40 @@ class BrandController
 
         $validated = $request->validate([
             'nama' => 'required|string|max:255|unique:brands,nama,' . $brand->id,
+            'logo' => 'nullable|string',
         ]);
 
-        $brand->update($validated);
+        $logoPath = $brand->getRawOriginal('logo');
+        if ($request->filled('logo')) {
+            $logoData = $request->input('logo');
+            if (preg_match('/^data:image\/(\w+);base64,/', $logoData, $type)) {
+                $logoData = substr($logoData, strpos($logoData, ',') + 1);
+                $type = strtolower($type[1]);
+                if (in_array($type, ['jpg', 'jpeg', 'gif', 'png', 'webp'])) {
+                    $logoData = base64_decode($logoData);
+                    if ($logoData !== false) {
+                        // Delete old logo if exists
+                        if ($logoPath) {
+                            \Illuminate\Support\Facades\Storage::disk('public')->delete($logoPath);
+                        }
+                        $fileName = 'brand/' . \Illuminate\Support\Str::slug($request->input('nama')) . '_' . time() . '.' . $type;
+                        \Illuminate\Support\Facades\Storage::disk('public')->put($fileName, $logoData);
+                        $logoPath = $fileName;
+                    }
+                }
+            } else {
+                $cleanPath = $logoData;
+                if (str_contains($cleanPath, '/storage/')) {
+                    $cleanPath = substr($cleanPath, strpos($cleanPath, '/storage/') + 9);
+                }
+                $logoPath = $cleanPath;
+            }
+        }
+
+        $brand->update([
+            'nama' => $validated['nama'],
+            'logo' => $logoPath,
+        ]);
 
         return response()->json([
             'status'  => true,

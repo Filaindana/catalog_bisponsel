@@ -2,6 +2,7 @@ import logo from "../assets/logo.png";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiUser, FiMenu, FiX, FiLogOut, FiChevronRight } from "react-icons/fi";
 import { useState } from "react";
+import { confirmAlert } from "../utils/swal";
 
 const navLinks = [
   { to: "/", label: "Home", end: true },
@@ -22,11 +23,19 @@ export default function Navbar() {
 
   const user = getUser();
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setMobileOpen(false);
-    navigate("/login");
+  const handleLogout = async () => {
+    const result = await confirmAlert({
+      title: "Konfirmasi Logout",
+      text: "Apakah Anda yakin ingin keluar?",
+      confirmText: "Ya, Keluar",
+      cancelText: "Batal",
+    });
+    if (result.isConfirmed) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setMobileOpen(false);
+      navigate("/login");
+    }
   };
 
   const closeMobile = () => setMobileOpen(false);

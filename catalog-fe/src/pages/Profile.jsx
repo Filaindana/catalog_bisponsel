@@ -4,6 +4,7 @@ import { changePassword, getProfile, updateProfile } from "../utils/services/pro
 import { getFavorit, removeFavorit } from "../utils/services/favoritService";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import ProductCard from "../components/ProductCard";
+import { successAlert, errorAlert, confirmAlert, toastSuccess } from "../utils/swal";
 
 const NAVY = "#072B50";
 
@@ -405,9 +406,10 @@ export default function Profile() {
       // sync ke localStorage agar navbar ikut update
       const stored = JSON.parse(localStorage.getItem("user") || "{}");
       localStorage.setItem("user", JSON.stringify({ ...stored, [field]: value }));
+      toastSuccess(`${field === "nama" ? "Nama" : "Email"} berhasil diperbarui`);
     } catch (err) {
       console.error(err);
-      alert(err.message || "Gagal menyimpan perubahan");
+      errorAlert("Gagal Menyimpan", err.message || "Gagal menyimpan perubahan");
     }
   };
 
@@ -492,7 +494,19 @@ export default function Profile() {
           </div>
           {tab === "userdata" && (
             <button
-              onClick={() => { localStorage.removeItem("token"); navigate("/login"); }}
+              onClick={async () => {
+                const result = await confirmAlert({
+                  title: "Konfirmasi Logout",
+                  text: "Apakah Anda yakin ingin keluar dari sesi ini?",
+                  confirmText: "Ya, Keluar",
+                  cancelText: "Batal",
+                });
+                if (result.isConfirmed) {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("user");
+                  navigate("/login");
+                }
+              }}
               className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[13px] font-bold border-0 cursor-pointer transition-colors">
               <IconLogout /> Logout
             </button>

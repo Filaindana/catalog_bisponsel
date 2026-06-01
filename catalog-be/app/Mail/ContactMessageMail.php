@@ -26,9 +26,9 @@ class ContactMessageMail extends Mailable
         return new Envelope(
             from: new Address(
                 config('mail.from.address') ?? 'hello@example.com',
-                config('mail.from.name') ?? config('app.name', 'BizPonsel'),
+                'BizPonsel',
             ),
-            subject: 'Pesan Baru dari Halaman Kontak - ' . config('app.name'),
+            subject: '📩 Kontak Baru Masuk | BizPonsel',
             replyTo: [new Address($this->contact->email, $this->contact->nama)],
         );
     }

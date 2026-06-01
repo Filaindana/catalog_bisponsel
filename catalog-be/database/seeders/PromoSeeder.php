@@ -56,7 +56,7 @@ class PromoSeeder extends Seeder
                 'tanggal_mulai' => $start,
                 'tanggal_selesai' => $end,
                 'status' => $status,
-                'banner' => 'https://i0.wp.com/pemmztechie.id/wp-content/uploads/2022/05/Desain-Banner-Web-Pemmztechie-Promo-MEI_.jpg?ssl=1' . $i . '/1200/600',
+                'banner' => 'promo/banner' . (($i % 6) + 1) . '.jpeg',
                 'dibuat_pada' => $start->copy()->subDays(rand(5, 15)),
                 'diperbarui_pada' => $start,
             ];

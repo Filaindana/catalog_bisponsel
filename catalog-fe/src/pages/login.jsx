@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import heroBg from "../assets/hero1.jpg";
 import logo from "../assets/logo.png";
 import { login } from "../utils/services/authService";
+import { toastSuccess } from "../utils/swal";
 
 const inputStyle = {
   width: "100%",
@@ -63,6 +64,8 @@ export default function Login() {
 
       localStorage.setItem("token", res.token);
       localStorage.setItem("user", JSON.stringify(res.user));
+
+      toastSuccess("Login Berhasil!");
 
       // Redirect berdasarkan role
       const redirectPath = (res.user?.peran === "admin" || res.user?.peran === "superadmin") ? "/admin" : "/";

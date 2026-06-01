@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
             [
                 'nama' => 'Superadmin',
                 'email' => 'superadmin@bizponsel.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('SuperadminBizPonsel123!'),
                 'peran' => 'superadmin',
                 'is_active' => true,
                 'dibuat_pada' => now(),
@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
             [
                 'nama' => 'Admin',
                 'email' => 'admin@bizponsel.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('AdminBizPonsel123!'),
                 'peran' => 'admin',
                 'is_active' => true,
                 'dibuat_pada' => now(),
@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
             [
                 'nama' => 'User',
                 'email' => 'user@bizponsel.com',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('UserBizPonsel123!'),
                 'peran' => 'user',
                 'is_active' => true,
                 'dibuat_pada' => now(),
@@ -44,6 +44,6 @@ class UserSeeder extends Seeder
 
         DB::table('users')->insert($users);
 
-        $this->command->info('✅ Default users created: superadmin/admin/user (password: password)');
+        $this->command->info('✅ Default users created: superadmin/admin/user (password: SuperadminBizPonsel123!, AdminBizPonsel123!, UserBizPonsel123!)');
     }
 }

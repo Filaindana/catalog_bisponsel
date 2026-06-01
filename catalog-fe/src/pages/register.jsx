@@ -5,6 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import heroBg from "../assets/hero1.jpg";
 import logo from "../assets/logo.png";
 import { register } from "../utils/services/authService";
+import { successAlert, errorAlert } from "../utils/swal";
 
 const inputStyle = {
   width: "100%",
@@ -48,7 +49,7 @@ export default function Register() {
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
-      return alert("Password tidak sama");
+      return errorAlert("Validasi Gagal", "Password dan konfirmasi password tidak sama");
     }
 
     try {
@@ -61,10 +62,10 @@ export default function Register() {
         peran: "user",
       });
 
-      alert("Register berhasil!");
+      await successAlert("Registrasi Berhasil!", "Akun Anda telah berhasil dibuat. Silakan login.");
       navigate("/login");
     } catch (err) {
-      alert(err.message);
+      errorAlert("Registrasi Gagal", err.message);
     }
   };
 

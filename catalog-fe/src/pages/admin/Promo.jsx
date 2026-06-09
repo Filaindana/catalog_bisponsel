@@ -6,6 +6,8 @@ import {
   deletePromo,
 } from "../../utils/services/promoService";
 import productService from "../../utils/services/productService";
+import { errorAlert, toastSuccess } from "../../utils/swal";
+import { getImageUrl } from "../../utils/imageHelper";
 import {
   Eye,
   Pencil,
@@ -95,7 +97,7 @@ const fmt = (date) => {
   });
 };
 
-const getImageUrl = (path) => (path ? `/storage/${path}` : null);
+
 
 const inputCls =
   "input-field w-full px-3.5 py-3 rounded-xl border border-gray-200 text-[13.5px] outline-none text-gray-800 bg-gray-50 transition-all";
@@ -578,7 +580,7 @@ function AddModal({ onClose, onSave, productOptions = produkOptions }) {
           </button>
           <button
             onClick={async () => {
-              await onSave({
+              const success = await onSave({
                 name: form.name,
                 desc: form.desc,
                 startDate: form.startDate,
@@ -589,7 +591,9 @@ function AddModal({ onClose, onSave, productOptions = produkOptions }) {
                   .map((produk) => produk?.id)
                   .filter((id) => id !== undefined && id !== null),
               });
-              onClose();
+              if (success) {
+                onClose();
+              }
             }}
             className="px-5 py-2.5 rounded-xl border-none text-white cursor-pointer text-[13.5px] font-bold transition-all hover:opacity-90"
             style={{
@@ -676,39 +680,60 @@ export default function Promo() {
   };
 
   const handleSaveEdit = async () => {
-    const payload = {
-      ...editForm,
-      produk_terkait: editSelectedProduk
-        .map((produk) => produk?.id)
-        .filter((id) => id !== undefined && id !== null),
-      banner: editBannerFile || null,
-    };
+    try {
+      const payload = {
+        ...editForm,
+        produk_terkait: editSelectedProduk
+          .map((produk) => produk?.id)
+          .filter((id) => id !== undefined && id !== null),
+        banner: editBannerFile || null,
+      };
 
-    console.log("handleSaveEdit payload:", payload);
-    console.log("editSelectedProduk:", editSelectedProduk);
+      console.log("handleSaveEdit payload:", payload);
+      console.log("editSelectedProduk:", editSelectedProduk);
 
-    const updated = await updatePromo(editPromo.id, payload);
+      const updated = await updatePromo(editPromo.id, payload);
 
-    setPromos((prev) =>
-      prev.map((p) => (editPromo && p.id === editPromo.id ? updated : p)),
-    );
+      setPromos((prev) =>
+        prev.map((p) => (editPromo && p.id === editPromo.id ? updated : p)),
+      );
 
-    setEditPromo(null);
-    setEditSelectedProduk([]);
-    setEditProdukSearch("");
-    setEditBannerFile(null);
-    setEditBannerPreview(null);
+      setEditPromo(null);
+      setEditSelectedProduk([]);
+      setEditProdukSearch("");
+      setEditBannerFile(null);
+      setEditBannerPreview(null);
+
+      toastSuccess("Promo berhasil diperbarui");
+    } catch (err) {
+      console.error("Error saving edit promo:", err);
+      errorAlert("Gagal Menyimpan", err.message || "Terjadi kesalahan saat menyimpan perubahan promo.");
+    }
   };
 
   const handleDelete = async () => {
-    await deletePromo(deleteId);
-    setPromos((prev) => prev.filter((p) => p.id !== deleteId));
-    setDeleteId(null);
+    try {
+      await deletePromo(deleteId);
+      setPromos((prev) => prev.filter((p) => p.id !== deleteId));
+      setDeleteId(null);
+      toastSuccess("Promo berhasil dihapus");
+    } catch (err) {
+      console.error("Error deleting promo:", err);
+      errorAlert("Gagal Menghapus", err.message || "Terjadi kesalahan saat menghapus promo.");
+    }
   };
 
   const handleAddSave = async (data) => {
-    const newPromo = await createPromo(data);
-    setPromos((prev) => [newPromo, ...prev]);
+    try {
+      const newPromo = await createPromo(data);
+      setPromos((prev) => [newPromo, ...prev]);
+      toastSuccess("Promo berhasil ditambahkan");
+      return true;
+    } catch (err) {
+      console.error("Error creating promo:", err);
+      errorAlert("Gagal Menyimpan", err.message || "Terjadi kesalahan saat menyimpan promo baru.");
+      return false;
+    }
   };
 
   const STAT_CARDS = [
@@ -778,9 +803,7 @@ export default function Promo() {
   useEffect(() => {
     if (editPromo) {
       setEditBannerPreview(
-        editPromo.banner && typeof editPromo.banner === "string"
-          ? getImageUrl(editPromo.banner)
-          : null,
+        getImageUrl(editPromo.banner_url || editPromo.banner) || null
       );
       setEditBannerFile(null);
     } else {
@@ -886,9 +909,9 @@ export default function Promo() {
                     className={`row-item ${i < visiblePromos.length - 1 ? "border-b border-gray-50" : ""}`}
                   >
                     <td className="px-5 py-4 shrink-0">
-                      {promo.banner_url ? (
+                      {promo.banner_url || promo.banner ? (
                         <img
-                          src={promo.banner_url}
+                          src={getImageUrl(promo.banner_url || promo.banner)}
                           alt={promo.name || "Banner Promo"}
                           className="w-24 h-14 object-cover rounded-lg shrink-0"
                           onError={(e) => {

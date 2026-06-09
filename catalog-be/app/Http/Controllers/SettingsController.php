@@ -116,7 +116,8 @@ class SettingsController extends Controller
         $profile = is_array($settings->profile ?? null) ? $settings->profile : [];
 
         if (! empty($profile['avatar_path']) && Storage::disk('public')->exists($profile['avatar_path'])) {
-            $profile['avatar'] = Storage::url($profile['avatar_path']);
+            $url = Storage::url($profile['avatar_path']);
+            $profile['avatar'] = \Illuminate\Support\Str::startsWith($url, 'http') ? $url : asset($url);
         }
 
         unset($profile['avatar_path']);

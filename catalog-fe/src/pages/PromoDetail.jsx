@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getPromoById } from "../utils/services/promoService";
+import { getImageUrl } from "../utils/imageHelper";
 
 const formatRange = (startStr, endStr) => {
   const start = new Date(startStr);
@@ -27,8 +28,7 @@ const formatRange = (startStr, endStr) => {
   return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${startYear}`;
 };
 
-const getImageUrl = (path) =>
-  path ? `https://api.bizponsel.com/storage/${path}` : "/fallback.jpg";
+
 
 export default function PromoDetail() {
   const { id } = useParams();
@@ -90,7 +90,7 @@ export default function PromoDetail() {
             <div className="space-y-6">
               <div className="overflow-hidden bg-white shadow-sm rounded-3xl">
                 <img
-                  src={getImageUrl(promo.banner)}
+                  src={getImageUrl(promo.banner_url || promo.banner) || "/fallback.jpg"}
                   alt={promo.name}
                   className="object-cover w-full"
                   style={{ height: 360 }}

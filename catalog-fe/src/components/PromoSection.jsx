@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getPromosList as getPromos } from "../utils/services/promoService";
+import { getImageUrl } from "../utils/imageHelper";
 
 const INTERVAL = 3000;
 
@@ -76,7 +77,7 @@ export default function PromoSection() {
         <div className="relative flex flex-col h-full min-h-[220px] lg:min-h-0">
           <div className="w-full flex-1 relative overflow-hidden rounded-2xl aspect-[16/11] lg:aspect-auto">
             <img
-              src={banners[activeSlide]?.banner_url}
+              src={getImageUrl(banners[activeSlide]?.banner_url || banners[activeSlide]?.banner)}
               alt={banners[activeSlide]?.nama}
               className="w-full h-full object-cover object-center rounded-2xl lg:absolute lg:inset-0"
               style={{ transition: "opacity 0.4s ease" }}
@@ -126,7 +127,7 @@ export default function PromoSection() {
               }}
             >
               <img
-                src={banner.banner_url}
+                src={getImageUrl(banner.banner_url || banner.banner)}
                 alt={banner.nama}
                 className="w-full object-cover object-center aspect-[16/11] block group-hover:scale-105 transition-transform duration-300"
                 onError={(e) => {

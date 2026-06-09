@@ -23,7 +23,7 @@ const api = async (endpoint, options = {}) => {
   try {
     data = await res.json();
   } catch (err) {
-    console.log(err);    
+    console.log(err);
     throw new Error("Response bukan JSON / kosong");
   }
 

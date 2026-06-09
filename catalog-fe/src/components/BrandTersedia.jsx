@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { getImageUrl } from "../utils/imageHelper";
 
 export default function BrandSection() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function BrandSection() {
             title={brand.nama}
           >
             <img
-              src={brand.logo}
+              src={getImageUrl(brand.logo || brand.logo_path)}
               alt={brand.nama}
               onError={(e) => {
                 e.target.onerror = null;

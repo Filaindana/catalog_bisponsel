@@ -201,6 +201,10 @@ class ProdukController extends BaseController
             $produk = Produk::create($produkData);
 
             if (!empty($validated['gambar'])) {
+                $produk->gambar = $validated['gambar'][0] ?? null;
+                $produk->images = $validated['gambar'];
+                $produk->save();
+
                 foreach ($validated['gambar'] as $url) {
                     $produk->gambar()->create(['url_gambar' => $url]);
                 }
@@ -301,6 +305,10 @@ class ProdukController extends BaseController
             $produk->update($produkData);
 
             if (isset($validated['gambar'])) {
+                $produk->gambar = $validated['gambar'][0] ?? null;
+                $produk->images = $validated['gambar'];
+                $produk->save();
+
                 $produk->gambar()->delete();
                 foreach ($validated['gambar'] as $url) {
                     $produk->gambar()->create(['url_gambar' => $url]);

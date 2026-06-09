@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPublicPromos } from "../utils/services/promoService";
+import { getImageUrl } from "../utils/imageHelper";
 
 /* ── Minimal style: hanya animasi & keyframes ── */
 if (typeof document !== "undefined" && !document.querySelector("[data-promo-style]")) {
@@ -435,9 +436,7 @@ export default function PromoPage() {
           title: promo.name,
           desc: promo.desc,
 
-          image: promo.banner
-            ? `https://api.bizponsel.com/storage/${promo.banner}`
-            : "/fallback.jpg",
+          image: getImageUrl(promo.banner_url || promo.banner) || "/fallback.jpg",
 
           status: promo.status,
           startDate: promo.startDate,

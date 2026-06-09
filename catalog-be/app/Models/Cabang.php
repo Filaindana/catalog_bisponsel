@@ -38,7 +38,17 @@ class Cabang extends Model
             return null;
         }
 
-        return asset('storage/' . $this->foto);
+        $val = preg_replace('/https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i', '', $this->foto);
+        $val = ltrim($val, '/');
+        if (\Illuminate\Support\Str::startsWith($val, 'storage/')) {
+            $val = substr($val, 8);
+        }
+
+        if (\Illuminate\Support\Str::startsWith($val, ['http://', 'https://'])) {
+            return $val;
+        }
+
+        return asset('storage/' . $val);
     }
 
 

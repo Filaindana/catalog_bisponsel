@@ -8,6 +8,7 @@ import "swiper/css";
 
 import ProductCard from "../components/ProductCard";
 import { getProdukBySlug, getProdukTerkait } from "../utils/services/produkService";
+import { getImageUrl } from "../utils/imageHelper";
 
 /* ── Style inject ── */
 if (typeof document !== "undefined" && !document.querySelector("[data-detail-style]")) {
@@ -136,26 +137,6 @@ export default function DetailProduct() {
   // const { id } = useParams();
   // console.log("Product ID:", id);
   const { slug } = useParams();
-  
-  const getImageUrl = (path) => {
-    if (!path) return "/fallback.jpg";
-
-    // kalau object gambar
-    if (typeof path === "object") {
-      path = path.path;
-    }
-
-    // safety lagi
-    if (typeof path !== "string") {
-      return "/fallback.jpg";
-    }
-
-    if (path.startsWith("http")) {
-      return path;
-    }
-
-    return `/images/${path}`;
-  };
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
@@ -191,14 +172,8 @@ export default function DetailProduct() {
           //   ? data.images.map(getImageUrl)
           //   : [getImageUrl(data.gambar)],
           images: data.gambar?.length
-          ? data.gambar.map((img) => {
-              if (img.url_gambar.startsWith("http")) {
-                return img.url_gambar;
-              }
-
-              return `/images/${img.url_gambar}`;
-            })
-          : ["/fallback.jpg"],
+            ? data.gambar.map((img) => getImageUrl(img.url_gambar))
+            : ["/fallback.jpg"],
 
           colors: data.colors || [],
           colorLabels: data.color_labels || [],
@@ -233,10 +208,11 @@ export default function DetailProduct() {
             brand: p.brand?.nama || "-",
             price: fmt(p.harga),
             rating: p.rating || 4.5,
-            // image: getImageUrl(p.gambar),
             image: p.images?.length
-            ? getImageUrl(p.images[0])
-            : "/fallback.jpg",
+              ? getImageUrl(p.images[0])
+              : p.gambar?.length
+                ? getImageUrl(p.gambar[0].url_gambar)
+                : "/fallback.jpg",
           })));
         }
       } catch (err) {

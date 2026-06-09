@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import ProductCard from "./ProductCard.jsx";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import api from "../utils/api.js";
+import { getImageUrl } from "../utils/imageHelper.js";
 
 const CARD_W = 240; // 220px card + 20px gap
 const AUTO_MS = 3000;
@@ -79,8 +80,10 @@ export default function NewProduct() {
 
           image:
             Array.isArray(p.images) && p.images.length > 0
-              ? `https://api.bizponsel.com/storage/${p.images[0]}`
-              : "/fallback.jpg",
+              ? getImageUrl(p.images[0])
+              : Array.isArray(p.gambar) && p.gambar.length > 0
+                ? getImageUrl(p.gambar[0].url_gambar)
+                : "/fallback.jpg",
 
           badge: "New",
         })));

@@ -6,6 +6,7 @@ import productService from "../utils/services/productService.js";
 import kategoriService from "../utils/services/kategoriService.js";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import api from "../utils/api.js";
+import { getImageUrl } from "../utils/imageHelper.js";
 
 const discounts = ["Diskon"];
 
@@ -593,9 +594,9 @@ export default function Product() {
                   rating: product.rating || 0,
                   image:
                     Array.isArray(product.images) && product.images.length > 0
-                      ? `https://api.bizponsel.com/storage/${product.images[0]}`
+                      ? getImageUrl(product.images[0])
                       : Array.isArray(product.gambar) && product.gambar.length > 0
-                        ? product.gambar[0].url_gambar
+                        ? getImageUrl(product.gambar[0].url_gambar)
                         : "/fallback.jpg",
                   badge: product.adalah_promo ? "Sale" : undefined,
                 }}

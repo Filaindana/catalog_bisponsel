@@ -35,10 +35,17 @@ class Kategori extends Model
     public function getGambarUrlAttribute()
     {
         if ($this->gambar) {
-            if (\Illuminate\Support\Str::startsWith($this->gambar, ['http://', 'https://', '/'])) {
-                return $this->gambar;
+            $val = preg_replace('/https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i', '', $this->gambar);
+            $val = ltrim($val, '/');
+            if (\Illuminate\Support\Str::startsWith($val, 'storage/')) {
+                $val = substr($val, 8);
             }
-            return asset('storage/' . ltrim($this->gambar, '/'));
+
+            if (\Illuminate\Support\Str::startsWith($val, ['http://', 'https://'])) {
+                return $val;
+            }
+
+            return asset('storage/' . $val);
         }
         return '/fallback-category.jpg';
     }

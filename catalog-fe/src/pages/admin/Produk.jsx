@@ -3,6 +3,7 @@ import api from "../../utils/api";
 import productService from "../../utils/services/productService";
 import { getPromos } from "../../utils/services/promoService";
 import { errorAlert, toastSuccess, confirmAlert } from "../../utils/swal";
+import { getImageUrl } from "../../utils/imageHelper";
 import {
   Eye,
   Pencil,
@@ -45,24 +46,25 @@ if (
 
 const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
-const BASE_IMAGE_URL = "https://api.bizponsel.com/storage/";
 
 const formatPrice = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
 
 const resolveImageUrl = (gambar) => {
   if (!gambar) return "/fallback.jpg";
-  if (typeof gambar === "string") return gambar;
+  if (typeof gambar === "string") return getImageUrl(gambar);
 
   if (Array.isArray(gambar) && gambar.length > 0) {
     const first = gambar[0];
     if (!first) return "/fallback.jpg";
-    if (typeof first === "string") return first;
-    if (first.path) return `${BASE_IMAGE_URL}${first.path}`;
-    if (first.url) return first.url;
+    if (typeof first === "string") return getImageUrl(first);
+    if (first.path) return getImageUrl(first.path);
+    if (first.url) return getImageUrl(first.url);
+    if (first.url_gambar) return getImageUrl(first.url_gambar);
   }
 
-  if (gambar.path) return `${BASE_IMAGE_URL}${gambar.path}`;
-  if (gambar.url) return gambar.url;
+  if (gambar.path) return getImageUrl(gambar.path);
+  if (gambar.url) return getImageUrl(gambar.url);
+  if (gambar.url_gambar) return getImageUrl(gambar.url_gambar);
   return "/fallback.jpg";
 };
 
@@ -1986,6 +1988,7 @@ export default function Produk() {
       const productData = {
         kategori_id: data.kategori_id ?? null,
         brand_id: data.brand_id ?? null,
+        brand: data.brand || "",
         nama: data.name,
         slug: data.slug || undefined,
         deskripsi: data.deskripsi || "",
@@ -2003,6 +2006,24 @@ export default function Produk() {
             : [],
         color_labels: data.colorLabel || [],
       };
+
+      if (data.imageFiles?.length) {
+        const formPayload = new FormData();
+        data.imageFiles.forEach((item) => {
+          const fileObject = item?.file || item;
+          if (fileObject instanceof File) {
+            formPayload.append("images[]", fileObject);
+          }
+        });
+
+        if (formPayload.has("images[]")) {
+          const uploadResponse = await productService.uploadProductImages(formPayload);
+          const uploadedImages = Array.isArray(uploadResponse.data)
+            ? uploadResponse.data.map((item) => item.url)
+            : [];
+          productData.gambar = [...productData.gambar, ...uploadedImages];
+        }
+      }
 
       const payload = productData;
       console.log("PRODUCT PAYLOAD", payload);
@@ -2082,6 +2103,7 @@ export default function Produk() {
       const productData = {
         kategori_id: formData.kategori_id ?? null,
         brand_id: formData.brand_id ?? null,
+        brand: formData.brand || "",
         nama: formData.name,
         slug: undefined,
         deskripsi: formData.description,
@@ -2168,19 +2190,6 @@ export default function Produk() {
     },
   ];
 
-  const getImageUrl = (product) => {
-    // ambil gambar pertama dari relasi gambar
-    const firstImage = product?.gambar?.[0]?.url_gambar;
-
-    if (!firstImage) return "/fallback.jpg";
-
-    // kalau sudah full url
-    if (firstImage.startsWith("http")) {
-      return firstImage;
-    }
-
-    return `/images/${firstImage}`;
-  };
 
   return (
     <div className="produk-admin">
@@ -2312,17 +2321,7 @@ export default function Produk() {
                 >
                   <td className="px-5 py-4">
                     <ProductChip
-                      image={
-                        product.fullData?.images?.length
-                          ? `/images/${product.fullData.images[0]}`
-                          : product.fullData?.gambar?.length
-                            ? (
-                              product.fullData.gambar[0].url_gambar.startsWith("http")
-                                ? product.fullData.gambar[0].url_gambar
-                                : `/images/${product.fullData.gambar[0].url_gambar}`
-                            )
-                            : "/fallback.jpg"
-                      }
+                      image={product.imageUrl}
                       color={chipColors[product.id % chipColors.length]}
                     />
                   </td>

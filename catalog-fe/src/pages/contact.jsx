@@ -6,6 +6,7 @@ import { getStatusBuka } from "../utils/getStatusBuka";
 import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ExternalLink } from "lucide-react";
 import { getSocialIcon } from "../utils/getSocialIcon";
 import { successAlert, errorAlert } from "../utils/swal";
+import { getImageUrl } from "../utils/imageHelper";
 
 if (typeof document !== "undefined" && !document.querySelector("[data-font-bismar]")) {
   const s = document.createElement("style");
@@ -316,7 +317,7 @@ export default function Contact() {
   const profileJob = profile.jabatan || "Jabatan belum disetel";
   const profileEmail = profile.email || kontak.email || "Email belum disetel";
   const profileQuote = profile.quote || "Profil CEO belum diatur.";
-  const ceoAvatarUrl = profileImageError ? null : (profile.avatar || "/storage/profil/ceo.png");
+  const ceoAvatarUrl = profileImageError ? null : getImageUrl(profile.avatar || "/storage/profil/ceo.png");
   const showProfileImage = Boolean(ceoAvatarUrl);
 
   const contactCards = [

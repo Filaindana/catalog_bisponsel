@@ -29,10 +29,17 @@ class Promo extends Model
     public function getBannerUrlAttribute()
     {
         if ($this->banner) {
-            if (\Illuminate\Support\Str::startsWith($this->banner, ['http://', 'https://', '/'])) {
-                return $this->banner;
+            $val = preg_replace('/https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i', '', $this->banner);
+            $val = ltrim($val, '/');
+            if (\Illuminate\Support\Str::startsWith($val, 'storage/')) {
+                $val = substr($val, 8);
             }
-            return asset('storage/' . $this->banner);
+
+            if (\Illuminate\Support\Str::startsWith($val, ['http://', 'https://'])) {
+                return $val;
+            }
+
+            return asset('storage/' . $val);
         }
         return '/fallback-promo.png';
     }

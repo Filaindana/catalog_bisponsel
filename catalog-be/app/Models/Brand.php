@@ -16,11 +16,18 @@ class Brand extends Model
     public function getLogoAttribute($value)
     {
         if ($value) {
-            if (\Illuminate\Support\Str::startsWith($value, ['http://', 'https://', '/'])) {
+            $value = preg_replace('/https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i', '', $value);
+            $value = ltrim($value, '/');
+            if (\Illuminate\Support\Str::startsWith($value, 'storage/')) {
+                $value = substr($value, 8);
+            }
+
+            if (\Illuminate\Support\Str::startsWith($value, ['http://', 'https://'])) {
                 return $value;
             }
+
             $url = \Illuminate\Support\Facades\Storage::url($value);
-            return '/' . ltrim(parse_url($url, PHP_URL_PATH), '/');
+            return \Illuminate\Support\Str::startsWith($url, 'http') ? $url : asset($url);
         }
         return '/fallback-brand.png';
     }

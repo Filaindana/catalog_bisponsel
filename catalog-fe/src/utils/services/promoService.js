@@ -1,4 +1,5 @@
 import api from "../api";
+import { getImageUrl } from "../imageHelper";
 
 /* ================= HELPERS ================= */
 
@@ -18,9 +19,6 @@ const getBannerColor = (status) => {
   }
 };
 
-const getImageUrl = (path) =>
-  path ? `/storage/${path}` : "/fallback.jpg";
-
 const normalizeMeta = (meta = {}) => ({
   aktif_count: Number(meta.aktif_count ?? 0),
   segera_count: Number(meta.segera_count ?? 0),
@@ -36,7 +34,7 @@ const normalizePromo = (item = {}) => ({
   endDate: item.tanggal_selesai,
   status: item.status,
   banner: item.banner,
-  banner_url: item.banner_url || (item.banner ? `/storage/${item.banner}` : "/fallback-promo.png"),
+  banner_url: getImageUrl(item.banner_url || item.banner) || "/fallback-promo.png",
   bannerColor: getBannerColor(item.status),
   produk: (item.produk || []).map((p) => ({
     id: p.id,
@@ -126,9 +124,7 @@ export const getActivePromoProducts = async () => {
           rating: p.rating || 4.5,
           stock: p.stok,
 
-          image: p.gambar
-            ? `/storage/${p.gambar}`
-            : "/fallback.jpg",
+          image: getImageUrl(p.gambar) || "/fallback.jpg",
 
           discount: 15,
         }));
@@ -172,6 +168,10 @@ export const createPromo = async (payload) => {
     formData.append("deskripsi", payload.desc || "");
     formData.append("tanggal_mulai", payload.startDate || "");
     formData.append("tanggal_selesai", payload.endDate || "");
+
+    if (payload.status) {
+      formData.append("status", payload.status);
+    }
 
     if (payload.banner instanceof File) {
       formData.append("banner", payload.banner);
@@ -219,6 +219,10 @@ export const updatePromo = async (id, payload) => {
     }
     if (payload.endDate) {
       formData.append("tanggal_selesai", payload.endDate);
+    }
+
+    if (payload.status) {
+      formData.append("status", payload.status);
     }
 
     if (payload.banner instanceof File) {

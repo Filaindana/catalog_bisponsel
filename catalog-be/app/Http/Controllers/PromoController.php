@@ -16,15 +16,15 @@ class PromoController
         $mulai = $promo->tanggal_mulai ? Carbon::parse($promo->tanggal_mulai) : null;
         $selesai = $promo->tanggal_selesai ? Carbon::parse($promo->tanggal_selesai) : null;
 
-        if ($mulai && $mulai->isFuture()) {
-            return 'segera';
-        }
-
         if ($selesai && $selesai->isPast()) {
             return 'berakhir';
         }
 
-        return 'aktif';
+        if ($mulai && $mulai->isFuture()) {
+            return 'segera';
+        }
+
+        return $promo->status ?? 'aktif';
     }
 
     private function formatPromo(Promo $promo): array
@@ -39,6 +39,7 @@ class PromoController
             'tanggal_selesai' => optional($promo->tanggal_selesai)->format('Y-m-d'),
             'status' => $this->getStatus($promo),
             'banner' => $promo->banner,
+            'banner_url' => $promo->banner_url,
             'produk' => $promo->produk->map(function ($produk) {
                 return [
                     'id' => $produk->id,
@@ -136,6 +137,7 @@ class PromoController
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
             'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'status' => 'nullable|string|in:aktif,segera,berakhir',
             'produk_terkait' => 'nullable|array',
             'produk_terkait.*' => 'integer|exists:produk,id',
             'produk_ids' => 'nullable|array',
@@ -174,6 +176,7 @@ class PromoController
             'tanggal_mulai' => 'sometimes|date',
             'tanggal_selesai' => 'sometimes|date',
             'banner' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'status' => 'sometimes|string|in:aktif,segera,berakhir',
             'produk_terkait' => 'nullable|array',
             'produk_terkait.*' => 'integer|exists:produk,id',
             'produk_ids' => 'nullable|array',

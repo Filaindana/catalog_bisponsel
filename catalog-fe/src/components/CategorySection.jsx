@@ -4,12 +4,13 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import kategoriService from "../utils/services/kategoriService";
+import { getImageUrl } from "../utils/imageHelper";
 
 import "swiper/css";
 import "swiper/css/free-mode";
 
 function CategoryItem({ item, onClick }) {
-  const imageUrl = item.gambar_url || "/fallback-category.jpg";
+  const imageUrl = getImageUrl(item.gambar_url || item.gambar) || "/fallback-category.jpg";
 
   return (
     <div

@@ -5,6 +5,7 @@ import { getFavorit, removeFavorit } from "../utils/services/favoritService";
 import { useFavorit } from "../context/FavoritContext.jsx";
 import ProductCard from "../components/ProductCard";
 import { successAlert, errorAlert, confirmAlert, toastSuccess } from "../utils/swal";
+import { getImageUrl } from "../utils/imageHelper";
 
 const NAVY = "#072B50";
 
@@ -448,7 +449,7 @@ export default function Profile() {
           spec: p.deskripsi || "-",
           price: formatPrice(p.harga),
           rating: p.rating || 0,
-          image: p.gambar ? `/images/${p.gambar}` : "/fallback.jpg",
+          image: getImageUrl(p.gambar) || "/fallback.jpg",
           badge: p.adalah_promo ? "Sale" : undefined,
         };
       })

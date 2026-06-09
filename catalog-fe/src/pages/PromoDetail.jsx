@@ -28,7 +28,7 @@ const formatRange = (startStr, endStr) => {
 };
 
 const getImageUrl = (path) =>
-  path ? `http://127.0.0.1:8000/storage/${path}` : "/fallback.jpg";
+  path ? `https://api.bizponsel.com/storage/${path}` : "/fallback.jpg";
 
 export default function PromoDetail() {
   const { id } = useParams();

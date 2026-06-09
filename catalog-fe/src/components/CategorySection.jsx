@@ -18,8 +18,11 @@ function CategoryItem({ item, onClick }) {
     >
       <div
         className="w-20 h-20 sm:w-22.5 sm:h-22.5 md:w-25 md:h-25
+
         rounded-full bg-gray-100 flex items-center justify-center overflow-hidden
+
         border-2 border-transparent hover:border-[#072B50] hover:scale-105
+
         transition-all duration-200 shadow-md"
       >
         <img
@@ -27,11 +30,13 @@ function CategoryItem({ item, onClick }) {
           alt={item.nama}
           onError={(e) => {
             e.target.onerror = null;
+
             e.target.src = "/fallback-category.jpg";
           }}
-          className="w-full h-full object-cover"
+          className="object-cover w-full h-full"
         />
       </div>
+
       <span className="text-[12px] sm:text-[13px] md:text-[14px] font-semibold text-center text-gray-700 leading-tight">
         {item.nama}
       </span>
@@ -76,7 +81,7 @@ export default function CategorySection() {
           Product Category
         </h2>
         <div className="relative px-4 mx-auto max-w-350 sm:px-6 md:px-18">
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-4">
+          <div className="grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-7">
             {Array.from({ length: 7 }).map((_, idx) => (
               <div key={idx} className="flex flex-col items-center gap-3 py-3">
                 <div className="w-20 h-20 sm:w-22.5 sm:h-22.5 md:w-25 md:h-25 rounded-full bg-gray-200" />
@@ -95,7 +100,7 @@ export default function CategorySection() {
         <h2 className="mb-6 text-center section-title md:mb-9">
           Product Category
         </h2>
-        <div className="flex flex-col items-center justify-center gap-3 py-6 px-4 max-w-md mx-auto text-center">
+        <div className="flex flex-col items-center justify-center max-w-md gap-3 px-4 py-6 mx-auto text-center">
           <p className="text-[14px] text-red-500 font-medium m-0">{error}</p>
           <button
             onClick={loadCategories}
@@ -115,7 +120,7 @@ export default function CategorySection() {
         <h2 className="mb-6 text-center section-title md:mb-9">
           Product Category
         </h2>
-        <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+        <div className="flex flex-col items-center justify-center px-4 py-10 text-center">
           <p className="text-[14px] text-gray-400 font-semibold m-0">
             Belum ada kategori tersedia.
           </p>
@@ -131,7 +136,6 @@ export default function CategorySection() {
       </h2>
 
       <div className="relative px-4 mx-auto max-w-350 sm:px-6 md:px-18">
-
         {/* LEFT BUTTON */}
         <button
           onClick={() => swiperRef.current?.slidePrev()}
@@ -154,7 +158,9 @@ export default function CategorySection() {
 
         <Swiper
           modules={[Mousewheel, FreeMode, Autoplay]}
-          onSwiper={(s) => { swiperRef.current = s; }}
+          onSwiper={(s) => {
+            swiperRef.current = s;
+          }}
           loop={false}
           autoplay={{ delay: 2500, disableOnInteraction: false }}
           mousewheel={{ forceToAxis: true }}
@@ -162,8 +168,8 @@ export default function CategorySection() {
           spaceBetween={10}
           slidesPerView={3}
           breakpoints={{
-            480:  { slidesPerView: 4, spaceBetween: 10 },
-            640:  { slidesPerView: 5, spaceBetween: 12 },
+            480: { slidesPerView: 4, spaceBetween: 10 },
+            640: { slidesPerView: 5, spaceBetween: 12 },
             1024: { slidesPerView: 7, spaceBetween: 16 },
           }}
         >
@@ -180,4 +186,3 @@ export default function CategorySection() {
     </section>
   );
 }
-

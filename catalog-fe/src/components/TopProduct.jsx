@@ -88,7 +88,7 @@ export default function TopProduct() {
 
           image:
             Array.isArray(p.images) && p.images.length > 0
-              ? `http://127.0.0.1:8000/storage/${p.images[0]}`
+              ? `https://api.bizponsel.com/storage/${p.images[0]}`
               : "/fallback.jpg",
 
           badge: p.adalah_promo ? "Sale" : undefined,

@@ -45,7 +45,7 @@ if (
 
 const ITEMS_PER_PAGE = 5;
 const NAVY = "#072B50";
-const BASE_IMAGE_URL = "http://127.0.0.1:8000/storage/";
+const BASE_IMAGE_URL = "https://api.bizponsel.com/storage/";
 
 const formatPrice = (p) => "Rp " + p.toLocaleString("id-ID").replace(/,/g, ".");
 
@@ -1727,7 +1727,7 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                   /* Preview Gambar */
                   <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl bg-gray-50">
                     <div
-                      className="flex items-center justify-center w-16 h-16 border border-gray-200 rounded-xl shrink-0 overflow-hidden bg-white"
+                      className="flex items-center justify-center w-16 h-16 overflow-hidden bg-white border border-gray-200 rounded-xl shrink-0"
                       style={{ background: "repeating-conic-gradient(#e5e7eb 0% 25%, white 0% 50%) 0 0 / 10px 10px" }}
                     >
                       <img src={kategoriPreview} alt="preview" className="object-cover w-full h-full" onError={(e) => { e.target.src = "/fallback-category.jpg"; }} />
@@ -1791,7 +1791,7 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                       <div key={id} className="flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-[#dce6f0] bg-[#f0f4f9] hover:bg-[#e4ecf5] transition-all">
                         <div className="flex items-center gap-3">
                           <div
-                            className="flex items-center justify-center w-9 h-9 border border-gray-200 rounded-full shrink-0 overflow-hidden bg-white shadow-sm animate-fade-in"
+                            className="flex items-center justify-center overflow-hidden bg-white border border-gray-200 rounded-full shadow-sm w-9 h-9 shrink-0 animate-fade-in"
                           >
                             <img src={imgUrl} alt={nama} onError={(e) => { e.target.src = "/fallback-category.jpg"; }} className="object-cover w-full h-full" />
                           </div>
@@ -1803,14 +1803,14 @@ function AddBrandKategoriModal({ onClose, brands, setBrands, kategoris, setKateg
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => startEditKategori(k)}
-                            className="flex items-center justify-center w-7 h-7 text-indigo-600 transition-colors border-none rounded-md cursor-pointer bg-indigo-50 hover:bg-indigo-100"
+                            className="flex items-center justify-center text-indigo-600 transition-colors border-none rounded-md cursor-pointer w-7 h-7 bg-indigo-50 hover:bg-indigo-100"
                             title="Edit Kategori"
                           >
                             <Pencil size={11} />
                           </button>
                           <button
                             onClick={() => deleteKategori(id, nama, produkCount)}
-                            className="flex items-center justify-center w-7 h-7 text-red-500 transition-colors border-none rounded-md cursor-pointer bg-red-50 hover:bg-red-100"
+                            className="flex items-center justify-center text-red-500 transition-colors border-none rounded-md cursor-pointer w-7 h-7 bg-red-50 hover:bg-red-100"
                             title="Hapus Kategori"
                           >
                             <Trash2 size={11} />

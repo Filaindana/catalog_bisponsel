@@ -593,7 +593,7 @@ export default function Product() {
                   rating: product.rating || 0,
                   image:
                     Array.isArray(product.images) && product.images.length > 0
-                      ? `http://127.0.0.1:8000/storage/${product.images[0]}`
+                      ? `https://api.bizponsel.com/storage/${product.images[0]}`
                       : Array.isArray(product.gambar) && product.gambar.length > 0
                         ? product.gambar[0].url_gambar
                         : "/fallback.jpg",

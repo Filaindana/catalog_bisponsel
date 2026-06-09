@@ -436,7 +436,7 @@ export default function PromoPage() {
           desc: promo.desc,
 
           image: promo.banner
-            ? `http://127.0.0.1:8000/storage/${promo.banner}`
+            ? `https://api.bizponsel.com/storage/${promo.banner}`
             : "/fallback.jpg",
 
           status: promo.status,
@@ -641,7 +641,7 @@ export default function PromoPage() {
           </div>
         )} */}
         {!loading && smalls.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+          <div className="grid grid-cols-1 gap-6 mb-10 md:grid-cols-2 lg:grid-cols-3">
             {smalls.map((promo, index) => (
               <SmallCard
                 key={promo.id}
